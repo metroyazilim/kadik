@@ -1,0 +1,572 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  AUTHOR
+}
+
+model AdminUser {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  role         AdminRole  @default(ADMIN)
+  avatarAssetId String?
+  tokenVersion Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  audits       AuditLog[]
+}
+
+/// Single-use, short-lived password reset grant. Only the SHA-256 hash of
+/// the emailed token is stored, so a database read never yields a usable
+/// reset link. `usedAt` makes redemption idempotent-safe (a replayed link
+/// is rejected rather than silently resetting the password twice).
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model SiteContentTr {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteContentEn {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model AuditLog {
+  id        String     @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String?
+  userId    String?
+  metadata  Json?
+  createdAt DateTime   @default(now())
+  user      AdminUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
+}
+
+
+/// Contact form submissions. Not localised content - user input, tagged with
+/// the locale the visitor submitted from. `status` replaces the earlier
+/// plain `read` boolean (Story 6.3): UNREAD is the only default-entry
+/// state, the other five are admin-driven transitions guarded by
+/// `version` (optimistic concurrency, mirrors ContentTranslation.version).
+/// Removal is soft-only - ARCHIVED - there is no hard delete path.
+enum MessageStatus {
+  UNREAD
+  READ
+  REPLIED
+  PROCESSED
+  ARCHIVED
+  SPAM
+}
+
+model Message {
+  id      String        @id @default(cuid())
+  locale  String
+  name    String
+  email   String
+  phone   String?
+  subject String?
+  message String
+  status  MessageStatus @default(UNREAD)
+  version Int           @default(0)
+  /// sha256 of the normalized submission fields plus a 10-minute time
+  /// bucket (lib/content-model/message-idempotency.ts). Unique so a
+  /// retried/double-submitted identical payload within the same bucket
+  /// cannot create a second row - the create() call catches the P2002
+  /// violation and treats it as an idempotent success instead of a new
+  /// message.
+  submissionHash String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status, createdAt])
+}
+
+/// Fixed-window PostgreSQL rate limiter (Story 6.3 CAP-3). One row per
+/// (scope, bucketKey, windowStart); `count` increments via an atomic
+/// upsert (Postgres `ON CONFLICT ... DO UPDATE`, race-safe without an
+/// application-level lock). `bucketKey` is always a hash of the
+/// identifying value (e.g. visitor IP) - never the raw value - so this
+/// table never carries PII at rest.
+model ContactRateLimit {
+  id          String   @id @default(cuid())
+  scope       String
+  bucketKey   String
+  windowStart DateTime
+  count       Int      @default(1)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([scope, bucketKey, windowStart])
+  @@index([windowStart])
+}
+
+// ---- Shared content model foundation (Story 0.2) ----
+// Generic entity/translation/revision/pointer shape every future managed
+// content type (Service, Post, Product, Project, Team, FAQ, Home section,
+// site settings) reuses in its own vertical-slice story. Additive only:
+// none of the legacy locale tables above are altered by this migration.
+
+enum ContentLocale {
+  tr
+  en
+}
+
+model ContentEntity {
+  id          String   @id @default(cuid())
+  contentType String
+  archived    Boolean  @default(false)
+  order       Int      @default(0)
+  version     Int      @default(0)
+  provenance  String   @default("authored")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  translations ContentTranslation[]
+  routes       ContentRoute[]
+  homeSection     HomeSection?
+  siteSettings    SiteSettingsRegistry?
+  contentPage     ContentPageRegistry?
+  reusableSection ReusableSection?
+  mediaUsages     MediaUsage[]
+
+  @@index([contentType])
+  @@index([contentType, order])
+}
+
+model ContentTranslation {
+  id                  String        @id @default(cuid())
+  entityId            String
+  locale              ContentLocale
+  draftRevisionId     String?
+  publishedRevisionId String?
+  version             Int           @default(0)
+  publishedAt         DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  entity            ContentEntity                @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  revisions         ContentTranslationRevision[] @relation("TranslationRevisions")
+  draftRevision     ContentTranslationRevision?  @relation("DraftRevision", fields: [draftRevisionId], references: [id], onDelete: Restrict)
+  publishedRevision ContentTranslationRevision?  @relation("PublishedRevision", fields: [publishedRevisionId], references: [id], onDelete: Restrict)
+  route             ContentRoute?
+
+  @@unique([entityId, locale])
+  @@index([draftRevisionId])
+  @@index([publishedRevisionId])
+}
+
+/// Immutable once written: never updated or deleted after creation. Every
+/// draft save inserts a new row and repoints ContentTranslation.draftRevisionId
+/// at it; publish never creates a row, it only repoints publishedRevisionId.
+model ContentTranslationRevision {
+  id            String   @id @default(cuid())
+  translationId String
+  schemaVersion Int
+  payload       Json
+  createdAt     DateTime @default(now())
+  createdBy     String
+
+  translation  ContentTranslation   @relation("TranslationRevisions", fields: [translationId], references: [id], onDelete: Cascade)
+  draftFor     ContentTranslation[] @relation("DraftRevision")
+  publishedFor ContentTranslation[] @relation("PublishedRevision")
+
+  @@index([translationId])
+}
+
+/// Populated and updated only inside publish()'s transaction (Story 0.4) -
+/// a route exists for a translation if and only if that translation has
+/// actually published. `translationId` unique: at most one live route per
+/// translation (a re-publish with a changed slug updates this row rather
+/// than creating a second one). `(contentType, locale, collectionSegment,
+/// slug)` unique: the collision guard publish()'s route hook checks
+/// before its pointer swap.
+model ContentRoute {
+  id                String        @id @default(cuid())
+  entityId          String
+  translationId     String        @unique
+  locale            ContentLocale
+  contentType       String
+  collectionSegment String
+  slug              String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  entity      ContentEntity      @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  translation ContentTranslation @relation(fields: [translationId], references: [id], onDelete: Cascade)
+
+  @@unique([contentType, locale, collectionSegment, slug])
+  @@index([entityId])
+}
+
+/// Written only inside publish()'s transaction (Story 0.5), after the
+/// pointer swap and any audit/route hooks succeed - a durable record of
+/// what cache state a successful publish invalidated. No consumer reads
+/// PENDING rows yet (out of this slice's scope); status/processedAt exist
+/// so a future one has somewhere to record having done so.
+enum OutboxEventStatus {
+  PENDING
+  PROCESSED
+}
+
+model InvalidationOutboxEvent {
+  id                  String            @id @default(cuid())
+  createdAt           DateTime          @default(now())
+  sourceEntityId      String
+  sourceTranslationId String?
+  locale              ContentLocale?
+  tags                String[]
+  status              OutboxEventStatus @default(PENDING)
+  processedAt         DateTime?
+
+  @@index([status, createdAt])
+  @@index([sourceEntityId])
+}
+
+/// Persists the mapping-record interface `legacy-backfill-mapping.md`
+/// (Story 0.2) defined and deliberately left as an in-memory test double.
+/// `lib/content-model/persisted-mapping-port.ts` implements Story 0.2's
+/// exact `MappingLookupPort`/`MappingRecorderPort` signature against this
+/// table - `dryRunBackfill`/`runBackfill` are never modified, only re-run
+/// against this adapter instead of the in-memory port.
+model LegacyMigrationMap {
+  id                  String        @id @default(cuid())
+  migrationVersion    String
+  sourceTable         String
+  sourcePrimaryKey    String
+  sourceLocale        ContentLocale
+  sourceHash          String
+  targetEntityId      String
+  targetTranslationId String
+  targetRevisionId    String
+  mappingMethod       String
+  mappingConfidence   String
+  approvedBy          String?
+  migratedAt          DateTime
+
+  @@unique([migrationVersion, sourceTable, sourcePrimaryKey])
+}
+
+/// One row per migration domain (never per (domain, locale) - AD-8 binds
+/// state to the domain as a whole). State transitions go through
+/// `transitionDomainState` (`lib/content-model/migration-domain-store.ts`)
+/// only - never a direct Prisma write elsewhere - which enforces the
+/// `expectedVersion` compare-and-swap, the COMPARE-requires-compareResult
+/// rule, and the NEW-blocked-by-unresolvedParityFailures promotion gate.
+
+enum HomeSectionKey {
+  hero
+  about
+  brandTrust
+  services
+  process
+  achievements
+  projects
+  marquee
+  team
+  testimonials
+  blog
+}
+
+/// Registry row: one per HomeSectionKey, ever created only by
+/// `ensureHomeSectionRegistry()` (Story 2.1). Never created or deleted at
+/// runtime - the eleven keys are the closed set AD-2 requires ("serbest
+/// section uretimi V1 disi"). Each row's `entityId` backs the section's
+/// locale-aware content through the existing ContentEntity/ContentTranslation
+/// machinery (Story 0.2) - `contentType` on that entity is
+/// `home-section:<key>`, so `saveDraft`/`publish`/`getPublished` work on
+/// Home section content completely unmodified.
+model HomeSection {
+  id            String         @id @default(cuid())
+  key           HomeSectionKey @unique
+  entityId      String         @unique
+  schemaVersion Int
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  entity ContentEntity @relation(fields: [entityId], references: [id], onDelete: Restrict)
+}
+
+/// Singleton (enforced by the unique `singleton` column, always `true`) -
+/// the one global Home section order/visibility record (AD-7: "Home sirasi
+/// ve gorunurlugu globaldir; locale basina layout veya sira olusturulmaz").
+/// Deliberately not a ContentTranslation row: it carries no locale.
+/// draftRevisionId/publishedRevisionId/version/publishedAt mirror
+/// ContentTranslation's pointer shape (Story 0.2) structurally, but this is
+/// an independent model - lib/content-model/publishing.ts is never imported
+/// or modified to support it.
+model HomeLayout {
+  id                  String    @id @default(cuid())
+  singleton           Boolean   @unique @default(true)
+  draftRevisionId     String?
+  publishedRevisionId String?
+  version             Int       @default(0)
+  publishedAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  draftRevision     HomeLayoutRevision?  @relation("HomeLayoutDraft", fields: [draftRevisionId], references: [id], onDelete: Restrict)
+  publishedRevision HomeLayoutRevision?  @relation("HomeLayoutPublished", fields: [publishedRevisionId], references: [id], onDelete: Restrict)
+  revisions         HomeLayoutRevision[] @relation("HomeLayoutRevisions")
+
+  @@index([draftRevisionId])
+  @@index([publishedRevisionId])
+}
+
+/// Immutable once written, exactly like ContentTranslationRevision: never
+/// updated or deleted after creation. `payload` is a JSON array of exactly
+/// the eleven HomeSectionKey values, each `{ key, enabled }`, array index is
+/// the global render order - validated by
+/// `lib/content-model/home-section-registry.ts`'s `validateHomeLayoutPayload`
+/// before every write.
+model HomeLayoutRevision {
+  id            String   @id @default(cuid())
+  layoutId      String
+  schemaVersion Int
+  payload       Json
+  createdBy     String
+  createdAt     DateTime @default(now())
+
+  layout       HomeLayout   @relation("HomeLayoutRevisions", fields: [layoutId], references: [id], onDelete: Cascade)
+  draftFor     HomeLayout[] @relation("HomeLayoutDraft")
+  publishedFor HomeLayout[] @relation("HomeLayoutPublished")
+
+  @@index([layoutId])
+}
+
+enum MediaStorageStatus {
+  /// The object is expected to exist in the configured storage provider.
+  /// Default for every asset whose upload transaction completed.
+  ACTIVE
+  /// A verification pass (`verifyMediaAssetStorage`) found the object
+  /// missing from storage - e.g. deleted out-of-band or a storage outage
+  /// during the original upload window. Drives Story 4.3's broken-media
+  /// fallback: a MISSING asset resolves to a safe placeholder even though
+  /// its database row (and any MediaUsage rows) still exist.
+  MISSING
+}
+
+/// Media library asset stored in object storage (Cloudflare R2 or local fallback).
+/// Tracks file metadata, dimensions, checksum, and archive state.
+model MediaAsset {
+  id            String             @id @default(cuid())
+  filename      String
+  objectKey     String             @unique
+  url           String
+  mimeType      String
+  /// Normalized lowercase extension including the leading dot (e.g. ".png"),
+  /// derived once at upload time from `validateUploadBuffer`'s magic-byte
+  /// detection - never trusted from the client's claimed filename alone.
+  extension     String
+  byteSize      Int
+  width         Int?
+  height        Int?
+  checksum      String
+  altText       String?
+  caption       String?
+  /// `null` = active. A timestamp (not a boolean) so "when was this
+  /// archived" is answerable directly from the row for audit/UI display,
+  /// per this story's explicit `archivedAt` field contract.
+  archivedAt    DateTime?
+  storageStatus MediaStorageStatus @default(ACTIVE)
+  createdBy     String
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  usages MediaUsage[]
+
+  @@index([mimeType])
+  @@index([archivedAt, createdAt])
+  @@index([checksum])
+  @@index([storageStatus])
+}
+
+/// Tracks relationships between a MediaAsset and content entities/surfaces.
+/// Prevents accidental deletion of assets that are actively in use by published content.
+model MediaUsage {
+  id        String         @id @default(cuid())
+  assetId   String
+  entityId  String?
+  surface   String
+  field     String
+  locale    ContentLocale?
+  altText   String?
+  caption   String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  asset  MediaAsset     @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  entity ContentEntity? @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([assetId])
+  @@index([entityId])
+  @@index([surface, field])
+}
+
+/// Durable ledger of every object key committed to storage before its
+/// owning `MediaAsset` row is written, so a crash between "R2 upload
+/// succeeded" and "database insert committed" leaves a traceable orphan
+/// instead of a silently-leaked object. `resolvedAt` is set in the same
+/// transaction that creates the `MediaAsset` row; `cleanupOrphanMediaUploads`
+/// deletes the storage object and this row for any attempt left unresolved
+/// past its retention window.
+model MediaUploadAttempt {
+  id         String    @id @default(cuid())
+  objectKey  String    @unique
+  createdBy  String
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@index([resolvedAt, createdAt])
+}
+
+/// Registry row for the single, locale-aware "site-settings" `ContentEntity`
+/// (Story 6.1) - mirrors `HomeSection`'s key-to-entity registry shape, but
+/// there is exactly one row, ever, enforced the same way `HomeLayout`
+/// enforces its own singleton: a unique column that is always `true`.
+/// Unlike `HomeLayout`, site settings *is locale-aware; brand/contact/CTA/
+/// navigation/footer/legal fields keep independent tr/en draft and publish
+/// state, so content lives on ordinary
+/// `ContentTranslation`/`ContentTranslationRevision` rows through the
+/// existing `ContentEntity` (`contentType = "site-settings"`) machinery -
+/// `saveDraft`/`publish`/`getPublished`/`resolve()` all work on it
+/// unmodified, exactly like `HomeSection`'s per-key entities do. This
+/// table's only job is being the one stable lookup path to that entity's
+/// id, created once by `ensureSiteSettingsEntity()`
+/// (`lib/content-model/site-settings-registry.ts`).
+model SiteSettingsRegistry {
+  id            String   @id @default(cuid())
+  singleton     Boolean  @unique @default(true)
+  entityId      String   @unique
+  schemaVersion Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  entity ContentEntity @relation(fields: [entityId], references: [id], onDelete: Restrict)
+}
+
+/// The closed set of admin-managed static content pages (Spec 3). Starts
+/// with `about` only; a future page (e.g. FAQ chrome, a landing page) adds
+/// a new enum value plus a `ContentPageKey`-keyed payload validator, never
+/// a second registry shape.
+enum ContentPageKey {
+  about
+  home
+  services
+  products
+  projects
+  blog
+  faq
+  contact
+}
+
+model ReusableSection {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  contentType   String
+  entityId      String   @unique
+  schemaVersion Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  entity ContentEntity @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  usages PageSection[]
+}
+
+model ContentPageRegistry {
+  id            String         @id @default(cuid())
+  key           ContentPageKey @unique
+  entityId      String         @unique
+  schemaVersion Int
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  entity ContentEntity @relation(fields: [entityId], references: [id], onDelete: Restrict)
+}
+
+model PageLayout {
+  id                  String         @id @default(cuid())
+  pageKey             ContentPageKey @unique
+  draftRevisionId     String?
+  publishedRevisionId String?
+  version             Int            @default(0)
+  publishedAt         DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  // Deliberately no FK to ContentPageRegistry: a page's *section layout* is
+  // independent of whether that page also owns a locale-aware content
+  // payload. Only `about` has a payload validator today; every page key
+  // still needs a layout row.
+  draftRevision       PageLayoutRevision?  @relation("PageLayoutDraft", fields: [draftRevisionId], references: [id], onDelete: Restrict)
+  publishedRevision   PageLayoutRevision?  @relation("PageLayoutPublished", fields: [publishedRevisionId], references: [id], onDelete: Restrict)
+  revisions           PageLayoutRevision[] @relation("PageLayoutRevisions")
+  sections            PageSection[]
+
+  @@index([draftRevisionId])
+  @@index([publishedRevisionId])
+}
+
+model PageLayoutRevision {
+  id            String   @id @default(cuid())
+  layoutId      String
+  schemaVersion Int      @default(1)
+  payload       Json
+  createdBy     String
+  createdAt     DateTime @default(now())
+
+  layout        PageLayout   @relation("PageLayoutRevisions", fields: [layoutId], references: [id], onDelete: Cascade)
+  draftFor      PageLayout[] @relation("PageLayoutDraft")
+  publishedFor  PageLayout[] @relation("PageLayoutPublished")
+
+  @@index([layoutId])
+}
+
+model PageSection {
+  id        String   @id @default(cuid())
+  layoutId  String
+  sectionId String
+  order     Int      @default(0)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  layout    PageLayout      @relation(fields: [layoutId], references: [id], onDelete: Cascade)
+  section   ReusableSection @relation(fields: [sectionId], references: [id], onDelete: Restrict)
+
+  @@unique([layoutId, sectionId])
+  @@index([layoutId, order])
+}
+

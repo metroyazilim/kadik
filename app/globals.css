@@ -1,0 +1,129 @@
+@import "tailwindcss" source(none);
+@source "../app";
+@source "../components";
+
+/* Metro Yazılım public site tasarım token'ları */
+@theme {
+  --color-base: #ffffff;
+  --color-ink: #0f0d1d;
+  --color-brand: #384bff;
+  --color-brand-soft: rgba(56, 75, 255, 0.1);
+  --color-muted: #445375;
+  --color-navy: #18185e;
+  --color-navy-deep: #18195e;
+  --color-hairline: #d4dcff;
+
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", ui-sans-serif, sans-serif;
+  --font-display: var(--font-rajdhani), "Rajdhani", ui-sans-serif, sans-serif;
+
+  --radius-pill: 100px;
+  --radius-card: 15px;
+
+  --shadow-card: 0 4px 25px 0 rgba(0, 0, 0, 0.06);
+  --shadow-menu: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+}
+
+
+/* ---- Real @keyframes bodies from the captured site ---- */
+
+/* preloader ring */
+@keyframes spinner {
+  100% { transform: rotate(360deg); }
+}
+
+/* preloader letters flipping into view */
+@keyframes letters-loading {
+  0%, 75% { opacity: 0; transform: rotateY(-90deg); }
+  100% { opacity: 1; transform: rotateY(0deg); }
+}
+
+/* looping brand / text marquee */
+@keyframes marqueeLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* slowly rotating footer contact icons */
+@keyframes cir36 {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ripple ring behind the video buttons */
+@keyframes rippleOne {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* hero entrance moves */
+@keyframes slideInRight {
+  0% { opacity: 0; transform: translateX(400px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  0% { opacity: 0; transform: translateX(-400px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInDown {
+  0% { opacity: 0; transform: translateY(-400px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Motion utilities (used instead of Tailwind animate-* so the
+   captured timing/easing is exact) ---- */
+.anim-spinner { animation: spinner 1s linear infinite; }
+.anim-letters { animation: letters-loading 4s linear infinite; }
+.anim-marquee { animation: marqueeLeft 25s linear infinite; }
+.anim-cir36 { animation: cir36 10s linear infinite; }
+.anim-ripple { animation: rippleOne 3s linear infinite; }
+
+.intro-in-right { animation: slideInRight 2s linear both; }
+.intro-in-left { animation: slideInLeft 3s linear both; }
+.intro-in-down { animation: slideInDown 3s linear both; }
+
+/* Preloader dismissal is pure CSS: the measured hiddenAt is 3095 ms, and a
+   JS timer would leave the page stuck behind a full-screen layer whenever the
+   client bundle is slow or blocked. `visibility` also kills pointer events. */
+@keyframes intro-dismiss {
+  0%, 86% { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+.intro-overlay {
+  animation: intro-dismiss 3595ms linear forwards;
+}
+
+/* Scroll reveal is progressive enhancement: content is visible by default and a
+   section is only hidden while Reveal.tsx has measured it below the fold, so a
+   page whose JS never runs - or whose reveal pass never lands - still shows
+   every section instead of a column of blank bands. */
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+.reveal.reveal-armed {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s linear, transform 1s linear;
+}
+.reveal.reveal-armed.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .intro-overlay {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .reveal,
+  .reveal.reveal-armed {
+    opacity: 1;
+    transform: none;
+  }
+}

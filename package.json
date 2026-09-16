@@ -1,0 +1,60 @@
+{
+  "name": "metro-yazilim",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "test:unit": "playwright test --config=playwright.contract.config.ts unit/story-0-1-fixtures.spec.ts",
+    "test:integration": "playwright test --config=playwright.contract.config.ts integration/story-0-1-fixtures.spec.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:reset-admin-password": "tsx scripts/reset-admin-password.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@prisma/client": "^6.19.3",
+    "@tiptap/core": "^3.31.3",
+    "@tiptap/extensions": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
+    "@types/nodemailer": "^8.0.1",
+    "bcryptjs": "^3.0.3",
+    "htmlparser2": "^12.0.0",
+    "jose": "^6.2.11",
+    "lucide-react": "^1.41.0",
+    "next": "16.3.4",
+    "nodemailer": "^10.0.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "sanitize-html": "^2.17.7",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@seontechnologies/playwright-utils": "^4.4.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^20.19.43",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.5",
+    "@types/sanitize-html": "^2.16.1",
+    "eslint": "^9.36.0",
+    "eslint-config-next": "16.3.4",
+    "prisma": "^6.19.3",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3"
+  }
+}

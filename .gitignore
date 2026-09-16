@@ -1,0 +1,28 @@
+# Dependencies
+/node_modules
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts.bak
+
+# Build artifacts
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Env
+.env*.local
+.env
+
+# macOS
+.DS_Store
+
+# Editor
+.ventura/
+
+/.auth/
+
+/test-results/
+/playwright-report/
+/_bmad-output/test-artifacts/playwright-report/
+/_bmad-output/test-artifacts/playwright-results.xml
