@@ -57,11 +57,11 @@ export function AdminSidebar({
         <div className="flex items-center justify-between border-b border-brand-border px-5 pb-3 pt-5">
           <Link href="/manage" className="flex min-w-0 items-center gap-2.5">
             <span className="flex size-8 items-center justify-center rounded-[var(--radius-sm)] bg-brand-invert text-xs font-extrabold text-brand-on-invert">
-              M
+              K
             </span>
             <span className="flex min-w-0 flex-col">
               <span className="truncate text-sm font-extrabold leading-tight tracking-tight text-brand-text">
-                Starter Kurumsal
+                KADIK
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-brand-accent">Yönetim Paneli</span>
             </span>

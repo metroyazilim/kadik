@@ -8,7 +8,7 @@ import "./admin.css";
 // sözleşmesinden miras alınır."
 const inter = Inter({ subsets: ["latin", "latin-ext"], weight: ["400", "500", "600", "700"], variable: "--font-admin-inter" });
 
-export const metadata: Metadata = { title: "Starter Kurumsal Admin" };
+export const metadata: Metadata = { title: "KADIK Yönetim Paneli" };
 
 export default function ManageLayout({ children }: { children: React.ReactNode }) {
   return (

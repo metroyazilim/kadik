@@ -24,7 +24,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         <div className="relative flex h-full flex-col justify-between p-12">
           <div className="flex items-center justify-between gap-4">
             <span className="flex size-14 items-center justify-center rounded-[var(--radius-md)] bg-brand-on-invert/10 text-xl font-extrabold text-brand-on-invert">
-              M
+              K
             </span>
             <span className="rounded-[var(--radius-sm)] bg-brand-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
               Yönetim
@@ -33,7 +33,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
           <div>
             <p className="text-[28px] font-extrabold leading-tight tracking-tight text-brand-on-invert">
-              Starter Kurumsal İçerik Yönetimi
+              KADIK İçerik Yönetimi
             </p>
             <p className="mt-3 max-w-md text-[15px] leading-relaxed text-brand-on-invert-muted">
               Anasayfa bloklarını, hizmet ve ürün kataloglarını, blog yazılarını, medya kütüphanesini ve

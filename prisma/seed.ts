@@ -28,7 +28,7 @@ async function seedAdmin(): Promise<void> {
 
   if (!existing) {
     await prisma.adminUser.create({
-      data: { email: normalizedEmail, passwordHash, name: "Starter Admin", role: "SUPER_ADMIN" },
+      data: { email: normalizedEmail, passwordHash, name: "KADIK Yönetici", role: "SUPER_ADMIN" },
     });
     console.log(`seed: created SUPER_ADMIN ${normalizedEmail}`);
     return;

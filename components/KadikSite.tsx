@@ -2,9 +2,8 @@
 
 import { FormEvent, useMemo, useState } from "react";
 
-const ASSET_ROOT = "https://partiso.axiomthemes.com/wp-content/uploads/2018/10";
+const ASSET_ROOT = "/kadik";
 const images = {
-  logo: `${ASSET_ROOT}/logo.png`,
   hero: `${ASSET_ROOT}/post-6-copyright.jpg`,
   about: `${ASSET_ROOT}/post-6-copyright-1170x858.jpg`,
   campaign: `${ASSET_ROOT}/post-1-copyright.jpg`,
@@ -106,7 +105,7 @@ function Footer() {
     <div><h3>Hızlı Erişim</h3><a href="/hakkimizda">Hakkımızda</a><a href="/etkinlikler">Etkinlikler</a><a href="/gonulluluk">Gönüllülük</a><a href="/duyurular">Duyurular</a></div>
     <div><h3>İletişim</h3><p>İstanbul, Türkiye</p><a href="tel:+902120000000">+90 (212) 000 00 00</a><a href="mailto:merhaba@kadik.org">merhaba@kadik.org</a></div>
     <div><h3>Bizi Takip Edin</h3><p className="kadik-socials"><a href="#facebook">f</a><a href="#youtube">▶</a><a href="#x">𝕏</a></p><Button href="/iletisim">Bize Ulaşın</Button></div>
-  </div><div className="kadik-footer-bottom"><span>© 2026 Kadık. Tüm hakları saklıdır.</span><span><a href="/gizlilik-politikasi">Gizlilik</a><a href="/kullanim-kosullari">Kullanım Koşulları</a></span></div></footer>;
+  </div><div className="kadik-footer-bottom"><span>© 2026 Kadık. Tüm hakları saklıdır.</span><span><a href="/gizlilik-politikasi">Gizlilik</a><a href="/kullanim-sartlari">Kullanım Koşulları</a></span></div></footer>;
 }
 
 function Banner({ title, active }: { title: string; active: PageKey }) {

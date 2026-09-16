@@ -4,7 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Sayfa Bulunamadı — Starter Kurumsal",
+  title: "Sayfa Bulunamadı | KADIK",
   description: "Aradığınız sayfa bulunamadı veya taşınmış olabilir.",
 };
 

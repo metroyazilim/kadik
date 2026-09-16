@@ -68,7 +68,7 @@ export function CmdRecentOperations({ entries }: { entries: readonly AuditEntry[
             <span className="size-3 rounded-full bg-[#eab308] border border-yellow-700 inline-block" />
             <span className="size-3 rounded-full bg-[#22c55e] border border-green-700 inline-block" />
             <span className="ml-2 font-mono text-xs font-semibold text-neutral-300">
-              admin@metro-os: ~/logs/audit.log
+              kadik@local: ~/logs/audit.log
             </span>
           </div>
           <div className="flex items-center gap-3 text-xs text-neutral-400">
@@ -141,7 +141,7 @@ export function CmdRecentOperations({ entries }: { entries: readonly AuditEntry[
 
           {/* CMD Command prompt line */}
           <div className="pt-3 flex items-center gap-2 text-neutral-300 border-t border-neutral-800/80">
-            <span className="font-bold text-emerald-400">admin@metro:~$</span>
+            <span className="font-bold text-emerald-400">kadik@local:~$</span>
             <span className="text-neutral-200 font-mono">tail -f /var/log/audit.log</span>
             <span className="inline-block w-2 h-4 bg-emerald-400 animate-pulse" />
           </div>

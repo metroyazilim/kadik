@@ -16,7 +16,7 @@ export default function ManageLoginPage() {
     <AuthLayout>
       <div className="mb-8">
         <span className="mb-5 flex size-12 items-center justify-center rounded-[var(--radius-sm)] bg-brand-invert text-base font-extrabold text-brand-on-invert">
-          M
+              K
         </span>
         <h1 className="text-2xl font-bold tracking-tight text-brand-text">Yönetim paneline giriş</h1>
         <p className="mt-1 text-sm text-brand-muted">Site içeriğini düzenlemek için oturum açın.</p>
