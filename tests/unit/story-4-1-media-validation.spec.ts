@@ -161,9 +161,9 @@ test.describe("Story 4.1 Media Validation & Security Contracts", () => {
     expect(validateMediaUrl("//evil.com/image.png")).toBe(false);
     expect(validateMediaUrl("javascript:alert(1)")).toBe(false);
 
-    const allowedOrigins = ["https://media.metroyazilim.com", "https://pub-abc123.r2.dev"];
-    expect(validateMediaUrl("https://media.metroyazilim.com/uploads/photo.jpg", allowedOrigins)).toBe(true);
-    expect(validateMediaUrl("https://sub.media.metroyazilim.com/photo.jpg", allowedOrigins)).toBe(true);
+    const allowedOrigins = ["https://media.example-starter.com", "https://pub-abc123.r2.dev"];
+    expect(validateMediaUrl("https://media.example-starter.com/uploads/photo.jpg", allowedOrigins)).toBe(true);
+    expect(validateMediaUrl("https://sub.media.example-starter.com/photo.jpg", allowedOrigins)).toBe(true);
     expect(validateMediaUrl("https://pub-abc123.r2.dev/doc.pdf", allowedOrigins)).toBe(true);
     expect(validateMediaUrl("https://attacker.com/malicious.jpg", allowedOrigins)).toBe(false);
   });

@@ -47,7 +47,7 @@ test.describe("Story 4.1 Media Storage & Fallback Contracts", () => {
       accessKeyId: "test-access-key-id",
       secretAccessKey: "test-secret-access-key-very-secret",
       bucketName: "metro-bucket",
-      publicBaseUrl: "https://media.metroyazilim.com",
+      publicBaseUrl: "https://media.example-starter.com",
       isConfigured: true,
     });
 
@@ -55,7 +55,7 @@ test.describe("Story 4.1 Media Storage & Fallback Contracts", () => {
     const presigned = await provider.getPresignedUploadUrl(objectKey, "image/jpeg", 900);
 
     expect(presigned.objectKey).toBe(objectKey);
-    expect(presigned.publicUrl).toBe(`https://media.metroyazilim.com/${objectKey}`);
+    expect(presigned.publicUrl).toBe(`https://media.example-starter.com/${objectKey}`);
     expect(presigned.method).toBe("PUT");
     expect(presigned.expiresInSeconds).toBe(900);
 
@@ -77,7 +77,7 @@ test.describe("Story 4.1 Media Storage & Fallback Contracts", () => {
       id: "med_123",
       filename: "photo.jpg",
       objectKey: "uploads/2026/09/photo.jpg",
-      url: "https://media.metroyazilim.com/uploads/2026/09/photo.jpg",
+      url: "https://media.example-starter.com/uploads/2026/09/photo.jpg",
       mimeType: "image/jpeg",
       extension: ".jpg",
       byteSize: 102400,
@@ -95,7 +95,7 @@ test.describe("Story 4.1 Media Storage & Fallback Contracts", () => {
     };
 
     const resolved = resolveMediaOrFallback(asset);
-    expect(resolved.url).toBe("https://media.metroyazilim.com/uploads/2026/09/photo.jpg");
+    expect(resolved.url).toBe("https://media.example-starter.com/uploads/2026/09/photo.jpg");
     expect(resolved.altText).toBe("A corporate building");
     expect(resolved.caption).toBe("Headquarters");
     expect(resolved.width).toBe(800);
@@ -129,7 +129,7 @@ test.describe("Story 4.1 Media Storage & Fallback Contracts", () => {
       id: "med_456",
       filename: "old-hero.jpg",
       objectKey: "uploads/2026/09/old-hero.jpg",
-      url: "https://media.metroyazilim.com/uploads/2026/09/old-hero.jpg",
+      url: "https://media.example-starter.com/uploads/2026/09/old-hero.jpg",
       mimeType: "image/jpeg",
       extension: ".jpg",
       byteSize: 51200,

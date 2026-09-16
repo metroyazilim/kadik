@@ -17,7 +17,7 @@ test.describe("Spec 5 - e2eData fixture singleton/rate-limit cleanup (AC-5.9/AC-
   }) => {
     const { client } = testDatabase;
     const admin = await client.adminUser.create({
-      data: { email: "gercek.admin@metroyazilim.com", passwordHash: "x", name: "Gerçek Admin" },
+      data: { email: "gercek.admin@example-starter.com", passwordHash: "x", name: "Gerçek Admin" },
     });
     const { entityId } = await ensureSiteSettingsEntity(client);
     const translation = await client.contentTranslation.findUniqueOrThrow({

@@ -1,8 +1,8 @@
-# Extech — Metro Yazılım Web Sitesi ve İçerik Yönetimi
+# Extech — Corporate Starter Web Sitesi ve İçerik Yönetimi
 
 ## Overview
 
-Extech, Metro Yazılım'ın iki dilli (tr = Türkçe, en = Global) kurumsal web sitesi ve bu sitenin tüm içeriğini üreten yönetim uygulamasıdır. Ziyaretçiler yayınlanmış kurumsal içeriği (anasayfa, hakkımızda, hizmetler, ürünler, projeler, ekip, SSS, blog, yasal metinler, iletişim) görür. Yetkili yöneticiler aynı içeriği `/manage` altındaki yönetim panelinden düzenler, taslak olarak saklar ve dil bazında yayınlar. Türkçe ve Global dışındaki diller uygulama i18n'i değildir; ziyaretçinin tarayıcı/Google çevirisiyle karşılanır ve ayrı route, sözlük veya revizyon üretmez. Ürün, ancak bir yöneticinin düzenlediği içeriğin yayınlandıktan sonra ilgili public adreste birebir görünmesiyle başarılı sayılır.
+Extech, Corporate Starter'ın iki dilli (tr = Türkçe, en = Global) kurumsal web sitesi ve bu sitenin tüm içeriğini üreten yönetim uygulamasıdır. Ziyaretçiler yayınlanmış kurumsal içeriği (anasayfa, hakkımızda, hizmetler, ürünler, projeler, ekip, SSS, blog, yasal metinler, iletişim) görür. Yetkili yöneticiler aynı içeriği `/manage` altındaki yönetim panelinden düzenler, taslak olarak saklar ve dil bazında yayınlar. Türkçe ve Global dışındaki diller uygulama i18n'i değildir; ziyaretçinin tarayıcı/Google çevirisiyle karşılanır ve ayrı route, sözlük veya revizyon üretmez. Ürün, ancak bir yöneticinin düzenlediği içeriğin yayınlandıktan sonra ilgili public adreste birebir görünmesiyle başarılı sayılır.
 
 ## Goals
 
@@ -27,7 +27,7 @@ Extech, Metro Yazılım'ın iki dilli (tr = Türkçe, en = Global) kurumsal web 
 - Audit geçmişi terminal görünümünde cursor ile yukarı doğru yüklenir.
 - Archive erişilebilir switch olur; kalıcı silme yalnız şifreyle tekrar doğrulanmış kısa ömürlü SUPER_ADMIN Developer Mode capability'sinde çalışır.
 - Admin navigasyonu production build üzerinde ölçülür ve kaynak maliyetleri azaltılır.
-- `metroyazilim.com` içeriği runtime bağımlılığı olmadan idempotent CLI importuyla kendi PostgreSQL/MediaAsset verisine alınır.
+- `example-starter.com` içeriği runtime bağımlılığı olmadan idempotent CLI importuyla kendi PostgreSQL/MediaAsset verisine alınır.
 
 Bu maddeler uygulanmış özellik iddiası değildir; kanonik kapsam ve sıra `progress-tracker.md` içindedir.
 

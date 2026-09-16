@@ -184,7 +184,7 @@ Legacy author migration:
 
 - Legacy string normalize edilip kullanıcı adı/email ile tekil eşleşirse bağlanır.
 - Belirsiz/eşleşmeyen string snapshot olarak korunur, `authorUserId=null`.
-- Boş author current migration actor'a otomatik uydurulmaz; “Metro Yazılım” gibi mevcut public fallback varsa açık registry fallback'ına taşınır.
+- Boş author current migration actor'a otomatik uydurulmaz; “Corporate Starter” gibi mevcut public fallback varsa açık registry fallback'ına taşınır.
 - Migration raporu matched/unmatched/ambiguous sayıları verir.
 
 ## 9. Public Yazar Görünümü

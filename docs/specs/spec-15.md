@@ -156,10 +156,10 @@ Kullanılmayan spekülatif index eklenmez; gerçek query plan kanıtı gerekir.
 
 ## 10. Metro Kaynak Sisteminin Kullanımı
 
-Kullanıcının “ana metroyazilimdaki sistemi kullanabiliriz” talebi şu sınırda uygulanır:
+Kullanıcının “ana example-starterdaki sistemi kullanabiliriz” talebi şu sınırda uygulanır:
 
 - Referans sistemin hızlı sayfa geçişi, içerik hiyerarşisi ve route-local veri desenleri davranış karşılaştırması için incelenebilir.
-- `metroyazilim.com` runtime API/scraping bağımlılığı admin navigasyonuna eklenmez.
+- `example-starter.com` runtime API/scraping bağımlılığı admin navigasyonuna eklenmez.
 - İçerik migration'ı Spec 16'da offline/idempotent script'tir.
 - Başka uygulamanın mock client state'i veya farklı framework cache varsayımları kör kopyalanmaz.
 
@@ -186,7 +186,7 @@ Public component görsel tasarımı, data schema semantiği ve business feature'
 5. **AC-15.5** Kapalı rich-text section Tiptap instance/chunk mount etmez; açıldığında içerik ve dirty state doğru çalışır.
 6. **AC-15.6** Kapalı MediaPicker asset listesi istemez; dialog açıkken bounded pagination kullanır.
 7. **AC-15.7** Sidebar/list link pending feedback'i tıklamadan sonraki ilk frame'lerde görünür ve screen reader için `aria-busy`/status sağlar.
-8. **AC-15.8** `(panel)` altında `loading.tsx`, mutation sonrası `router.refresh()` ve admin runtime'da metroyazilim.com fetch yoktur.
+8. **AC-15.8** `(panel)` altında `loading.tsx`, mutation sonrası `router.refresh()` ve admin runtime'da example-starter.com fetch yoktur.
 9. **AC-15.9** Reorder/search/SEO preview her etkileşimde server round-trip yapmaz; explicit save/preflight tek request'tir.
 10. **AC-15.10** Eklenen DB index'lerin her biri ölçülen query plan ile gerekçelendirilir; spekülatif index yoktur.
 11. **AC-15.11** Optimizasyon bütün Spec 7–14 browser acceptance akışlarını bozmaz.

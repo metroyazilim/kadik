@@ -1,5 +1,5 @@
 {
-  "name": "metro-yazilim",
+  "name": "corporate-website-starter",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,6 +15,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "db:create": "node scripts/create-local-db.mjs",
     "db:reset-admin-password": "tsx scripts/reset-admin-password.ts"
   },
   "prisma": {

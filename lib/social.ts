@@ -6,5 +6,5 @@ export type SocialNetwork = "youtube" | "linkedin" | "x";
 export const SOCIAL_LINKS: ReadonlyArray<Readonly<{ network: SocialNetwork; label: string; url: string }>> = [
   { network: "youtube", label: "YouTube", url: "https://www.youtube.com/@starter-company" },
   { network: "linkedin", label: "LinkedIn", url: "https://www.linkedin.com/company/kurumsal-starter" },
-  { network: "x", label: "X", url: "https://x.com/metroyazilim" },
+  { network: "x", label: "X", url: "https://x.com/example-starter" },
 ];

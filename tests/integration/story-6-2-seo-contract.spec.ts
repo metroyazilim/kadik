@@ -196,7 +196,7 @@ test.describe("CAP-1 upstream - getSiteSeoDefaults derives from the real publish
     const { getSiteSeoDefaults } = await loadFutureModule<SiteSettingsModule>("site-seo-defaults");
 
     const defaults = await getSiteSeoDefaults(client, "tr");
-    expect(defaults.siteName).toBe("Metro Yazılım");
+    expect(defaults.siteName).toBe("Corporate Starter");
     expect(defaults.defaultOgImageUrl).toBeNull();
   });
 });

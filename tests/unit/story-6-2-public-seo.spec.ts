@@ -84,16 +84,16 @@ type PublicSeoModule = Readonly<{
 }>;
 
 const DEFAULTS: SiteSeoDefaults = {
-  siteName: "Metro Yazılım",
-  defaultDescription: "Metro Yazılım - default description",
-  defaultOgImageUrl: "https://metroyazilim.example/og-default.png",
+  siteName: "Corporate Starter",
+  defaultDescription: "Corporate Starter - default description",
+  defaultOgImageUrl: "https://example-starter.example/og-default.png",
 };
 
-const NATIVE_EN: FallbackResolution = { kind: "native", url: "https://metroyazilim.example/en/services/waste-audit" };
+const NATIVE_EN: FallbackResolution = { kind: "native", url: "https://example-starter.example/en/services/waste-audit" };
 const FALLBACK_RU: FallbackResolution = {
   kind: "fallback",
-  url: "https://metroyazilim.example/ru/услуги/atik-denetimi",
-  canonical: "https://metroyazilim.example/servisler/atik-denetimi",
+  url: "https://example-starter.example/ru/услуги/atik-denetimi",
+  canonical: "https://example-starter.example/servisler/atik-denetimi",
   noindex: true,
 };
 const NOT_FOUND: FallbackResolution = { kind: "notFound" };
@@ -157,8 +157,8 @@ test.describe("AC-6.2-02 - fallback-alias noindex policy", () => {
   test("buildHreflangAlternates never includes a fallback-alias URL as an alternate for any locale - the type only accepts native URLs", async () => {
     const { buildHreflangAlternates } = await loadFutureModule<PublicSeoModule>("public-seo");
     const natives = new Map<"tr" | "en", string>([
-      ["tr", "https://metroyazilim.example/servisler/atik-denetimi"],
-      ["en", "https://metroyazilim.example/en/services/waste-audit"],
+      ["tr", "https://example-starter.example/servisler/atik-denetimi"],
+      ["en", "https://example-starter.example/en/services/waste-audit"],
     ]);
     const alternates = buildHreflangAlternates(natives);
 
@@ -185,9 +185,9 @@ test.describe("AC-6.2-03 - sitemap/robots exclusivity", () => {
 
   test("CAP-2 buildRobotsDirectives references the supplied sitemap URL and always disallows exactly /manage", async () => {
     const { buildRobotsDirectives } = await loadFutureModule<PublicSeoModule>("public-seo");
-    const directives = buildRobotsDirectives("https://metroyazilim.example/sitemap.xml");
+    const directives = buildRobotsDirectives("https://example-starter.example/sitemap.xml");
 
-    expect(directives.sitemap).toBe("https://metroyazilim.example/sitemap.xml");
+    expect(directives.sitemap).toBe("https://example-starter.example/sitemap.xml");
     expect(directives.rules).toEqual([{ userAgent: "*", disallow: ["/manage"] }]);
   });
 });

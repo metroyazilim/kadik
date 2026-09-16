@@ -2,7 +2,7 @@
 
 ## Theme
 
-Yönetim paneli açık temadır; koyu tema yoktur. Görsel dil `metroyazilim/organization-wpfuk` yönetim panelinden birebir alınmıştır: beyaz yüzeyler, `#f7f8fa` sayfa zemini, lacivert metin, kırmızı vurgu ve keskin (maksimum 4px) köşeler. Panel "kurumsal operasyon konsolu" gibi görünür: yoğun bilgi, ince çizgiler, büyük harf küçük punto etiketler, gölge yerine kenarlık.
+Yönetim paneli açık temadır; koyu tema yoktur. Görsel dil `example-starter/organization-wpfuk` yönetim panelinden birebir alınmıştır: beyaz yüzeyler, `#f7f8fa` sayfa zemini, lacivert metin, kırmızı vurgu ve keskin (maksimum 4px) köşeler. Panel "kurumsal operasyon konsolu" gibi görünür: yoğun bilgi, ince çizgiler, büyük harf küçük punto etiketler, gölge yerine kenarlık.
 
 Public site kendi mevcut görsel dilini korur. Bu dosyanın renk tabloları yönetim paneli için bağlayıcıdır.
 

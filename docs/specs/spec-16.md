@@ -1,20 +1,20 @@
-# Spec 16 — metroyazilim.com İçerik Envanteri, İdempotent İçe Aktarım ve Public Parity
+# Spec 16 — example-starter.com İçerik Envanteri, İdempotent İçe Aktarım ve Public Parity
 
-**Durum:** Hazır — uygulanmadı  
-**Uygulama komutu:** `spec-16 uygula`  
-**Oluşturuldu:** 2026-09-08  
-**Kanonik depo:** `/Users/berat/extech`  
-**Kaynak:** `https://www.metroyazilim.com/` ve aynı origin sitemap/public route'ları  
-**Bağımlılık:** Spec 7–15 tamamlanmış olmalıdır  
+**Durum:** Hazır — uygulanmadı
+**Uygulama komutu:** `spec-16 uygula`
+**Oluşturuldu:** 2026-09-08
+**Kanonik depo:** `/Users/berat/extech`
+**Kaynak:** `https://www.example-starter.com/` ve aynı origin sitemap/public route'ları
+**Bağımlılık:** Spec 7–15 tamamlanmış olmalıdır
 **Paralellik:** Tek başına ve son içerik birimi; page/section/collection/media/SEO seed ve import sınırlarını sahiplenir
 
 ## 1. Hedef
 
-Kaynak Metro Yazılım sitesindeki gerçek Türkçe içerik, medya ve route envanteri tek seferlik, denetlenebilir ve tekrar çalıştırılabilir bir migration ile Extech CMS'e alınır. Bütün hedef sayfalar lorem ipsum/boş alan yerine kaynak içerikle dolar. Public runtime kaynak siteye fetch/scrape yapmaz; import tamamlandıktan sonra Extech yalnız kendi PostgreSQL + MediaAsset/R2 verisini kullanır.
+Kaynak Corporate Starter sitesindeki gerçek Türkçe içerik, medya ve route envanteri tek seferlik, denetlenebilir ve tekrar çalıştırılabilir bir migration ile Extech CMS'e alınır. Bütün hedef sayfalar lorem ipsum/boş alan yerine kaynak içerikle dolar. Public runtime kaynak siteye fetch/scrape yapmaz; import tamamlandıktan sonra Extech yalnız kendi PostgreSQL + MediaAsset/R2 verisini kullanır.
 
 ## 2. Doğrulanmış Kaynak Envanteri
 
-2026-09-08 tarihinde `https://www.metroyazilim.com/sitemap.xml` şu route ailelerini içeriyordu:
+2026-09-08 tarihinde `https://www.example-starter.com/sitemap.xml` şu route ailelerini içeriyordu:
 
 - root: `/`
 - indeks: `/hizmetler`, `/isler`, `/blog`, `/iletisim`, `/sss`
@@ -28,7 +28,7 @@ Bu anlık liste sabit kabul edilmez. Import her çalışmada sitemap'i okuyup ve
 
 ## 3. Ürün Kararları
 
-- Source yalnız allowlist origin `https://www.metroyazilim.com`.
+- Source yalnız allowlist origin `https://www.example-starter.com`.
 - Network erişimi yalnız CLI import/snapshot anında; admin/public request sırasında yok.
 - İlk import yalnız gerçek kaynak dili `tr` için draft üretir. EN/RU/AR içerik uydurulmaz; Spec 10 akışıyla çevrilir.
 - Import varsayılanı `--dry-run`; explicit `--apply` olmadan DB/R2 yazmaz.
@@ -41,9 +41,9 @@ Bu anlık liste sabit kabul edilmez. Import her çalışmada sitemap'i okuyup ve
 Yeni script:
 
 ```bash
-npm run import:metroyazilim -- --snapshot ./tmp/metro-import
-npm run import:metroyazilim -- --from-snapshot ./tmp/metro-import --dry-run
-npm run import:metroyazilim -- --from-snapshot ./tmp/metro-import --apply
+npm run import:example-starter -- --snapshot ./tmp/metro-import
+npm run import:example-starter -- --from-snapshot ./tmp/metro-import --dry-run
+npm run import:example-starter -- --from-snapshot ./tmp/metro-import --apply
 ```
 
 Gerekirse filtre:
@@ -52,14 +52,14 @@ Gerekirse filtre:
 - `--resume` yalnız manifest checkpoint; duplicate üretmez.
 - `--publish-tr` ayrı ve explicit.
 
-Snapshot dizini production source olarak repoya commit edilmezse import run artifact olarak saklanır. Geçici HTML/binary dosyalar cleanup'ta kaldırılır. Kalıcı tutulacak manifest küçük ve kişisel veri içermeyen `prisma/import-manifests/metroyazilim-<date>.json` olabilir; karar repo boyutu ve lisans/kişisel veri incelemesi sonrası.
+Snapshot dizini production source olarak repoya commit edilmezse import run artifact olarak saklanır. Geçici HTML/binary dosyalar cleanup'ta kaldırılır. Kalıcı tutulacak manifest küçük ve kişisel veri içermeyen `prisma/import-manifests/example-starter-<date>.json` olabilir; karar repo boyutu ve lisans/kişisel veri incelemesi sonrası.
 
 Manifest:
 
 ```json
 {
   "schemaVersion": 1,
-  "sourceOrigin": "https://www.metroyazilim.com",
+  "sourceOrigin": "https://www.example-starter.com",
   "capturedAt": "...",
   "sitemapHash": "sha256:...",
   "routes": [
@@ -182,7 +182,7 @@ Dry-run binary upload yapmaz; asset HEAD/GET gereksinimi snapshot aşamasında t
 
 Her imported root kayıt:
 
-- `provenance = "import:metroyazilim"` veya mevcut alan formatına uygun registry değeri.
+- `provenance = "import:example-starter"` veya mevcut alan formatına uygun registry değeri.
 - sourcePath, source body hash, extractor version ve mapping key durable import mapping'de tutulur.
 - Mevcut `LegacyMigrationMap` bu iş için semantik olarak yanlışsa yeniden kullanılmaz; açık `ExternalImportMap` modeli eklenir.
 
@@ -244,11 +244,11 @@ Apply success kriteri: failed fetch 0, unmapped meaningful fragment 0 veya her b
 - Görseller MediaAsset resolver üzerinden, source hotlink yok.
 - Metadata/canonical/hreflang/sitemap Spec 11 kurallarına uyar.
 - Mobile/desktop layout mevcut Extech tasarımıdır; source pixel parity aranmaz.
-- Public network kaydında `metroyazilim.com` content/API/image runtime isteği yoktur.
+- Public network kaydında `example-starter.com` content/API/image runtime isteği yoktur.
 
 ## 14. Dosya Sahipliği
 
-- `scripts/import-metroyazilim.ts` ve typed extractor/mapping modules
+- `scripts/import-example-starter.ts` ve typed extractor/mapping modules
 - Gerekli `ExternalImportMap` Prisma migration/modeli
 - `prisma/seed.ts` yalnız import verisini seed ile karıştırmamak için açık entegrasyon
 - Content/page/section/media/SEO servis adaptörleri; iş kurallarını bypass etmez
@@ -269,7 +269,7 @@ Public components ve CSS bu spec'te yeniden tasarlanmaz.
 8. **AC-16.8** Import default draft-only; explicit publish mevcut publish/audit/outbox servislerini kullanır.
 9. **AC-16.9** Route matrixteki her target browser'da 200, doğru ana içerik ve internal links ile çalışır; source-only/target-only farkları raporludur.
 10. **AC-16.10** Source'ta ayrı About yoksa mevcut kurumsal Home section'ları açık reuse/clone kararıyla About'u doldurur; mevcut authored içerik kaybolmaz.
-11. **AC-16.11** Runtime browser network'ünde metroyazilim.com content/image/API isteği yoktur.
+11. **AC-16.11** Runtime browser network'ünde example-starter.com content/image/API isteği yoktur.
 12. **AC-16.12** Fetch/parse/sanitize/media hatasında partial published state veya orphan storage bırakılmaz.
 13. **AC-16.13** Geçici snapshot/dump/test kayıtları cleanup'ta kaldırılır; yalnız kararlaştırılmış küçük manifest/fixtures kalır.
 

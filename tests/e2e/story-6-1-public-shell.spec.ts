@@ -21,7 +21,7 @@ import { SITE_SETTINGS_SCHEMA_VERSION, type SiteSettingsPayload } from "../../li
 
 function basePayload(marker: string, overrides: Partial<SiteSettingsPayload> = {}): SiteSettingsPayload {
   return {
-    brand: { name: `Metro Yazılım ${marker}`, logoAssetId: null },
+    brand: { name: `Corporate Starter ${marker}`, logoAssetId: null },
     contact: { email: `contact-${marker}@metro.test`, phone: "+90 555 111 22 33", address: `Adres ${marker}` },
     cta: { label: `CTA ${marker}`, url: "/tr/contact" },
     navigation: [
@@ -109,7 +109,7 @@ test.describe("Story 6.1 correction - public shell consumes published site-setti
     const { entityId } = await publishSiteSettings(e2eData.client, admin, "tr", basePayload(marker));
 
     await page.goto("/tr");
-    await expect(page.getByRole("banner").getByText(`Metro Yazılım ${marker}`)).toBeVisible();
+    await expect(page.getByRole("banner").getByText(`Corporate Starter ${marker}`)).toBeVisible();
     await expect(page.getByRole("link", { name: `Nav ${marker}` })).toBeVisible();
     await expect(page.getByRole("link", { name: `Nav ${marker}` })).toHaveAttribute("target", "_blank");
     await expect(page.getByRole("link", { name: `Nav ${marker}` })).toHaveAttribute("rel", "noopener noreferrer");
@@ -150,8 +150,8 @@ test.describe("Story 6.1 correction - public shell consumes published site-setti
     if (!draftResult.ok) throw new Error("draft-only save unexpectedly conflicted");
 
     await page.goto("/tr");
-    await expect(page.getByRole("banner").getByText(`Metro Yazılım ${published}`)).toBeVisible();
-    await expect(page.getByText(`Metro Yazılım ${draftOnly}`)).toHaveCount(0);
+    await expect(page.getByRole("banner").getByText(`Corporate Starter ${published}`)).toBeVisible();
+    await expect(page.getByText(`Corporate Starter ${draftOnly}`)).toHaveCount(0);
     await expect(page.getByText(`Nav ${draftOnly}`)).toHaveCount(0);
     await expect(page.getByText(`Footer summary ${draftOnly}`)).toHaveCount(0);
   });
@@ -163,7 +163,7 @@ test.describe("Story 6.1 correction - public shell consumes published site-setti
     await publishSiteSettings(e2eData.client, admin, "tr", basePayload(marker));
 
     await page.goto("/en");
-    await expect(page.getByRole("banner").getByText(`Metro Yazılım ${marker}`)).toBeVisible();
+    await expect(page.getByRole("banner").getByText(`Corporate Starter ${marker}`)).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });
 

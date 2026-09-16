@@ -4,7 +4,7 @@ import { DEFAULT_IMAGE_PLACEHOLDER } from "../../lib/media/fallback";
 import type { MediaAssetDto, MediaUsageDto } from "../../lib/media/types";
 
 const R2_HOST = "pub-abc123.r2.dev";
-const CUSTOM_HOST = "assets.metroyazilim.example";
+const CUSTOM_HOST = "assets.example-starter.example";
 const ALLOWED_HOSTS = [R2_HOST, CUSTOM_HOST];
 
 function makeAsset(overrides: Partial<MediaAssetDto> = {}): MediaAssetDto {

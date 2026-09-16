@@ -15,7 +15,7 @@ test.describe("Spec 5 - clean-e2e-residue selectivity (AC-5.12)", () => {
     // ContentEntity with the ordinary "authored" provenance, and a real
     // visitor Message - none of this may ever be selected for deletion.
     const realAdmin = await client.adminUser.create({
-      data: { email: "gercek.admin@metroyazilim.com", passwordHash: "x", name: "Gerçek Admin" },
+      data: { email: "gercek.admin@example-starter.com", passwordHash: "x", name: "Gerçek Admin" },
     });
     const realEntity = await client.contentEntity.create({ data: { contentType: "service", provenance: "authored" } });
     const realMessage = await client.message.create({
@@ -138,7 +138,7 @@ test.describe("Spec 5 - clean-e2e-residue selectivity (AC-5.12)", () => {
 
   test("a dry run with no marker-tagged rows reports zero and deletes nothing", async ({ testDatabase }) => {
     const { client } = testDatabase;
-    await client.adminUser.create({ data: { email: "sadece.gercek@metroyazilim.com", passwordHash: "x", name: "Sadece Gerçek" } });
+    await client.adminUser.create({ data: { email: "sadece.gercek@example-starter.com", passwordHash: "x", name: "Sadece Gerçek" } });
 
     const report = await computeResidueReport(client);
 
@@ -155,7 +155,7 @@ test.describe("Spec 5 - clean-e2e-residue selectivity (AC-5.12)", () => {
     // have flagged every genuinely seeded Home/site-settings/About
     // translation as E2E residue in exactly this environment.
     const bootstrapAdmin = await client.adminUser.create({
-      data: { email: "admin@example.com", passwordHash: "x", name: "Metro Yazılım Admin" },
+      data: { email: "admin@example.com", passwordHash: "x", name: "Corporate Starter Admin" },
     });
     const e2eStyleAdmin = await client.adminUser.create({
       data: { email: `e2e-${crypto.randomUUID()}@example.com`, passwordHash: "x", name: "E2E Actor" },
@@ -170,7 +170,7 @@ test.describe("Spec 5 - clean-e2e-residue selectivity (AC-5.12)", () => {
   test("an ordinary entity where every revision was authored by an E2E actor is removed even without the e2e-test provenance marker; a mixed-author entity is preserved", async ({ testDatabase }) => {
     const { client } = testDatabase;
     const realAdmin = await client.adminUser.create({
-      data: { email: "gercek.admin2@metroyazilim.com", passwordHash: "x", name: "Gerçek Admin" },
+      data: { email: "gercek.admin2@example-starter.com", passwordHash: "x", name: "Gerçek Admin" },
     });
     const e2eAdmin = await client.adminUser.create({
       data: { email: `e2e-${crypto.randomUUID()}@example.test`, passwordHash: "x", name: "E2E Actor" },

@@ -2,7 +2,7 @@ import { prisma } from "../lib/db";
 import { tr } from "../lib/i18n/dictionaries/tr";
 import { en } from "../lib/i18n/dictionaries/en";
 import { HOME_SECTION_SCHEMA_VERSION } from "../lib/content-model/home-section-schemas";
-import type { ContentLocale, HomeSectionKey, Prisma } from "@prisma/client";
+import type { ContentLocale, HomeSectionKey, Prisma, PrismaClient } from "@prisma/client";
 
 const DICTS: Record<ContentLocale, typeof tr> = { tr, en };
 const LOCALES: ContentLocale[] = ["tr", "en"];
@@ -193,9 +193,9 @@ function buildSectionBlocks(key: HomeSectionKey, loc: ContentLocale): readonly R
   }
 }
 
-async function run() {
+export async function seedHomeClientData(client: PrismaClient = prisma) {
   console.log("Seeding home section live client payloads...");
-  const sections = await prisma.homeSection.findMany({
+  const sections = await client.homeSection.findMany({
     include: { entity: { include: { translations: true } } },
   });
 
@@ -203,12 +203,13 @@ async function run() {
     for (const locale of LOCALES) {
       const translation = section.entity.translations.find((t) => t.locale === locale);
       if (!translation) continue;
+      if (translation.publishedRevisionId) continue;
 
       const blocks = buildSectionBlocks(section.key, locale);
       const payload = { blocks };
 
       // Create new published revision and update pointers so it's live both in admin and publicly
-      const revision = await prisma.contentTranslationRevision.create({
+      const revision = await client.contentTranslationRevision.create({
         data: {
           translationId: translation.id,
           schemaVersion: HOME_SECTION_SCHEMA_VERSION,
@@ -217,7 +218,7 @@ async function run() {
         },
       });
 
-      await prisma.contentTranslation.update({
+      await client.contentTranslation.update({
         where: { id: translation.id },
         data: {
           draftRevisionId: revision.id,
@@ -231,12 +232,3 @@ async function run() {
 
   console.log("Finished seeding live home section data!");
 }
-
-run()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });

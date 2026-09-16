@@ -1,8 +1,8 @@
 // Deterministic, idempotent bootstrap for a fresh environment: the first
 // SUPER_ADMIN plus every registry row the admin panel expects to exist
 // (site settings, the eleven fixed Home sections, the content pages).
-// The starter intentionally contains no customer snapshot. Every project
-// begins with empty content and fills it through /manage.
+// The starter contains only generic demo content; customer data is never
+// copied into a new project.
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { getAdminBootstrap } from "../lib/env";
@@ -12,6 +12,7 @@ import {
   CONTENT_PAGE_KEYS,
   ensureContentPageEntity,
 } from "../lib/content-model/content-page-registry";
+import { seedHomeClientData } from "../scripts/seed-home-client-data";
 
 const prisma = new PrismaClient();
 
@@ -49,7 +50,8 @@ async function main(): Promise<void> {
   for (const key of CONTENT_PAGE_KEYS) {
     await ensureContentPageEntity(prisma, key);
   }
-  console.log("seed: registries ensured");
+  await seedHomeClientData(prisma);
+  console.log("seed: registries and generic demo content ensured");
 }
 
 main()

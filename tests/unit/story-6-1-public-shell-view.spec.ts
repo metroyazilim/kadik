@@ -22,7 +22,7 @@ function fallbackLogo(): ResolvedPublicMedia {
 function realLogo(): ResolvedPublicMedia {
   return {
     url: "https://cdn.example.com/logo.png",
-    altText: "Metro Yazılım logo",
+    altText: "Corporate Starter logo",
     caption: null,
     width: 200,
     height: 40,
@@ -35,11 +35,11 @@ function realLogo(): ResolvedPublicMedia {
 
 function baseSettings(overrides: Partial<PublicSiteSettings> = {}): PublicSiteSettings {
   return {
-    brand: { name: "Metro Yazılım", logo: fallbackLogo() },
+    brand: { name: "Corporate Starter", logo: fallbackLogo() },
     contact: { email: "hello@metro.test", phone: "+90 555 000 00 00", address: "İstanbul" },
     cta: { label: "Teklif Al", url: "/contact" },
     navigation: [{ id: "nav-1", label: "Hizmetler", url: "/servisler", children: [] }],
-    footer: { summary: "Metro Yazılım footer summary.", columns: [{ id: "col-1", title: "Bağlantılar", links: [{ id: "l-1", label: "Hakkımızda", url: "/hakkimizda" }] }] },
+    footer: { summary: "Corporate Starter footer summary.", columns: [{ id: "col-1", title: "Bağlantılar", links: [{ id: "l-1", label: "Hakkımızda", url: "/hakkimizda" }] }] },
     mission: "Mission",
     vision: "Vision",
     servedLocale: "tr",
@@ -71,9 +71,9 @@ test.describe("AC-6.1 public shell - buildSiteShellView (no database)", () => {
   });
 
   test("published settings with real data override every field", () => {
-    const view = buildSiteShellView(baseSettings({ brand: { name: "Metro Yazılım", logo: realLogo() } }), tr, "tr");
+    const view = buildSiteShellView(baseSettings({ brand: { name: "Corporate Starter", logo: realLogo() } }), tr, "tr");
 
-    expect(view.brandName).toBe("Metro Yazılım");
+    expect(view.brandName).toBe("Corporate Starter");
     expect(view.logo?.url).toBe("https://cdn.example.com/logo.png");
     expect(view.nav).toEqual([{ label: "Hizmetler", href: "/servisler", external: false, children: [] }]);
     expect(view.cta).toEqual({ label: "Teklif Al", href: "/contact", external: false });
@@ -81,7 +81,7 @@ test.describe("AC-6.1 public shell - buildSiteShellView (no database)", () => {
     expect(view.contact.emailHref).toBe("mailto:hello@metro.test");
     expect(view.contact.address).toBe("İstanbul");
     expect(view.footerColumns).toEqual([{ id: "col-1", title: "Bağlantılar", links: [{ label: "Hakkımızda", href: "/hakkimizda", external: false }] }]);
-    expect(view.footerSummary).toBe("Metro Yazılım footer summary.");
+    expect(view.footerSummary).toBe("Corporate Starter footer summary.");
   });
 
   test("published settings with an empty navigation array still falls back to the dictionary nav, never an empty bar", () => {
@@ -113,7 +113,7 @@ test.describe("AC-6.1 public shell - buildSiteShellView (no database)", () => {
   });
 
   test("a fallback-placeholder logo is never rendered as a real image", () => {
-    const view = buildSiteShellView(baseSettings({ brand: { name: "Metro Yazılım", logo: fallbackLogo() } }), tr, "tr");
+    const view = buildSiteShellView(baseSettings({ brand: { name: "Corporate Starter", logo: fallbackLogo() } }), tr, "tr");
     expect(view.logo).toBeNull();
   });
 

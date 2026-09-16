@@ -25,7 +25,7 @@ const valid: AboutPagePayload = {
   titleBefore: "Teknolojiyle",
   titleAccent: "Geleceği",
   titleAfter: "İnşa Ediyoruz",
-  text: "<p>Metro Yazılım olarak <strong>15 yıldır</strong> teknoloji üretiyoruz.</p>",
+  text: "<p>Corporate Starter olarak <strong>15 yıldır</strong> teknoloji üretiyoruz.</p>",
   collageImageAssetId: null,
   collageAlt: "Ekip fotoğrafı",
   experienceValue: "15",

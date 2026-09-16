@@ -63,7 +63,7 @@ Next.js kodu değiştirilmeden önce `node_modules/next/dist/docs/` altındaki k
 - TR çeviri export/import paketi registry `localizablePaths` alanlarından üretilir; EN/RU/AR apply tek transaction ve draft-only'dir.
 - SEO override revision payload'ında versioned kalır; otomatik preview ve public metadata aynı resolver'ı, farklı draft/published girdiyi kullanır.
 - RBAC tek permission registry'den route, nav, query ve action katmanlarına uygulanır. Developer Mode global ayar değil, SUPER_ADMIN'a bağlı kısa ömürlü capability'dir.
-- `metroyazilim.com` yalnız offline CLI import kaynağıdır; public/admin runtime bu origin'e içerik veya medya isteği yapmaz.
+- `example-starter.com` yalnız offline CLI import kaynağıdır; public/admin runtime bu origin'e içerik veya medya isteği yapmaz.
 
 Bu gelecek maddeleri uygulanmış storage iddiası değildir. Migration ve cutover tamamlandıkça normal mimari bölümlerine taşınır.
 

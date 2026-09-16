@@ -4,7 +4,7 @@
 **Uygulama komutu:** `spec-1 uygula`
 **Oluşturuldu:** 2026-09-08
 **Kanonik depo:** `/Users/berat/extech` (branch `main`)
-**Görsel referans:** `metroyazilim/organization-wpfuk` → `src/app/manage`, `src/components/manage`, `src/app/globals.css`
+**Görsel referans:** `example-starter/organization-wpfuk` → `src/app/manage`, `src/components/manage`, `src/app/globals.css`
 
 ## 1. Hedef ve Görünür Sonuç
 

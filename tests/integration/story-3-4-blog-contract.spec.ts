@@ -35,7 +35,7 @@ function postPayload(slug: string, overrides: Partial<PostPayload> = {}): PostPa
     excerpt: "A concise locale-owned post excerpt.",
     blocks: [{ id: "b1", type: "text", html: "A complete locale-owned post body." }],
     category: "Security",
-    author: "Metro Yazılım",
+    author: "Corporate Starter",
     coverImageAssetId: null,
     seoTitle: "5 IT Security Steps | Metro",
     seoDescription: "Independent guidance on IT security posture.",

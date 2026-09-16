@@ -185,7 +185,7 @@ test.describe("Story 3.4 - Blog post payload", () => {
     excerpt: "Kısa özet",
     blocks: [{ id: "b1", type: "text", html: "<p>Uzun gövde</p>" }],
     category: "Güvenlik",
-    author: "Metro Yazılım",
+    author: "Corporate Starter",
     coverImageAssetId: null,
     seoTitle: null,
     seoDescription: null,
