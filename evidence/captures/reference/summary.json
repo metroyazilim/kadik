@@ -1,0 +1,286 @@
+[
+  {
+    "id": "home",
+    "viewport": "desktop",
+    "title": "Home 2 – Partiso",
+    "url": "https://partiso.axiomthemes.com/home-2/",
+    "scrollHeight": 7928,
+    "headings": [
+      "Help Bring the Change We Need",
+      "Forward Thinking. United Team.",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "images": 10,
+    "buttons": 80
+  },
+  {
+    "id": "home",
+    "viewport": "mobile",
+    "title": "Home 2 – Partiso",
+    "url": "https://partiso.axiomthemes.com/home-2/",
+    "scrollHeight": 8968,
+    "headings": [
+      "Help Bring the Change We Need",
+      "Forward Thinking. United Team.",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "images": 10,
+    "buttons": 80
+  },
+  {
+    "id": "about",
+    "viewport": "desktop",
+    "title": "Our History – Partiso",
+    "url": "https://partiso.axiomthemes.com/our-history/",
+    "scrollHeight": 3976,
+    "headings": [
+      "Our History",
+      "Choose a New Direction",
+      "Fast Facts",
+      "Our History",
+      "Campaign Highlights"
+    ],
+    "images": 17,
+    "buttons": 77
+  },
+  {
+    "id": "about",
+    "viewport": "mobile",
+    "title": "Our History – Partiso",
+    "url": "https://partiso.axiomthemes.com/our-history/",
+    "scrollHeight": 3550,
+    "headings": [
+      "Our History",
+      "Choose a New Direction",
+      "Fast Facts",
+      "Our History",
+      "Campaign Highlights"
+    ],
+    "images": 17,
+    "buttons": 68
+  },
+  {
+    "id": "events",
+    "viewport": "desktop",
+    "title": "Events from September 16 – October 15 – Partiso",
+    "url": "https://partiso.axiomthemes.com/event/",
+    "scrollHeight": 2193,
+    "headings": [
+      "Events for September 2026",
+      "Events",
+      "Events Search and Views Navigation",
+      "Event Views Navigation",
+      "Calendar of Events",
+      "1 event 31"
+    ],
+    "images": 7,
+    "buttons": 80
+  },
+  {
+    "id": "events",
+    "viewport": "mobile",
+    "title": "Events from September 16 – October 15 – Partiso",
+    "url": "https://partiso.axiomthemes.com/event/",
+    "scrollHeight": 1534,
+    "headings": [
+      "Events for September 2026",
+      "Events",
+      "Events Search and Views Navigation",
+      "Event Views Navigation",
+      "Calendar of Events",
+      "1 event 31"
+    ],
+    "images": 7,
+    "buttons": 74
+  },
+  {
+    "id": "volunteer",
+    "viewport": "desktop",
+    "title": "Volunteer – Partiso",
+    "url": "https://partiso.axiomthemes.com/volunteer/",
+    "scrollHeight": 1945,
+    "headings": [
+      "Volunteer",
+      "Get Involved!"
+    ],
+    "images": 5,
+    "buttons": 41
+  },
+  {
+    "id": "volunteer",
+    "viewport": "mobile",
+    "title": "Volunteer – Partiso",
+    "url": "https://partiso.axiomthemes.com/volunteer/",
+    "scrollHeight": 1716,
+    "headings": [
+      "Volunteer",
+      "Get Involved!"
+    ],
+    "images": 5,
+    "buttons": 32
+  },
+  {
+    "id": "issues",
+    "viewport": "desktop",
+    "title": "Issues – Partiso",
+    "url": "https://partiso.axiomthemes.com/issues/",
+    "scrollHeight": 4157,
+    "headings": [
+      "Issues",
+      "Campaign Principles",
+      "Help Us Bring the Change We Need"
+    ],
+    "images": 13,
+    "buttons": 58
+  },
+  {
+    "id": "issues",
+    "viewport": "mobile",
+    "title": "Issues – Partiso",
+    "url": "https://partiso.axiomthemes.com/issues/",
+    "scrollHeight": 4144,
+    "headings": [
+      "Issues",
+      "Campaign Principles",
+      "Help Us Bring the Change We Need"
+    ],
+    "images": 13,
+    "buttons": 49
+  },
+  {
+    "id": "posts",
+    "viewport": "desktop",
+    "title": "All Posts – Partiso",
+    "url": "https://partiso.axiomthemes.com/all-posts/",
+    "scrollHeight": 6929,
+    "headings": [
+      "All Posts",
+      "Posts pagination"
+    ],
+    "images": 19,
+    "buttons": 80
+  },
+  {
+    "id": "posts",
+    "viewport": "mobile",
+    "title": "All Posts – Partiso",
+    "url": "https://partiso.axiomthemes.com/all-posts/",
+    "scrollHeight": 6825,
+    "headings": [
+      "All Posts",
+      "Posts pagination"
+    ],
+    "images": 19,
+    "buttons": 80
+  },
+  {
+    "id": "post-detail",
+    "viewport": "desktop",
+    "title": "What are the Most Successful Methods to Fight Against Tax Scam – Partiso",
+    "url": "https://partiso.axiomthemes.com/what-are-the-most-successful-methods-to-fight-against-tax-scam/",
+    "scrollHeight": 4241,
+    "headings": [
+      "What are the Most Successful Methods to Fight Against Tax Scam",
+      "Post navigation",
+      "3 Comments",
+      "Leave a comment"
+    ],
+    "images": 11,
+    "buttons": 79
+  },
+  {
+    "id": "post-detail",
+    "viewport": "mobile",
+    "title": "What are the Most Successful Methods to Fight Against Tax Scam – Partiso",
+    "url": "https://partiso.axiomthemes.com/what-are-the-most-successful-methods-to-fight-against-tax-scam/",
+    "scrollHeight": 5618,
+    "headings": [
+      "What are the Most Successful Methods to Fight Against Tax Scam",
+      "Post navigation",
+      "3 Comments",
+      "Leave a comment"
+    ],
+    "images": 11,
+    "buttons": 70
+  },
+  {
+    "id": "contact",
+    "viewport": "desktop",
+    "title": "Contacts – Partiso",
+    "url": "https://partiso.axiomthemes.com/contacts/",
+    "scrollHeight": 2434,
+    "headings": [
+      "Contacts",
+      "Drop a Line"
+    ],
+    "images": 5,
+    "buttons": 45
+  },
+  {
+    "id": "contact",
+    "viewport": "mobile",
+    "title": "Contacts – Partiso",
+    "url": "https://partiso.axiomthemes.com/contacts/",
+    "scrollHeight": 2545,
+    "headings": [
+      "Contacts",
+      "Drop a Line"
+    ],
+    "images": 5,
+    "buttons": 36
+  },
+  {
+    "id": "gallery",
+    "viewport": "desktop",
+    "title": "Gallery Grid – Partiso",
+    "url": "https://partiso.axiomthemes.com/gallery-grid/",
+    "scrollHeight": 2186,
+    "headings": [
+      "Gallery Grid"
+    ],
+    "images": 17,
+    "buttons": 50
+  },
+  {
+    "id": "gallery",
+    "viewport": "mobile",
+    "title": "Gallery Grid – Partiso",
+    "url": "https://partiso.axiomthemes.com/gallery-grid/",
+    "scrollHeight": 2348,
+    "headings": [
+      "Gallery Grid"
+    ],
+    "images": 17,
+    "buttons": 41
+  },
+  {
+    "id": "privacy",
+    "viewport": "desktop",
+    "title": "Privacy Policy – Partiso",
+    "url": "https://partiso.axiomthemes.com/privacy-policy/",
+    "scrollHeight": 6951,
+    "headings": [
+      "Privacy Policy"
+    ],
+    "images": 5,
+    "buttons": 53
+  },
+  {
+    "id": "privacy",
+    "viewport": "mobile",
+    "title": "Privacy Policy – Partiso",
+    "url": "https://partiso.axiomthemes.com/privacy-policy/",
+    "scrollHeight": 9435,
+    "headings": [
+      "Privacy Policy"
+    ],
+    "images": 5,
+    "buttons": 44
+  }
+]

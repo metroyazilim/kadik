@@ -1,13 +1,4 @@
 import type { Metadata } from "next";
-import { generateTermsMetadata, TermsPage } from "@/lib/public-pages/terms";
-
-const LOCALE = "tr" as const;
-export const dynamic = "force-dynamic";
-
-export async function generateMetadata(): Promise<Metadata> {
-  return generateTermsMetadata(LOCALE);
-}
-
-export default async function TurkishTermsPage() {
-  return <TermsPage locale={LOCALE} />;
-}
+import { KadikLegal } from "@/components/KadikSite";
+export const metadata: Metadata = { title: "Kullanım Koşulları | KADIK" };
+export default function TurkishTermsPage() { return <KadikLegal terms />; }
