@@ -65,7 +65,7 @@ export async function getPublicDictionary(locale: Locale): Promise<Dictionary> {
     const record = await findDictionary(locale);
     return record?.published ? mergeDictionary(DICTIONARIES[locale], record.value) : DICTIONARIES[locale];
   } catch (error) {
-    console.error("Metro Yazılım content read failed; using checked-in dictionary", error);
+    console.error("Starter Kurumsal content read failed; using checked-in dictionary", error);
     return DICTIONARIES[locale];
   }
 }

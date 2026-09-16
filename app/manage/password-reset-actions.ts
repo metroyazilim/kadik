@@ -72,7 +72,7 @@ export async function requestPasswordResetAction(
   const link = `${resetBaseUrl()}/manage/reset-password?token=${encodeURIComponent(token)}`;
   await sendMail({
     to: email,
-    subject: "Metro Yazılım yönetim paneli - şifre sıfırlama",
+    subject: "Starter Kurumsal yönetim paneli - şifre sıfırlama",
     text: `Şifrenizi sıfırlamak için bu bağlantıyı açın (1 saat geçerlidir):\n\n${link}\n\nBu isteği siz yapmadıysanız bu e-postayı yok sayabilirsiniz.`,
     html: `<p>Şifrenizi sıfırlamak için aşağıdaki bağlantıyı açın. Bağlantı <strong>1 saat</strong> geçerlidir.</p><p><a href="${link}">Şifremi sıfırla</a></p><p>Bu isteği siz yapmadıysanız bu e-postayı yok sayabilirsiniz.</p>`,
   });

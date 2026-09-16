@@ -95,7 +95,7 @@ function PostLocaleForm({
                   </label>
                   <label className={fieldLabel}>
                     Yazar
-                    <input name="author" className={fieldInput} defaultValue={payload?.author ?? "Metro Yazılım"} maxLength={100} required />
+                    <input name="author" className={fieldInput} defaultValue={payload?.author ?? "Starter Kurumsal"} maxLength={100} required />
                   </label>
                 </FieldGrid>
                 <label className={fieldLabel}>

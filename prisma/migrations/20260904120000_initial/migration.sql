@@ -1,4 +1,4 @@
--- Extech owns this schema and database; it is intentionally separate from Metro Web.
+-- Each deployed project owns its own schema and database.
 CREATE TABLE "AdminUser" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,

@@ -10,7 +10,7 @@ export function hasAuthSecret() {
 export function requireDatabase() {
   const value = process.env.DATABASE_URL;
   if (!value) {
-    throw new Error("DATABASE_URL is required for Metro Yazılım admin and database-backed content.");
+    throw new Error("DATABASE_URL is required for Starter Kurumsal admin and database-backed content.");
   }
   return value;
 }

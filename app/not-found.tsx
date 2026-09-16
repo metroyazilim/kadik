@@ -4,7 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Sayfa Bulunamadı — Metro Yazılım",
+  title: "Sayfa Bulunamadı — Starter Kurumsal",
   description: "Aradığınız sayfa bulunamadı veya taşınmış olabilir.",
 };
 

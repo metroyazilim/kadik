@@ -1,7 +1,7 @@
 #!/bin/sh
 # Startup order for every deployment: wait for Postgres, apply migrations,
-# bootstrap a still-empty database (shipped content snapshot, first admin,
-# content registries), then hand the process over to the Next.js standalone
+# bootstrap a still-empty database (first admin and content registries), then
+# hand the process over to the Next.js standalone
 # server.
 set -eu
 
@@ -53,14 +53,8 @@ echo "entrypoint: applying migrations"
 
 entities=$(psql "$PSQL_URL" -tAc 'SELECT count(*) FROM "ContentEntity"')
 if [ "$entities" = "0" ]; then
-  SNAPSHOT=./prisma/data/content.sql
-  if [ -f "$SNAPSHOT" ]; then
-    echo "entrypoint: empty database, importing $SNAPSHOT"
-    psql "$PSQL_URL" -v ON_ERROR_STOP=1 -q -f "$SNAPSHOT"
-  fi
-  # Creates the first SUPER_ADMIN from ADMIN_EMAIL/ADMIN_PASSWORD (the
-  # snapshot carries content, never credentials) and no-ops over the
-  # registry rows the import already brought in.
+  # Creates the first SUPER_ADMIN from ADMIN_EMAIL/ADMIN_PASSWORD and
+  # bootstraps empty registry rows. Customer content is never bundled.
   echo "entrypoint: bootstrapping first admin and content registries"
   ./node_modules/.bin/tsx prisma/seed.ts
 else

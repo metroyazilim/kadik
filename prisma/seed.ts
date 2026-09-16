@@ -1,8 +1,8 @@
 // Deterministic, idempotent bootstrap for a fresh environment: the first
 // SUPER_ADMIN plus every registry row the admin panel expects to exist
 // (site settings, the eleven fixed Home sections, the content pages).
-// Content itself is not created here - a fresh deployment imports
-// `prisma/data/content.sql`, and every later change is made in /manage.
+// The starter intentionally contains no customer snapshot. Every project
+// begins with empty content and fills it through /manage.
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { getAdminBootstrap } from "../lib/env";
@@ -27,7 +27,7 @@ async function seedAdmin(): Promise<void> {
 
   if (!existing) {
     await prisma.adminUser.create({
-      data: { email: normalizedEmail, passwordHash, name: "Metro Yazılım Admin", role: "SUPER_ADMIN" },
+      data: { email: normalizedEmail, passwordHash, name: "Starter Admin", role: "SUPER_ADMIN" },
     });
     console.log(`seed: created SUPER_ADMIN ${normalizedEmail}`);
     return;

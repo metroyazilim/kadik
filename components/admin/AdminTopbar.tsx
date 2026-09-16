@@ -21,7 +21,7 @@ export function AdminTopbar({ onMenuOpen }: { onMenuOpen: () => void }) {
           <Menu className="size-5" aria-hidden="true" />
         </button>
         <span className="hidden truncate text-xs font-bold uppercase tracking-wider text-brand-muted sm:inline-block">
-          Metro Yazılım{section ? ` — ${section.label}` : ""}
+          Starter Kurumsal{section ? ` — ${section.label}` : ""}
         </span>
       </div>
 

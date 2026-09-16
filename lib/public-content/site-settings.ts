@@ -70,7 +70,7 @@ export const getPublicSiteSettings = cache(async (requestedLocale: ContentLocale
       fallbackApplied: result.fallbackApplied,
     };
   } catch (error) {
-    console.error("Metro Yazılım site settings read failed; using dictionary-only shell", error);
+    console.error("Starter Kurumsal site settings read failed; using dictionary-only shell", error);
     return null;
   }
 });
@@ -109,7 +109,7 @@ export async function getPublicLegalDocument(
       noindex: result.canonical?.noindex ?? false,
     };
   } catch (error) {
-    console.error("Metro Yazılım legal document read failed", error);
+    console.error("Starter Kurumsal legal document read failed", error);
     return null;
   }
 }

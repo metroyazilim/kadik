@@ -3,58 +3,58 @@ import type { Dictionary } from "../types";
 export const en: Dictionary = {
   meta: {
     home: {
-      title: "Metro Yazılım - IT Solutions and Technology",
+      title: "Starter Kurumsal - IT Solutions and Technology",
       description:
-        "Metro Yazılım helps businesses grow with database security, IT consulting, application development, and scalable cloud infrastructure solutions.",
+        "Starter Kurumsal helps businesses grow with database security, IT consulting, application development, and scalable cloud infrastructure solutions.",
     },
     about: {
-      title: "About Us | Metro Yazılım",
+      title: "About Us | Starter Kurumsal",
       description:
-        "Meet the Metro Yazılım team and discover how our proven process, expert guidance, and modern technology turn business goals into lasting success.",
+        "Meet the Starter Kurumsal team and discover how our proven process, expert guidance, and modern technology turn business goals into lasting success.",
     },
     blog: {
-      title: "Blog | Metro Yazılım",
-      description: "Read Metro Yazılım's latest articles on technology, security and IT services.",
+      title: "Blog | Starter Kurumsal",
+      description: "Read Starter Kurumsal's latest articles on technology, security and IT services.",
     },
     services: {
-      title: "Our Services | Metro Yazılım",
+      title: "Our Services | Starter Kurumsal",
       description: "Explore our database security, IT consulting, application development and cloud infrastructure services.",
     },
     products: {
-      title: "Our Products | Metro Yazılım",
-      description: "Browse the software products Metro Yazılım builds for businesses.",
+      title: "Our Products | Starter Kurumsal",
+      description: "Browse the software products Starter Kurumsal builds for businesses.",
     },
     projects: {
-      title: "Our Projects | Metro Yazılım",
+      title: "Our Projects | Starter Kurumsal",
       description: "A selection of technology projects we have delivered for our clients.",
     },
     faq: {
-      title: "Frequently Asked Questions | Metro Yazılım",
+      title: "Frequently Asked Questions | Starter Kurumsal",
       description: "The most common questions about our services, process and collaboration.",
     },
     terms: {
-      title: "Terms & Conditions | Metro Yazılım",
-      description: "Terms of use for the Metro Yazılım website and services.",
+      title: "Terms & Conditions | Starter Kurumsal",
+      description: "Terms of use for the Starter Kurumsal website and services.",
     },
     privacy: {
-      title: "Privacy Policy | Metro Yazılım",
-      description: "How Metro Yazılım collects and uses personal data.",
+      title: "Privacy Policy | Starter Kurumsal",
+      description: "How Starter Kurumsal collects and uses personal data.",
     },
     contact: {
-      title: "Contact | Metro Yazılım",
-      description: "Get in touch with the Metro Yazılım team.",
+      title: "Contact | Starter Kurumsal",
+      description: "Get in touch with the Starter Kurumsal team.",
     },
     search: {
-      title: "Search | Metro Yazılım",
+      title: "Search | Starter Kurumsal",
       description: "Search across blog posts, services, products, projects and team members.",
     },
     missionVision: {
-      title: "Our Mission & Vision | Metro Yazılım",
-      description: "Metro Yazılım's mission, vision and values.",
+      title: "Our Mission & Vision | Starter Kurumsal",
+      description: "Starter Kurumsal's mission, vision and values.",
     },
     partners: {
-      title: "Our Partners | Metro Yazılım",
-      description: "Discover Metro Yazılım's trusted partners and brand references.",
+      title: "Our Partners | Starter Kurumsal",
+      description: "Discover Starter Kurumsal's trusted partners and brand references.",
     },
   },
 
@@ -116,15 +116,15 @@ export const en: Dictionary = {
     eyebrow: "a leading IT company",
     titleTop: "Grow Your Business With This IT",
     titleBottom: "Solution",
-    text: "We help your business stay ahead with modern infrastructure, secure systems, and an expert team. Metro Yazılım puts technology to work for your growth.",
-    imageAlt: "The Metro Yazılım team working around a meeting table",
+    text: "We help your business stay ahead with modern infrastructure, secure systems, and an expert team. Starter Kurumsal puts technology to work for your growth.",
+    imageAlt: "The Starter Kurumsal team working around a meeting table",
   },
 
   about: {
     subtitle: "ABOUT US",
     title: "Supporting Our Clients With the Right Solutions",
     text: "Our experienced team supports your business growth with the right strategies and modern technologies.",
-    imageAlt: "The Metro Yazılım team working together around a meeting table",
+    imageAlt: "The Starter Kurumsal team working together around a meeting table",
     checklist: [
       "Brand and Design Identity",
       "Website Marketing Solutions",
@@ -228,14 +228,14 @@ export const en: Dictionary = {
     contactLabels: ["Call Us Anytime", "Get A Quote", "Location"],
     locationValue: "Levent, İstanbul",
     summary:
-      "Metro Yazılım is a full-service IT agency that helps businesses move faster with secure, practical technology.",
+      "Starter Kurumsal is a full-service IT agency that helps businesses move faster with secure, practical technology.",
     quickLinksTitle: "Quick Links",
     quickLinks: ["About Us", "Our Services", "Our Blog", "FAQ", "Contact Us"],
     recentTitle: "Recent Posts",
     recentPosts: ["Top 5 Technology Trends", "IT Solutions for the Digital Future"],
     reachTitle: "Contact Us",
     address: "Büyükdere Ave. No. 12, Levent, Şişli, İstanbul",
-    copyright: "© 2026 Metro Yazılım. All rights reserved.",
+    copyright: "© 2026 Starter Kurumsal. All rights reserved.",
     terms: "Terms and Conditions",
     privacy: "Privacy Policy",
   },
@@ -332,7 +332,7 @@ export const en: Dictionary = {
     banner: "Our Products",
     subtitle: "Our Products",
     title: "Solutions We Build for Your Business",
-    intro: "Speed up your business with Metro Yazılım's ready-made software products.",
+    intro: "Speed up your business with Starter Kurumsal's ready-made software products.",
     empty: "Our product catalogue is being prepared. It will be listed here soon.",
     ctaLabel: "View Details",
   },

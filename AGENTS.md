@@ -1,4 +1,4 @@
-# Extech — Agent Entry Point
+# Corporate Website Starter — Agent Entry Point
 
 ## Application Building Context
 
@@ -64,7 +64,7 @@ Planlama, iskele, kısmi backend, geçen bir build veya üretilmiş bir rapordan
 
 ## Non-Negotiable Project Rules
 
-- Kanonik dizin: `/Users/berat/extech`. Tek fiziksel checkout; kullanıcı açıkça istemedikçe worktree oluşturma.
+- Kanonik dizin: yeni projenin kendi checkout'u. Tek fiziksel checkout; kullanıcı açıkça istemedikçe worktree oluşturma.
 - Aynı checkout'ta birden fazla yazan ajan çalışmaz. Salt okunur inceleme paralel olabilir.
 - Her yönetim ekranı kendi route'udur. Rutin liste/oluşturma/düzenleme/sıralama akışları drawer veya modal içinde yaşamaz.
 - Yönetim panelinin görsel dili `docs/context/ui-context.md` token setinden gelir; ham hex yazılmaz. Public site kendi mevcut görsel dilini korur.

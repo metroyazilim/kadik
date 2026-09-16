@@ -1,4 +1,4 @@
-# Metro Yazılım - production image (Next.js standalone + Prisma + psql).
+# Corporate website starter - production image (Next.js standalone + Prisma + psql).
 # Build context is the repository root; `.env` is never copied in (see .dockerignore).
 
 FROM node:22-alpine AS deps
@@ -23,7 +23,7 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0
-# postgresql-client: the entrypoint imports prisma/data/content.sql with psql
+# postgresql-client: the entrypoint waits for and checks PostgreSQL with psql
 # on a first, empty deployment.
 RUN apk add --no-cache postgresql17-client
 

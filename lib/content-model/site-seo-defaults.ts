@@ -10,7 +10,7 @@ import { getStorageConfig } from "../media/storage";
 /** The exact literal `SiteHeader.tsx` already hardcodes as its own brand
  * fallback when neither a logo nor a brand name is published - reused
  * verbatim here, never a second invented default. */
-const DEFAULT_SITE_NAME = "Metro Yazılım";
+const DEFAULT_SITE_NAME = "Starter Kurumsal";
 
 function publicMediaAllowlist(): readonly string[] {
   const base = getStorageConfig().publicBaseUrl;

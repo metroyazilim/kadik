@@ -33,7 +33,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
           <div>
             <p className="text-[28px] font-extrabold leading-tight tracking-tight text-brand-on-invert">
-              Metro Yazılım İçerik Yönetimi
+              Starter Kurumsal İçerik Yönetimi
             </p>
             <p className="mt-3 max-w-md text-[15px] leading-relaxed text-brand-on-invert-muted">
               Anasayfa bloklarını, hizmet ve ürün kataloglarını, blog yazılarını, medya kütüphanesini ve

@@ -5,60 +5,60 @@ import type { Dictionary } from "../types";
 export const tr: Dictionary = {
   meta: {
     home: {
-      title: "Metro Yazılım - BT Çözümleri ve Teknoloji",
+      title: "Starter Kurumsal - BT Çözümleri ve Teknoloji",
       description:
-        "Metro Yazılım; veritabanı güvenliği, BT danışmanlığı, uygulama geliştirme ve bulut altyapı çözümleriyle işletmenizi büyütür.",
+        "Starter Kurumsal; veritabanı güvenliği, BT danışmanlığı, uygulama geliştirme ve bulut altyapı çözümleriyle işletmenizi büyütür.",
     },
     about: {
-      title: "Hakkımızda | Metro Yazılım",
+      title: "Hakkımızda | Starter Kurumsal",
       description:
-        "Metro Yazılım ekibini, çalışma sürecimizi ve teknolojiyle iş başarısını nasıl artırdığımızı tanıyın.",
+        "Starter Kurumsal ekibini, çalışma sürecimizi ve teknolojiyle iş başarısını nasıl artırdığımızı tanıyın.",
     },
     blog: {
-      title: "Blog | Metro Yazılım",
+      title: "Blog | Starter Kurumsal",
       description:
-        "Metro Yazılım'ın teknoloji, güvenlik ve BT hizmetleri üzerine güncel yazılarını okuyun.",
+        "Starter Kurumsal'ın teknoloji, güvenlik ve BT hizmetleri üzerine güncel yazılarını okuyun.",
     },
     services: {
-      title: "Hizmetlerimiz | Metro Yazılım",
+      title: "Hizmetlerimiz | Starter Kurumsal",
       description:
         "Veritabanı güvenliği, BT danışmanlığı, uygulama geliştirme ve bulut altyapı hizmetlerimizi keşfedin.",
     },
     products: {
-      title: "Ürünlerimiz | Metro Yazılım",
-      description: "Metro Yazılım'ın işletmeler için geliştirdiği yazılım ürünlerine göz atın.",
+      title: "Ürünlerimiz | Starter Kurumsal",
+      description: "Starter Kurumsal'ın işletmeler için geliştirdiği yazılım ürünlerine göz atın.",
     },
     projects: {
-      title: "Projelerimiz | Metro Yazılım",
+      title: "Projelerimiz | Starter Kurumsal",
       description: "Müşterilerimiz için tamamladığımız teknoloji projelerinden örnekler.",
     },
     faq: {
-      title: "Sıkça Sorulan Sorular | Metro Yazılım",
+      title: "Sıkça Sorulan Sorular | Starter Kurumsal",
       description: "Hizmetlerimiz, süreçlerimiz ve iş birliği hakkında en çok sorulan sorular.",
     },
     terms: {
-      title: "Şartlar ve Koşullar | Metro Yazılım",
-      description: "Metro Yazılım web sitesini ve hizmetlerini kullanım şartları.",
+      title: "Şartlar ve Koşullar | Starter Kurumsal",
+      description: "Starter Kurumsal web sitesini ve hizmetlerini kullanım şartları.",
     },
     privacy: {
-      title: "Gizlilik Politikası | Metro Yazılım",
-      description: "Metro Yazılım'ın kişisel verileri nasıl topladığı ve kullandığı hakkında bilgi.",
+      title: "Gizlilik Politikası | Starter Kurumsal",
+      description: "Starter Kurumsal'ın kişisel verileri nasıl topladığı ve kullandığı hakkında bilgi.",
     },
     contact: {
-      title: "İletişim | Metro Yazılım",
-      description: "Sorularınız için Metro Yazılım ekibiyle iletişime geçin.",
+      title: "İletişim | Starter Kurumsal",
+      description: "Sorularınız için Starter Kurumsal ekibiyle iletişime geçin.",
     },
     search: {
-      title: "Arama | Metro Yazılım",
+      title: "Arama | Starter Kurumsal",
       description: "Blog yazıları, hizmetler, ürünler, projeler ve ekip üyeleri arasında arayın.",
     },
     missionVision: {
-      title: "Misyon ve Vizyonumuz | Metro Yazılım",
-      description: "Metro Yazılım'ın misyonu, vizyonu ve değerleri.",
+      title: "Misyon ve Vizyonumuz | Starter Kurumsal",
+      description: "Starter Kurumsal'ın misyonu, vizyonu ve değerleri.",
     },
     partners: {
-      title: "İş Ortaklarımız | Metro Yazılım",
-      description: "Metro Yazılım'ın güvenilir iş ortaklarını ve marka referanslarını keşfedin.",
+      title: "İş Ortaklarımız | Starter Kurumsal",
+      description: "Starter Kurumsal'ın güvenilir iş ortaklarını ve marka referanslarını keşfedin.",
     },
   },
 
@@ -120,15 +120,15 @@ export const tr: Dictionary = {
     eyebrow: "en iyi bilişim şirketi",
     titleTop: "İşinizi Bu BT",
     titleBottom: "Çözümüyle Büyütün",
-    text: "Modern altyapı, güvenli sistemler ve uzman ekibimizle işletmenizi bir adım öne taşıyoruz. Metro Yazılım, teknolojiyi işinizin büyümesine hizmet ettirir.",
-    imageAlt: "Metro Yazılım ekibi toplantı masasında çalışıyor",
+    text: "Modern altyapı, güvenli sistemler ve uzman ekibimizle işletmenizi bir adım öne taşıyoruz. Starter Kurumsal, teknolojiyi işinizin büyümesine hizmet ettirir.",
+    imageAlt: "Starter Kurumsal ekibi toplantı masasında çalışıyor",
   },
 
   about: {
     subtitle: "HAKKIMIZDA",
     title: "Doğru Çözümlerle Müşterilerimizin Yanındayız",
     text: "Deneyimli ekibimiz, doğru stratejiler ve güncel teknolojilerle işletmenizin büyümesine katkı sağlar.",
-    imageAlt: "Metro Yazılım ekibi toplantı masasında birlikte çalışıyor",
+    imageAlt: "Starter Kurumsal ekibi toplantı masasında birlikte çalışıyor",
     checklist: [
       "Marka ve Tasarım Kimliği",
       "Web Sitesi Pazarlama Çözümleri",
@@ -232,14 +232,14 @@ export const tr: Dictionary = {
     contactLabels: ["Bizi 7/24 Arayın", "Teklif Alın", "Konum"],
     locationValue: "Levent, İstanbul",
     summary:
-      "Metro Yazılım, işletmelerin güvenli ve pratik teknolojilerle daha hızlı ilerlemesine yardımcı olan tam kapsamlı bir BT ajansıdır.",
+      "Starter Kurumsal, işletmelerin güvenli ve pratik teknolojilerle daha hızlı ilerlemesine yardımcı olan tam kapsamlı bir BT ajansıdır.",
     quickLinksTitle: "Hızlı Bağlantılar",
     quickLinks: ["Hakkımızda", "Hizmetlerimiz", "Blog Yazılarımız", "SSS", "Bize Ulaşın"],
     recentTitle: "Son Yazılar",
     recentPosts: ["En Popüler 5 Teknoloji Trendi", "Dijital Geleceğe Yönelik BT Çözümleri"],
     reachTitle: "Bize Ulaşın",
     address: "Büyükdere Cad. No:12, Levent, Şişli, İstanbul",
-    copyright: "© 2026 Metro Yazılım. Tüm Hakları Saklıdır.",
+    copyright: "© 2026 Starter Kurumsal. Tüm Hakları Saklıdır.",
     terms: "Şartlar ve Koşullar",
     privacy: "Gizlilik Politikası",
   },
@@ -339,7 +339,7 @@ export const tr: Dictionary = {
     banner: "Ürünlerimiz",
     subtitle: "Ürünlerimiz",
     title: "İşletmeniz İçin Geliştirdiğimiz Çözümler",
-    intro: "Metro Yazılım'ın hazır yazılım ürünleriyle işinizi hızlandırın.",
+    intro: "Starter Kurumsal'ın hazır yazılım ürünleriyle işinizi hızlandırın.",
     empty: "Ürün kataloğumuz hazırlanıyor. Yakında burada listelenecek.",
     ctaLabel: "Detayları Gör",
   },

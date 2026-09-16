@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const post = await getPublishedPostByRoute(locale, slug);
   if (!post) return {};
   return {
-    title: `${post.title} | Metro Yazılım`,
+    title: `${post.title} | Starter Kurumsal`,
     description: post.excerpt,
     alternates: alternatesFor(locale, `/blog/${post.slug}`),
     openGraph: { title: post.title, description: post.excerpt },

@@ -1,4 +1,4 @@
--- Metro Yazılım stores every locale in its own content and post table.
+-- Legacy locale content tables retained only for migration compatibility.
 CREATE TABLE "SiteContentTr" (
     "id" TEXT NOT NULL,
     "key" TEXT NOT NULL,

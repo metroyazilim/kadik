@@ -61,7 +61,7 @@ export function AdminSidebar({
             </span>
             <span className="flex min-w-0 flex-col">
               <span className="truncate text-sm font-extrabold leading-tight tracking-tight text-brand-text">
-                Metro Yazılım
+                Starter Kurumsal
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-brand-accent">Yönetim Paneli</span>
             </span>

@@ -26,7 +26,7 @@ export type ShellNavItem = Readonly<{ label: string; href: string; external: boo
 export type ShellFooterColumn = Readonly<{ id: string; title: string; links: readonly ShellLink[] }>;
 
 export type SiteShellView = Readonly<{
-  /** `null` -> render the default two-tone "Metro Yazılım" wordmark unchanged. */
+  /** `null` -> render the default two-tone "Starter Kurumsal" wordmark unchanged. */
   brandName: string | null;
   /** `null` -> no settings-provided logo (either none published, or it resolved to the shared placeholder). */
   logo: PublicSiteSettings["brand"]["logo"] | null;
