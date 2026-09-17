@@ -17,17 +17,17 @@ const contactSchema = z.object({
 
 export async function POST(request: Request) {
   const parsed = contactSchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ error: "Geçerli alanları doldurun ve onay kutusunu işaretleyin." }, { status: 400 });
+  if (!parsed.success) return NextResponse.json({ error: "Please fill in valid details and check the consent box." }, { status: 400 });
   const { name, email, message } = parsed.data;
-  const subject = parsed.data.subject || "KADIK iletişim formu";
+  const subject = parsed.data.subject || "KADIK contact form";
   const phone = parsed.data.phone || null;
   const submissionHash = createHash("sha256").update([name, email, phone ?? "", subject, message, Math.floor(Date.now() / 600000)].join("\n")).digest("hex");
   try {
-    await prisma.message.create({ data: { locale: "tr", name, email, phone, subject, message, submissionHash } });
+    await prisma.message.create({ data: { locale: "en", name, email, phone, subject, message, submissionHash } });
     return NextResponse.json({ ok: true });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") return NextResponse.json({ ok: true });
     console.error("Kadık contact submission failed", error);
-    return NextResponse.json({ error: "Mesaj kaydedilemedi." }, { status: 503 });
+    return NextResponse.json({ error: "Message could not be saved." }, { status: 503 });
   }
 }

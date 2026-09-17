@@ -36,7 +36,7 @@ api.get("/ready", async (context) => {
 });
 api.get("/content", (context) => context.json({
   site: "Kybele Atasever Dünya İş Konseyi",
-  locale: "tr",
+  locale: "en",
   routes: CONTENT_ROUTES,
 }));
 

@@ -2,12 +2,10 @@ import type { ReactNode } from "react";
 import "@/app/globals.css";
 
 /**
- * Document root shared by every Kadik route. `lang` defaults to English -
- * the site's native locale - and is overridden to `"tr"` by the `/tr/*`
- * route layouts. `globals.css`'s `--kadik-*` tokens are plain system fonts
- * (Georgia/Arial), so this needs no Google Fonts wiring the way the legacy
- * `[locale]/layout.tsx` does.
+ * Document root shared by every Kadik route. The public site has no
+ * non-English route tree, so `lang` is always `"en"`; other languages are
+ * served client-side by `components/GoogleTranslateWidget.tsx`.
  */
-export default function KadikLayout({ children, lang = "en" }: { children: ReactNode; lang?: "en" | "tr" }) {
-  return <html lang={lang}><body>{children}</body></html>;
+export default function KadikLayout({ children }: { children: ReactNode }) {
+  return <html lang="en"><body>{children}</body></html>;
 }

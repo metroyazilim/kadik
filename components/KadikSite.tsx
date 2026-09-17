@@ -35,12 +35,12 @@ const images = {
 };
 
 /** BCP 47 tag for `Date#toLocaleDateString`/string comparison helpers. */
-const DATE_LOCALE: Record<KadikLocale, string> = { en: "en-GB", tr: "tr-TR" };
+const DATE_LOCALE: Record<KadikLocale, string> = { en: "en-GB" };
 
 /**
  * Every exported page component is provided at its root, so `Header`,
- * `Footer`, `Banner`, `Shell` and the language switcher never need `locale`
- * or `active` threaded through as props - they read this instead.
+ * `Footer`, `Banner` and `Shell` never need `locale` or `active` threaded
+ * through as props - they read this instead.
  */
 const KadikPageContext = createContext<{ locale: KadikLocale; active: KadikPageKey }>({
   locale: "en",
@@ -205,16 +205,6 @@ function useNavItems() {
   ];
 }
 
-/** EN/TR toggle: resolves the current page's address in the other locale via
- * `KADIK_PATHS`. Post detail pages fall back to the news list root in the
- * other locale (`KADIK_PATHS.post`) - the exact translated slug for a given
- * article is not guaranteed to exist, so the switcher never guesses one. */
-function LanguageSwitcher() {
-  const { locale, active } = useKadikPage();
-  const other: KadikLocale = locale === "en" ? "tr" : "en";
-  const t = useKadikDict();
-  return <Link className="kadik-lang-switch" href={KADIK_PATHS[active][other]} hrefLang={other} aria-label={t.langSwitch.label}>{other.toUpperCase()}</Link>;
-}
 
 function Header() {
   const { locale, active } = useKadikPage();
@@ -234,7 +224,6 @@ function Header() {
         {item.children && <div className="kadik-dropdown">{item.children.map((child) => <Link key={child.href} href={child.href}>{child.label}</Link>)}</div>}
       </div>)}</nav>
       <GoogleTranslateWidget pageLanguage={locale} />
-      <LanguageSwitcher />
       <button className="kadik-menu-button" onClick={() => setOpen(!open)} aria-label={t.nav.openMenu} aria-expanded={open}><span /><span /><span /></button>
     </div>
     {open && <nav className="kadik-mobile-nav" aria-label={t.nav.mobileMenu}>{navItems.map((item) => <div key={item.href}>

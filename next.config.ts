@@ -39,28 +39,25 @@ const nextConfig: NextConfig = {
   // The clone contract comes from the generation prompt; a second, generic rule
   // file in the same directory would compete with it.
   agentRules: false,
-  // English is the site's native/default locale; Turkish lives under
-  // `/tr/*`. The legacy Metro-starter multi-locale redirect table
-  // (`buildStaticRedirects`) assumed the opposite (Turkish prefixless
-  // canonical, `/tr/*` always redirected away) and would 308 every real
-  // `/tr/...` Kadik page straight back to English - removed, not reused.
-  // These rows only carry forward the old bare-Turkish Kadik addresses to
-  // their new `/tr/...` home.
+  // English is the site's only structural locale; there is no `/tr/*`
+  // route tree. These rows carry forward the old bare-Turkish Kadik
+  // addresses (and the pre-KADIK `/gonulluluk` campaign address) to their
+  // English canonical home - see `KADIK_PATHS` in `lib/kadik-i18n.ts`.
   async redirects() {
     return [
-      { source: "/hakkimizda", destination: "/tr/hakkimizda", permanent: true as const },
-      { source: "/kurul-uyeleri", destination: "/tr/kurul-uyeleri", permanent: true as const },
-      { source: "/etkinlikler", destination: "/tr/etkinlikler", permanent: true as const },
-      { source: "/uyelik", destination: "/tr/uyelik", permanent: true as const },
-      { source: "/duyurular", destination: "/tr/duyurular", permanent: true as const },
-      { source: "/yazilar", destination: "/tr/yazilar", permanent: true as const },
-      { source: "/yazilar/:slug", destination: "/tr/yazilar/:slug", permanent: true as const },
-      { source: "/iletisim", destination: "/tr/iletisim", permanent: true as const },
-      { source: "/galeri", destination: "/tr/galeri", permanent: true as const },
-      { source: "/gizlilik-politikasi", destination: "/tr/gizlilik-politikasi", permanent: true as const },
-      { source: "/kullanim-sartlari", destination: "/tr/kullanim-sartlari", permanent: true as const },
+      { source: "/hakkimizda", destination: "/about", permanent: true as const },
+      { source: "/kurul-uyeleri", destination: "/board", permanent: true as const },
+      { source: "/etkinlikler", destination: "/events", permanent: true as const },
+      { source: "/uyelik", destination: "/membership", permanent: true as const },
+      { source: "/duyurular", destination: "/announcements", permanent: true as const },
+      { source: "/yazilar", destination: "/news", permanent: true as const },
+      { source: "/yazilar/:slug", destination: "/news/:slug", permanent: true as const },
+      { source: "/iletisim", destination: "/contact", permanent: true as const },
+      { source: "/galeri", destination: "/gallery", permanent: true as const },
+      { source: "/gizlilik-politikasi", destination: "/privacy-policy", permanent: true as const },
+      { source: "/kullanim-sartlari", destination: "/terms", permanent: true as const },
       // Campaign-era membership address; predates `/uyelik` itself.
-      { source: "/gonulluluk", destination: "/tr/uyelik", permanent: true as const },
+      { source: "/gonulluluk", destination: "/membership", permanent: true as const },
     ];
   },
   async headers() {

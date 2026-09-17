@@ -1,26 +1,18 @@
 /**
- * Single source of truth for the KADİK site's two structural locales.
- * English is the native/default locale (prefixless routes); Turkish is the
- * secondary locale under the `/tr` prefix. `components/KadikSite.tsx` is
- * the only consumer - every static string that used to be a Turkish JSX
- * literal now lives here, keyed by locale, so the exact same component tree
- * renders either language.
- *
- * A separate, unrelated mechanism (`components/GoogleTranslateWidget.tsx`)
- * offers machine translation into a handful of further languages on top of
- * these two - that widget never needs an entry here.
+ * Single source of truth for the KADİK site's page keys and copy. English
+ * is the site's only structural locale - the public site has no `/tr`
+ * route tree. Turkish and every other language are handled exclusively by
+ * `components/GoogleTranslateWidget.tsx`'s client-side Google Translate
+ * integration, never by a parallel route or dictionary here.
+ * `components/KadikSite.tsx` is the only consumer.
  */
 
-export type KadikLocale = "en" | "tr";
+export type KadikLocale = "en";
 
-export const KADIK_LOCALES: readonly KadikLocale[] = ["en", "tr"];
+export const KADIK_LOCALES: readonly KadikLocale[] = ["en"];
 
 export const KADIK_DEFAULT_LOCALE: KadikLocale = "en";
 
-export const KADIK_LOCALE_NAMES: Record<KadikLocale, string> = {
-  en: "English",
-  tr: "Türkçe",
-};
 
 export type KadikPageKey =
   | "home"
@@ -37,27 +29,22 @@ export type KadikPageKey =
   | "terms"
   | "notfound";
 
-/**
- * One address per page per locale. English is prefixless; Turkish keeps the
- * original Turkish segment names under `/tr`, so an already-shared
- * `/tr/kurul-uyeleri` style link keeps meaning what it says. `post`'s entry
- * is the list root - a post detail page resolves its own per-locale path
- * via `kadikPostPath`, not this table.
- */
+/** One canonical, prefixless address per page. `post`'s entry is the list
+ * root - a post detail page resolves its own path via `kadikPostPath`. */
 export const KADIK_PATHS: Record<KadikPageKey, Record<KadikLocale, string>> = {
-  home: { en: "/", tr: "/tr" },
-  about: { en: "/about", tr: "/tr/hakkimizda" },
-  board: { en: "/board", tr: "/tr/kurul-uyeleri" },
-  events: { en: "/events", tr: "/tr/etkinlikler" },
-  membership: { en: "/membership", tr: "/tr/uyelik" },
-  issues: { en: "/announcements", tr: "/tr/duyurular" },
-  posts: { en: "/news", tr: "/tr/yazilar" },
-  post: { en: "/news", tr: "/tr/yazilar" },
-  contact: { en: "/contact", tr: "/tr/iletisim" },
-  gallery: { en: "/gallery", tr: "/tr/galeri" },
-  privacy: { en: "/privacy-policy", tr: "/tr/gizlilik-politikasi" },
-  terms: { en: "/terms", tr: "/tr/kullanim-sartlari" },
-  notfound: { en: "/", tr: "/tr" },
+  home: { en: "/" },
+  about: { en: "/about" },
+  board: { en: "/board" },
+  events: { en: "/events" },
+  membership: { en: "/membership" },
+  issues: { en: "/announcements" },
+  posts: { en: "/news" },
+  post: { en: "/news" },
+  contact: { en: "/contact" },
+  gallery: { en: "/gallery" },
+  privacy: { en: "/privacy-policy" },
+  terms: { en: "/terms" },
+  notfound: { en: "/" },
 };
 
 export function kadikPostPath(locale: KadikLocale, slug: string): string {
@@ -94,7 +81,6 @@ export type KadikDictionary = Readonly<{
     terms: string;
   }>;
   breadcrumbHome: string;
-  langSwitch: Readonly<{ label: string }>;
   contactForm: Readonly<{
     namePlaceholder: string;
     emailPlaceholder: string;
@@ -315,7 +301,6 @@ const en: KadikDictionary = {
     terms: "Terms of Use",
   },
   breadcrumbHome: "HOME",
-  langSwitch: { label: "Switch language" },
   contactForm: {
     namePlaceholder: "Your full name",
     emailPlaceholder: "Your email address",
@@ -544,265 +529,4 @@ const en: KadikDictionary = {
     ],
   },
 };
-
-const tr: KadikDictionary = {
-  brandFull: "KYBELE ATASEVER DÜNYA İŞ KONSEYİ",
-  htmlLang: "tr",
-  nav: {
-    home: "Ana Sayfa",
-    corporate: "Kurumsal",
-    about: "Hakkımızda",
-    board: "Kurul Üyeleri",
-    contact: "İletişim",
-    activities: "Faaliyetler",
-    events: "Etkinlikler",
-    announcements: "Duyurular",
-    news: "Haberler",
-    membership: "Üyelik",
-    gallery: "Galeri",
-    openMenu: "Menüyü aç",
-    mainMenu: "Ana menü",
-    mobileMenu: "Mobil menü",
-  },
-  footer: {
-    tagline: "İş dünyasını ortak akıl, güven ve uluslararası iş birlikleri etrafında buluşturan bağımsız bir konsey.",
-    corporate: "Kurumsal",
-    activities: "Faaliyetler",
-    followUs: "Bizi Takip Edin",
-    contactCta: "Bize Ulaşın",
-    rightsReserved: "Tüm hakları saklıdır.",
-    privacy: "Gizlilik",
-    terms: "Kullanım Koşulları",
-  },
-  breadcrumbHome: "ANASAYFA",
-  langSwitch: { label: "Dili değiştir" },
-  contactForm: {
-    namePlaceholder: "Adınız Soyadınız",
-    emailPlaceholder: "E-posta adresiniz",
-    subjectPlaceholder: "Konu",
-    messagePlaceholder: "Mesajınız",
-    consent: "Gönderdiğim bilgilerin saklanmasını ve benimle iletişime geçilmesini kabul ediyorum.",
-    submit: "Mesaj Gönder",
-    submitting: "Gönderiliyor…",
-    success: "Mesajınız alındı. Ekibimiz en kısa sürede size dönecek.",
-    error: "Form gönderilemedi. Lütfen daha sonra tekrar deneyin.",
-    defaultName: "Konsey ziyaretçisi",
-    defaultMessage: "Konsey iletişim formu",
-  },
-  membershipForm: {
-    ariaLabel: "Üyelik başvuru formu",
-    name: "Ad Soyad",
-    namePlaceholder: "Adınız Soyadınız",
-    email: "E-posta",
-    phone: "Telefon",
-    phonePlaceholder: "+90 5xx xxx xx xx",
-    company: "Şirket / kurum",
-    companyPlaceholder: "Şirketinizin adı",
-    position: "Görev / unvan",
-    positionPlaceholder: "Genel müdür, kurucu, yönetici…",
-    sector: "Sektör",
-    sectorPlaceholder: "İnşaat, tekstil, lojistik, teknoloji…",
-    city: "Şehir",
-    cityPlaceholder: "İstanbul",
-    website: "Web sitesi (opsiyonel)",
-    websitePlaceholder: "www.sirketiniz.com",
-    reference: "Referans üye (opsiyonel)",
-    referencePlaceholder: "Sizi konseye yönlendiren üye",
-    note: "Başvuru notu",
-    notePlaceholder: "Faaliyet alanınız, üyelikten beklentiniz ve katkı sunmak istediğiniz sektör kurulu",
-    consent: "Başvuru bilgilerimin üyelik değerlendirmesi için saklanmasını ve benimle iletişime geçilmesini kabul ediyorum.",
-    submit: "Üyelik Başvurusu Gönder",
-    submitting: "Gönderiliyor…",
-    success: "Başvurunuz alındı. Konsey sekreteryası değerlendirme sonrasında sizinle iletişime geçecek.",
-    error: "Başvuru gönderilemedi. Lütfen daha sonra tekrar deneyin.",
-    fieldLabels: { company: "Şirket / kurum", position: "Görev / unvan", sector: "Sektör", city: "Şehir", website: "Web sitesi", reference: "Referans üye" },
-    subjectFallback: "Üyelik başvurusu",
-  },
-  home: {
-    heroKicker: "KYBELE ATASEVER DÜNYA İŞ KONSEYİ",
-    heroTitleLine1: "İş dünyasını",
-    heroTitleLine2: "geleceğe bağlıyoruz.",
-    heroSubtitle: "Güven, ortak akıl ve sürdürülebilir iş birlikleri.",
-    heroCta: "Üyelik hakkında",
-    introEyebrow: "KONSEYİMİZ",
-    introTitle: "Sınırları aşan bir iş ağı.",
-    introLead: "Kybele ve KADİK; girişimcileri, şirket yöneticilerini ve sektör liderlerini ortak değerler etrafında buluşturan bir dünya iş konseyi olarak çalışır.",
-    introText: "Bilgi paylaşımını, ticari bağlantıları ve yeni nesil iş birliklerini güçlendiren programlar düzenliyoruz.",
-    introCta: "Konseyi tanıyın",
-    principlesEyebrow: "FAALİYET ALANLARIMIZ",
-    principlesTitle: "Üyelerimiz için gerçek bağlantılar, somut fırsatlar.",
-    principles: [
-      { number: "01", title: "İş geliştirme", text: "Yeni pazarlara açılmak ve doğru ortaklarla buluşmak için programlar." },
-      { number: "02", title: "Sektör kurulları", text: "Sektörel deneyimi ortak akılla büyüten çalışma grupları." },
-      { number: "03", title: "Uluslararası ağ", text: "Dünya genelinde yatırım, ticaret ve temsil bağlantıları." },
-    ],
-    principlesLink: "Faaliyetleri keşfet ↗",
-    bandKicker: "İŞ BİRLİĞİ · VİZYON · GÜVEN",
-    bandTitleLine1: "Birlikte büyüyen",
-    bandTitleLine2: "bir iş ekosistemi.",
-    bandCta: "Üye olun",
-    boardKicker: "KYBELE ATASEVER DÜNYA İŞ KONSEYİ",
-    boardTitle: "Kurul üyelerimiz",
-    boardText: "Farklı sektörlerden iş insanlarını ortak akıl ve yeni iş birlikleri için aynı masada buluşturuyoruz.",
-    boardCta: "Tüm kurul",
-    boardEmptyTitle: "Kurul kadrosu hazırlanıyor.",
-    boardEmptyText: "Kurul üyelerini yönetim panelindeki \"Kurul Üyeleri\" bölümünden ekleyip yayınlayabilirsiniz.",
-    boardEmptyLink: "Kurul üyeleri sayfasını görüntüle ↗",
-    newsEyebrow: "GÜNCEL",
-    newsTitle: "Konseyden haberler",
-    newsEmpty: "Yayınlar hazırlanıyor. Yönetim panelindeki \"Yayınlar ve Haberler\" bölümünden yazı ekleyip yayınladığınızda bu alan otomatik güncellenir.",
-    newsCta: "Tüm yayınlar",
-    readMore: "Devamını oku ↗",
-  },
-  board: {
-    pageTitle: "Kurul Üyeleri",
-    introEyebrow: "KONSEY YÖNETİMİ",
-    introTitle: "Kurul üyelerimiz",
-    introLead: "Kybele ve KADİK Dünya İş Konseyi üyeleriyle tanışın; farklı sektörleri temsil eden iş insanlarımızla bağlantı kurun.",
-    emptyTitle: "Kurul üyeleri yakında burada.",
-    emptyText: "Yeni kurul üyeleri yönetim panelinden eklenip yayınlandığında bu sayfada görünecek.",
-  },
-  about: {
-    pageTitle: "Hakkımızda",
-    heroTitle: "Birlikte büyüyen bir ekosistem.",
-    lead: "Kybele ve KADİK; girişimcileri, şirket yöneticilerini ve sektör liderlerini güvene dayalı bir dünya iş ağı içinde buluşturur.",
-    text: "Konseyimiz; ticari bağlantıları güçlendiren, bilgi paylaşımını artıran ve üyelerinin uluslararası ölçekte gelişimine katkı sunan programlar tasarlar.",
-    cta: "Kurul üyelerini tanıyın",
-    wideImageAlt: "İş insanlarının toplantısı",
-    statsEyebrow: "RAKAMLARLA",
-    statsTitle: "Ortak değerlerimiz",
-    stats: [
-      { number: "01", label: "Güven odaklı ağ" },
-      { number: "02", label: "Sektör kurulu" },
-      { number: "03", label: "Uluslararası vizyon" },
-      { number: "04", label: "Sürdürülebilir büyüme" },
-    ],
-    storyEyebrow: "KONSEYİN HİKÂYESİ",
-    storyTitle: "Fikirden küresel iş ağına",
-    timeline: [
-      { year: "2024", title: "Kybele vizyonu doğdu", text: "İş dünyasının farklı sektörlerini ortak hedeflerde buluşturma fikriyle yola çıktık." },
-      { year: "2025", title: "KADİK ağı kuruldu", text: "Üyelerimiz için bilgi, bağlantı ve gelişim odaklı bir yapı oluşturduk." },
-      { year: "2026", title: "Dünya iş konseyi", text: "Yeni pazarlara açılan, güvenilir ve sürdürülebilir iş birliklerini büyütüyoruz." },
-    ],
-  },
-  events: {
-    pageTitle: "Etkinlikler",
-    searchAria: "Etkinliklerde ara",
-    searchPlaceholder: "Etkinliklerde ara",
-    searchButton: "Etkinlik bul",
-    viewList: "Liste",
-    viewMonth: "Ay",
-    viewDay: "Gün",
-    prevMonth: "Önceki ay",
-    nextMonth: "Sonraki ay",
-    thisMonth: "BU AY",
-    weekdays: ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"],
-    noResults: "Bu tarih için etkinlik bulunamadı.",
-    join: "Katıl",
-    dateFieldAria: "Etkinlik tarihi",
-    dayCellAria: "etkinlikleri",
-    events: [
-      { date: "2026-09-08", title: "Sektör kurulları ortak toplantısı" },
-      { date: "2026-09-15", title: "İhracat ve dış pazarlar paneli" },
-      { date: "2026-09-17", title: "Üye şirketler tanışma buluşması" },
-      { date: "2026-09-29", title: "Finansmana erişim çalıştayı" },
-    ],
-  },
-  membership: {
-    pageTitle: "Üyelik Başvurusu",
-    eyebrow: "KONSEY AİLESİ",
-    title: "İş ağınızı büyütün.",
-    lead: "Kybele ve KADİK üyeliğiyle bilgiye, bağlantıya ve yeni ticari fırsatlara daha yakın olun.",
-    text: "Üyelik; şirket sahipleri, yöneticiler ve profesyoneller için kurumsal bir başvuru süreciyle işler. Başvurunuz konsey sekreteryası tarafından değerlendirilir, ardından sizi uygun sektör kurulu ve çalışma gruplarıyla buluştururuz.",
-    steps: [
-      { number: "01", text: "Başvuru formunu şirket ve sektör bilgilerinizle doldurun." },
-      { number: "02", text: "Sekreterya başvurunuzu inceler ve sizinle ön görüşme yapar." },
-      { number: "03", text: "Yönetim kurulu değerlendirmesinin ardından üyelik kaydınız tamamlanır." },
-      { number: "04", text: "Sektör kurullarına, etkinliklere ve iş birliği programlarına katılmaya başlarsınız." },
-    ],
-  },
-  announcements: {
-    pageTitle: "Duyurular",
-    eyebrow: "KONSEYDEN",
-    title: "Gündem ve duyurular",
-    lead: "Üyelerimizi etkinlikler, sektör kurulları, iş fırsatları ve konsey çalışmalarındaki gelişmeler hakkında düzenli olarak bilgilendiriyoruz.",
-    items: ["Sektör kurulları", "Üyelik duyuruları", "Uluslararası iş fırsatları", "Eğitim ve gelişim", "Ticaret heyetleri", "Konsey buluşmaları", "Yayınlar", "İş birlikleri"],
-    itemText: "İş dünyasının gündemini, üyelerimizin gelişimini ve yeni bağlantıları destekleyen güncel başlıklar.",
-    itemCta: "Detaylı bilgi ↗",
-    ctaTitle: "Konsey gündeminden haberdar olun.",
-    ctaButton: "Bize ulaşın",
-  },
-  news: {
-    pageTitle: "Yayınlar",
-    typeLabel: "Yazı türü:",
-    all: "Tümü",
-    searchAria: "Yazılarda ara",
-    searchPlaceholder: "Ara…",
-    emptyNoContent: "Yayınlar hazırlanıyor. Yönetim panelinden yazı ekleyip yayınladığınızda burada listelenir.",
-    emptyNoMatch: "Aramanıza uygun yazı bulunamadı.",
-    searchHeading: "Arama",
-    categoriesHeading: "Kategoriler",
-    announcementsLink: "Duyurular",
-    readMore: "Devamını oku ↗",
-  },
-  article: {
-    tagsLabel: "ETİKETLER:",
-    brandTag: "KADİK",
-    industryTag: "İŞ DÜNYASI",
-  },
-  contact: {
-    pageTitle: "İletişim",
-    eyebrow: "KONSEY SEKRETERYASI",
-    title: "İş birliğini konuşalım.",
-    lead: "Üyelik, sektör kurulları, etkinlikler ve uluslararası iş bağlantıları hakkında bize ulaşın.",
-    addressLabel: "Adres",
-    address: "İstanbul, Türkiye",
-    phoneLabel: "Telefon",
-    phone: "+90 (212) 000 00 00",
-    emailLabel: "E-posta",
-    email: "merhaba@kadik.org",
-  },
-  gallery: {
-    pageTitle: "Galeri",
-    categories: ["Etkinlikler", "Toplantılar", "İş Gezileri"],
-    all: "Tümü",
-    close: "Kapat",
-    lightboxAria: "Galeri görseli",
-    enlargedAlt: "Büyütülmüş galeri görseli",
-  },
-  legal: {
-    privacyTitle: "Gizlilik Politikası",
-    termsTitle: "Kullanım Koşulları",
-    lead: "Bu metin, Kybele ve KADİK web sitesini kullanırken haklarınızı ve sorumluluklarınızı açıklar.",
-    privacySections: [
-      ["1. Giriş", "Kybele ve KADİK olarak kişisel verilerinizin korunmasına önem veriyoruz. Bu metin, web sitemizi kullanırken hangi bilgilerin toplandığını ve nasıl kullanıldığını açıklar."],
-      ["2. Toplanan veriler", "İletişim ve üyelik formlarında paylaştığınız bilgiler yalnızca talebinizi karşılamak ve sizinle iletişim kurmak amacıyla işlenir."],
-      ["3. Saklama ve güvenlik", "Veriler yetkisiz erişime karşı korunan sistemlerde, gerekli olduğu süre boyunca saklanır. Yasal yükümlülükler dışında üçüncü kişilerle paylaşılmaz."],
-      ["4. Haklarınız", "Kişisel verilerinize erişme, düzeltme, silme ve işlemeye itiraz etme hakkına sahipsiniz. Talepleriniz için merhaba@kadik.org adresinden bize ulaşabilirsiniz."],
-    ],
-    termsSections: [
-      ["1. Hizmetin kullanımı", "Siteyi yalnızca hukuka uygun amaçlarla kullanmayı kabul edersiniz. İçerikleri izinsiz çoğaltamaz, site güvenliğini tehlikeye atacak girişimlerde bulunamazsınız."],
-      ["2. İçerik ve bağlantılar", "Sitedeki içerikler bilgilendirme amacıyla sunulur. Harici bağlantıların içeriklerinden Kybele ve KADİK sorumlu değildir."],
-      ["3. Değişiklikler", "Koşullar gerektiğinde güncellenebilir. Güncel metin bu sayfada yayınlanır."],
-    ],
-  },
-  notFound: {
-    pageTitle: "Sayfa Bulunamadı",
-    code: "404",
-    heading: "Aradığınız sayfaya ulaşamadık.",
-    text: "Bağlantı taşınmış, adresi değişmiş ya da yayından kaldırılmış olabilir. Konsey içeriklerine aşağıdaki bölümlerden ulaşabilir, aradığınızı bulamazsanız sekreteryaya yazabilirsiniz.",
-    home: "Ana sayfaya dön",
-    contactCta: "İletişime geçin",
-    linksLabel: "Site bölümleri",
-    links: [
-      { key: "about", title: "Hakkımızda", text: "Konseyin vizyonu, çalışma alanları ve hikâyesi." },
-      { key: "board", title: "Kurul Üyeleri", text: "Yönetim kurulu ve sektör temsilcilerimiz." },
-      { key: "posts", title: "Yayınlar", text: "Haberler, makaleler ve konsey değerlendirmeleri." },
-      { key: "events", title: "Etkinlikler", text: "Toplantı, panel ve program takvimi." },
-      { key: "membership", title: "Üyelik Başvurusu", text: "Konsey ailesine katılmak için başvuru formu." },
-      { key: "gallery", title: "Galeri", text: "Faaliyetlerimizden fotoğraf seçkisi." },
-    ],
-  },
-};
-
-export const KADIK_DICT: Record<KadikLocale, KadikDictionary> = { en, tr };
+export const KADIK_DICT: Record<KadikLocale, KadikDictionary> = { en };
