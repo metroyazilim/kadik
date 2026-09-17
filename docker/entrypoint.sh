@@ -57,6 +57,8 @@ if [ "$entities" = "0" ]; then
   # bootstraps empty registry rows. Customer content is never bundled.
   echo "entrypoint: bootstrapping first admin and content registries"
   ./node_modules/.bin/tsx prisma/seed.ts
+  echo "entrypoint: seeding Kadik initial content (board members + posts)"
+  ./node_modules/.bin/tsx scripts/seed-kadik-content.ts || echo "entrypoint: kadik content seed failed, continuing"
 else
   echo "entrypoint: database already has $entities content entities, skipping bootstrap"
 fi
