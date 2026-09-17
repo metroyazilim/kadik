@@ -17,7 +17,9 @@
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:create": "node scripts/create-local-db.mjs",
-    "db:reset-admin-password": "tsx scripts/reset-admin-password.ts"
+    "db:reset-admin-password": "tsx scripts/reset-admin-password.ts",
+    "db:seed-kadik": "tsx scripts/seed-kadik-content.ts",
+    "media:import": "tsx scripts/media-import.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

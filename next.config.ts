@@ -46,7 +46,12 @@ const nextConfig: NextConfig = {
   // hand-typed here. Config-level redirects run before the app router, so a
   // `/tr/*` request never reaches a render or touches the database.
   async redirects() {
-    return buildStaticRedirects();
+    return [
+      ...buildStaticRedirects(),
+      // Üyelik sayfası kampanya döneminden kalan `/gonulluluk` adresinden
+      // Türkçe `/uyelik` segmentine taşındı; eski adres kalıcı yönlenir.
+      { source: "/gonulluluk", destination: "/uyelik", permanent: true as const },
+    ];
   },
   async headers() {
     return [

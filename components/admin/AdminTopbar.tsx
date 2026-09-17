@@ -25,15 +25,18 @@ export function AdminTopbar({ onMenuOpen }: { onMenuOpen: () => void }) {
         </span>
       </div>
 
-      <Link
-        href="/"
-        target="_blank"
-        rel="noreferrer"
-        className="flex shrink-0 items-center gap-1.5 rounded-[var(--radius-sm)] bg-brand-muted-surface px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-text transition-colors hover:bg-brand-border"
-      >
-        Siteyi görüntüle
-        <ExternalLink className="size-3.5" aria-hidden="true" />
-      </Link>
+      {section?.publicHref ? (
+        <Link
+          href={section.publicHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${section.label} sayfasını yeni sekmede aç`}
+          className="flex shrink-0 items-center gap-1.5 rounded-[var(--radius-sm)] bg-brand-muted-surface px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-text transition-colors hover:bg-brand-border"
+        >
+          Sitede gör
+          <ExternalLink className="size-3.5" aria-hidden="true" />
+        </Link>
+      ) : null}
     </header>
   );
 }

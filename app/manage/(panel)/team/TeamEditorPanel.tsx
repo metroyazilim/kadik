@@ -35,7 +35,7 @@ export function TeamEditorPanel({
   return (
     <div className="space-y-4">
       <LocaleStatusTabs
-        label="Ekip üyesi dilleri"
+        label="Kurul üyesi dilleri"
         activeLocale={activeLocale}
         statuses={Object.fromEntries(
           (["tr", "en"] as const).map((locale) => [locale, data.view.translations[locale]?.status ?? "missing"]),
@@ -81,7 +81,7 @@ function TeamMemberLocaleForm({
       <EditorPageLayout
         main={
           <div className="space-y-4">
-            <EditorSection title="Profil" id="team-profile" description="Public ekip detayında ve liste kartında görünen temel bilgiler." defaultOpen>
+            <EditorSection title="Profil" id="team-profile" description="Public kurul üyesi detayında ve liste kartında görünen temel bilgiler." defaultOpen>
               <div className="space-y-5">
                 <FieldGrid>
                   <label className={fieldLabel}>
@@ -106,7 +106,7 @@ function TeamMemberLocaleForm({
               </div>
             </EditorSection>
 
-            <EditorSection title="Biyografi" id="team-bio" description="Ekip üyesi detay sayfasındaki ana metin." defaultOpen>
+            <EditorSection title="Biyografi" id="team-bio" description="Kurul üyesi detay sayfasındaki ana metin." defaultOpen>
               <RichTextEditor name="bio" label="Biyografi" defaultValue={payload?.bio ?? ""} maxLength={4000} required />
             </EditorSection>
 

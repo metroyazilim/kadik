@@ -147,7 +147,7 @@ export async function saveTeamMemberDraftAction(_previous: ActionState, formData
     return { success: `${locale.toUpperCase()} kaydedildi.` };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
-    return { error: "Ekip üyesi kaydedilemedi. Alanları kontrol edip tekrar deneyin." };
+    return { error: "Kurul üyesi kaydedilemedi. Alanları kontrol edip tekrar deneyin." };
   }
 }
 
@@ -224,7 +224,7 @@ export async function archiveTeamMemberAction(
   try {
     await archiveEntityWithDependencyCheck(prisma, context, entityId, TEAM_MEMBER_CONTENT_TYPE, input);
     revalidatePublicTeamSurfaces();
-    return { success: input.archived ? "Ekip üyesi arşivlendi." : "Ekip üyesi arşivden çıkarıldı." };
+    return { success: input.archived ? "Kurul üyesi arşivlendi." : "Kurul üyesi arşivden çıkarıldı." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "İşlem tamamlanamadı." };
@@ -236,7 +236,7 @@ export async function deleteTeamMemberAction(entityId: string): Promise<ActionSt
   try {
     await deleteEntityIfSafe(prisma, context, entityId, TEAM_MEMBER_CONTENT_TYPE);
     revalidatePublicTeamSurfaces();
-    return { success: "Ekip üyesi silindi." };
+    return { success: "Kurul üyesi silindi." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Silme işlemi tamamlanamadı." };

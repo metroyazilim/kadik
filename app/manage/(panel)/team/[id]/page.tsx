@@ -27,7 +27,7 @@ export default async function TeamMemberEditorPage({
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader
-        eyebrow="Ekip"
+        eyebrow="Kurul"
         title={primary?.name?.trim() || "Yeni ekip üyesi"}
         description="Dil sekmesini seçin, alanları düzenleyin; Kaydet ve yayınla yalnızca o dili yayına alır."
         backHref="/manage/team"

@@ -36,6 +36,7 @@ export type AdminNavItem = {
   key: AdminNavKey;
   label: string;
   href: string;
+  publicHref?: string;
   icon: LucideIcon;
 };
 
@@ -53,28 +54,57 @@ export const ADMIN_NAV_SECTIONS: readonly AdminNavSection[] = [
   {
     label: "Genel",
     items: [
-      { key: "overview", label: "Genel Bakış", href: "/manage", icon: LayoutDashboard },
+      { key: "overview", label: "Genel Bakış", href: "/manage", publicHref: "/", icon: LayoutDashboard },
       { key: "media", label: "Medya", href: "/manage/media", icon: Image },
-      { key: "messages", label: "Mesajlar", href: "/manage/messages", icon: MessagesSquare },
+      {
+        key: "messages",
+        label: "Mesajlar ve Başvurular",
+        href: "/manage/messages",
+        publicHref: "/uyelik",
+        icon: MessagesSquare,
+      },
     ],
   },
   {
-    label: "Sayfa Düzenleyiciler",
+    label: "Site İçeriği",
     items: [
-      { key: "home", label: "Anasayfa", href: "/manage/home", icon: Layers },
-      { key: "pages", label: "Sayfalar", href: "/manage/pages", icon: FileText },
-      { key: "site-settings", label: "Site Ayarları", href: "/manage/site-settings", icon: Settings },
+      { key: "home", label: "Ana Sayfa", href: "/manage/home", publicHref: "/", icon: Layers },
+      { key: "pages", label: "Sayfalar", href: "/manage/pages", publicHref: "/hakkimizda", icon: FileText },
+      {
+        key: "site-settings",
+        label: "Site Ayarları",
+        href: "/manage/site-settings",
+        publicHref: "/",
+        icon: Settings,
+      },
     ],
   },
   {
-    label: "Koleksiyonlar",
+    label: "KADİK İçerikleri",
+    items: [
+      {
+        key: "team",
+        label: "Kurul Üyeleri",
+        href: "/manage/team",
+        publicHref: "/kurul-uyeleri",
+        icon: Users,
+      },
+      {
+        key: "posts",
+        label: "Yayınlar ve Haberler",
+        href: "/manage/posts",
+        publicHref: "/yazilar",
+        icon: Newspaper,
+      },
+      { key: "faq", label: "SSS", href: "/manage/faq", publicHref: "/sss", icon: CircleHelp },
+    ],
+  },
+  {
+    label: "Diğer Koleksiyonlar",
     items: [
       { key: "services", label: "Hizmetler", href: "/manage/services", icon: FileText },
       { key: "products", label: "Ürünler", href: "/manage/products", icon: Package },
       { key: "projects", label: "Projeler", href: "/manage/projects", icon: FolderKanban },
-      { key: "team", label: "Ekip", href: "/manage/team", icon: Users },
-      { key: "faq", label: "SSS", href: "/manage/faq", icon: CircleHelp },
-      { key: "posts", label: "Blog Yazıları", href: "/manage/posts", icon: Newspaper },
     ],
   },
   {

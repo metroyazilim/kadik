@@ -1,9 +1,13 @@
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/admin/PageHeader";
+import { InfoCard } from "@/components/admin/InfoCard";
 import { StatCard } from "@/components/admin/StatCard";
 import { CmdRecentOperations } from "./CmdRecentOperations";
 import { isAdminNavKey } from "@/components/admin/nav-items";
+import { secondaryButton } from "@/components/admin/ui";
 import {
   FAQ_CONTENT_TYPE,
   POST_CONTENT_TYPE,
@@ -19,9 +23,20 @@ const COLLECTIONS = [
   { contentType: SERVICE_CONTENT_TYPE, label: "Hizmetler", href: "/manage/services" },
   { contentType: PRODUCT_CONTENT_TYPE, label: "Ürünler", href: "/manage/products" },
   { contentType: PROJECT_CONTENT_TYPE, label: "Projeler", href: "/manage/projects" },
-  { contentType: TEAM_MEMBER_CONTENT_TYPE, label: "Ekip", href: "/manage/team" },
+  { contentType: TEAM_MEMBER_CONTENT_TYPE, label: "Kurul Üyeleri", href: "/manage/team" },
   { contentType: FAQ_CONTENT_TYPE, label: "SSS", href: "/manage/faq" },
   { contentType: POST_CONTENT_TYPE, label: "Blog Yazıları", href: "/manage/posts" },
+] as const;
+
+const SITE_SHORTCUTS = [
+  { label: "Ana Sayfa", href: "/" },
+  { label: "Kurul Üyeleri", href: "/kurul-uyeleri" },
+  { label: "Yayınlar", href: "/yazilar" },
+  { label: "Etkinlikler", href: "/etkinlikler" },
+  { label: "Duyurular", href: "/duyurular" },
+  { label: "Üyelik", href: "/uyelik" },
+  { label: "Galeri", href: "/galeri" },
+  { label: "İletişim", href: "/iletisim" },
 ] as const;
 
 const AUDIT_ACTION_LABEL: Record<string, string> = {
@@ -102,6 +117,28 @@ export default async function ManageOverviewPage({ searchParams }: { searchParam
           />
         ))}
       </div>
+
+      <InfoCard
+        title="KADİK sitesi kısayolları"
+        description="Sitedeki temel sayfaları yeni sekmede görüntüleyin."
+        className="mt-8"
+      >
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {SITE_SHORTCUTS.map((shortcut) => (
+            <Link
+              key={shortcut.href}
+              href={shortcut.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${shortcut.label} sayfasını yeni sekmede aç`}
+              className={secondaryButton}
+            >
+              {shortcut.label}
+              <ExternalLink className="size-3.5" aria-hidden="true" />
+            </Link>
+          ))}
+        </div>
+      </InfoCard>
 
       <CmdRecentOperations
         entries={recentAudit.map((entry) => ({

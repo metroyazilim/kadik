@@ -1,5 +1,17 @@
 # Progress Tracker
 
+## KADİK güncel kayıt — 2026-09-17 (ikinci tur)
+
+- Cloudflare R2 canlı: gerçek anahtarlar `.env.local`'e işlendi, `getStorageConfig()` artık `R2_PUBLIC_BASE_URL`/`MEDIA_BASE_URL` de okuyor (şablon bu adları kullanıyordu, kod okumuyordu). Yükleme hattı `scripts/media-import.ts` (`npm run media:import`): kaynak yerel dosya veya URL → `cwebp -q 85` → `validateUploadBuffer` → `createMediaAsset`; `--dir` modu klasördeki tüm görselleri sırayla yükler, checksum idempotency ikinci çalıştırmada yeni obje/satır üretmez.
+- İçerik veritabanından geliyor: `scripts/seed-kadik-content.ts` (`npm run db:seed-kadik`) 6 kurul üyesini (başkan, başkan yardımcısı, 4 üye) ve 2 yayını panelin kendi akışıyla (`createCollectionEntity` → `ensureLocaleTranslation` → `adminSaveDraft` → `adminPublish`) yazıp yayımlar; görseller R2'de WebP olarak durur. Ana sayfa ve `/yazilar` artık yayınlanmış revizyonları okur (`lib/public-content/kadik-view.ts`), yazı detayı `/yazilar/<slug>` olarak eklendi ve eski iki statik yazı route'u kaldırıldı.
+- Üyelik akışı başvuruya dönüştü: `/gonulluluk` → `/uyelik` (308, `next.config.ts`), kampanya dönemi "nasıl katkı sunabilirsiniz" dropdown'ı kaldırıldı; form ad/e-posta/telefon/şirket/görev/sektör/şehir/web/referans + başvuru notu topluyor, konu satırı `Üyelik başvurusu: <şirket>` olarak `Message` kaydına düşüyor.
+- Global 404 site kabuğunu kullanıyor (`KadikNotFound`): banner + 404 bloğu + altı bölüm bağlantısı. Kök `app/layout.tsx` olmadığı için `not-found.tsx` `globals.css`'i doğrudan import eder; `KadikLayout` sarmalaması ikinci `<html>` üretip hydration uyuşmazlığına yol açıyordu.
+- Görsel dil politik çağrışımdan arındırıldı: hero/banner/hakkımızda/galeri görselleri iş dünyası fotoğraflarıyla (standart Unsplash lisansı, WebP q85) değiştirildi; etkinlik takvimi ve galeri kategorileri iş gündemine göre yazıldı.
+- Yönetim paneli IA'sı public siteye hizalandı: sidebar bölümleri (Genel / Site İçeriği / KADİK İçerikleri / Diğer Koleksiyonlar / SEO ve Sistem), her ekranda `publicHref` ile "Sitede gör" bağlantısı ve Genel Bakış'ta KADİK sayfa kısayolları. Nav key/href kümesi değişmedi.
+- Gerçek kurul fotoğrafları yüklendi (geçici temsili portreler kaldırıldı): 6 fotoğraf ekran görüntüsü artıklarından arındırıldı (Yaşar Karadağ'da letterbox siyah bantlar, Orhan Selim Bayraktar'da tarayıcı çubuğu + alt navigasyon `ffmpeg crop` ile kesildi), 900px genişliğe indirildi, `cwebp -q 85` ile WebP'e çevrilip `scripts/seed-kadik-content.ts --photos <klasör>` moduyla R2'ye yüklendi ve üyeler aynı slug ile yeniden yayımlandı. Kaynak klasör: `.local/kurul-fotograflari` (gitignore). Yerini alan 6 geçici asset + 2 R2 smoke asset'i arşivlendi (kalıcı silme yapılmadı).
+- Kurul kartlarında "Profili incele" bağlantısı kullanıcı talebiyle kaldırıldı: kartlar artık `<article>` (tıklanabilir değil), hover kalkma efekti ve ölü `.kadik-board-card b` stili silindi, portreler `object-position: center top` ile yüzler görünecek şekilde çerçevelendi. `/ekip/<slug>` route'ları duruyor, public menüden bağlantı verilmiyor.
+- Doğrulama: `npm run dev` (3901) üzerinde Chrome ile ana sayfa, `/kurul-uyeleri`, `/uyelik` (gerçek başvuru gönderimi), `/yazilar`, yazı detayı, 404 ve panel ekranları gezildi; kırık görsel yok, `data-motion-state="pending"` kalmadı, R2 URL'leri 200 + `image/webp`.
+
 ## KADIK güncel kayıt — 2026-09-17
 
 Kanonik checkout `/Users/berat/anton/kadik`; port 3901. Kalan alt bölümler kopyalanmış starter geçmişidir ve KADIK için tamamlanma iddiası değildir.

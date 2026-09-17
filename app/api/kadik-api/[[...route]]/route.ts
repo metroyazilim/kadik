@@ -15,9 +15,9 @@ api.get("/ready", async (context) => {
   }
 });
 api.get("/content", (context) => context.json({
-  site: "Kadık",
+  site: "Kybele Atasever Dünya İş Konseyi",
   locale: "tr",
-  routes: ["/", "/hakkimizda", "/etkinlikler", "/gonulluluk", "/duyurular", "/yazilar", "/iletisim", "/galeri"],
+  routes: ["/", "/hakkimizda", "/kurul-uyeleri", "/etkinlikler", "/uyelik", "/duyurular", "/yazilar", "/iletisim", "/galeri"],
 }));
 
 export const GET = handle(api);

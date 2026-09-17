@@ -3,42 +3,55 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { KadikMotion } from "./KadikMotion";
+import type { PublicTeamMemberListItem } from "@/lib/public-content/team";
 
 const ASSET_ROOT = "/kadik";
+const BRAND_SHORT = "KADİK";
+const BRAND_FULL = "KYBELE ATASEVER DÜNYA İŞ KONSEYİ";
 const images = {
-  hero: `${ASSET_ROOT}/post-6-copyright.jpg`,
-  about: `${ASSET_ROOT}/post-6-copyright-1170x858.jpg`,
-  campaign: `${ASSET_ROOT}/post-1-copyright.jpg`,
+  hero: `${ASSET_ROOT}/is-hero.webp`,
+  about: `${ASSET_ROOT}/is-hakkimizda.webp`,
+  band: `${ASSET_ROOT}/is-band.webp`,
   gallery: [
-    `${ASSET_ROOT}/post-12-copyright.jpg`,
-    `${ASSET_ROOT}/post-10-copyright.jpg`,
-    `${ASSET_ROOT}/post-11-copyright.jpg`,
-    `${ASSET_ROOT}/post-7-copyright.jpg`,
-    `${ASSET_ROOT}/post-6-copyright.jpg`,
-    `${ASSET_ROOT}/post-5-copyright.jpg`,
-    `${ASSET_ROOT}/post-4-copyright.jpg`,
-    `${ASSET_ROOT}/post-3-copyright.jpg`,
-    `${ASSET_ROOT}/post-1-copyright.jpg`,
+    `${ASSET_ROOT}/is-galeri-1.webp`,
+    `${ASSET_ROOT}/is-galeri-2.webp`,
+    `${ASSET_ROOT}/is-galeri-3.webp`,
+    `${ASSET_ROOT}/is-galeri-4.webp`,
+    `${ASSET_ROOT}/is-galeri-5.webp`,
+    `${ASSET_ROOT}/is-galeri-6.webp`,
+    `${ASSET_ROOT}/is-galeri-7.webp`,
+    `${ASSET_ROOT}/is-galeri-8.webp`,
+    `${ASSET_ROOT}/is-galeri-9.webp`,
   ],
 };
 
-type PageKey = "home" | "about" | "events" | "volunteer" | "issues" | "posts" | "post" | "contact" | "gallery" | "privacy" | "terms";
+type PageKey = "home" | "about" | "board" | "events" | "membership" | "issues" | "posts" | "post" | "contact" | "gallery" | "privacy" | "terms" | "notfound";
 
 const navItems = [
-  { label: "Anasayfa", href: "/", key: "home" },
-  { label: "Hakkımızda", href: "/hakkimizda", key: "about" },
+  { label: "Ana Sayfa", href: "/", key: "home" },
   {
-    label: "Hizmetler",
-    href: "/etkinlikler",
-    key: "services",
+    label: "Kurumsal",
+    href: "/hakkimizda",
+    key: "about",
     children: [
-      { label: "Etkinlikler", href: "/etkinlikler" },
-      { label: "Gönüllülük", href: "/gonulluluk" },
-      { label: "Duyurular", href: "/duyurular" },
+      { label: "Hakkımızda", href: "/hakkimizda" },
+      { label: "Kurul Üyeleri", href: "/kurul-uyeleri" },
+      { label: "İletişim", href: "/iletisim" },
     ],
   },
   {
-    label: "Yazılar",
+    label: "Faaliyetler",
+    href: "/etkinlikler",
+    key: "events",
+    children: [
+      { label: "Etkinlikler", href: "/etkinlikler" },
+      { label: "Duyurular", href: "/duyurular" },
+      { label: "Yayınlar", href: "/yazilar" },
+    ],
+  },
+  { label: "Üyelik", href: "/uyelik", key: "membership" },
+  {
+    label: "Haberler",
     href: "/yazilar",
     key: "posts",
     children: [
@@ -48,21 +61,34 @@ const navItems = [
     ],
   },
   { label: "Galeri", href: "/galeri", key: "gallery" },
-  { label: "İletişim", href: "/iletisim", key: "contact" },
 ] as const;
 
-const posts = [
-  { category: "HABER", date: "24 Ekim 2026", title: "Vergi dolandırıcılığıyla mücadelede en başarılı yöntemler nelerdir?", image: `${ASSET_ROOT}/post-1-copyright.jpg`, href: "/what-are-the-most-successful-methods-to-fight-against-tax-scam" },
-  { category: "MAKALE", date: "20 Ekim 2026", title: "Birlikte kuracağımız güçlü yarınlar", image: `${ASSET_ROOT}/post-3-copyright-760x428.jpg`, href: "/yazilar" },
-  { category: "BLOG", date: "12 Ekim 2026", title: "Mahallelerimizde dayanışmayı büyütüyoruz", image: `${ASSET_ROOT}/post-4-copyright-760x428.jpg`, href: "/yazilar" },
-  { category: "HABER", date: "04 Ekim 2026", title: "Gönüllü ağımız her gün genişliyor", image: `${ASSET_ROOT}/post-6-copyright.jpg`, href: "/yazilar" },
-];
+/** Yönetim panelinde yazılıp yayınlanan `post` kayıtlarının public projeksiyonu.
+ * Sunucu sayfaları `lib/public-content/post.ts` çıktısını bu istemci-güvenli
+ * şekle indirger; bu bileşen hiçbir zaman asset id'si veya Prisma tipi görmez. */
+export type KadikPostListItem = Readonly<{
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  dateLabel: string;
+  image: string;
+}>;
+
+export type KadikArticleBlock =
+  | { type: "text"; html: string }
+  | { type: "image"; url: string; caption: string | null }
+  | { type: "kpi"; heading: string | null; items: readonly { label: string; value: string }[] }
+  | { type: "banner"; heading: string; text: string; ctaLabel: string | null; ctaUrl: string | null }
+  | { type: "quote"; text: string; author: string | null };
+
+export type KadikPostDetailData = KadikPostListItem & Readonly<{ author: string; blocks: readonly KadikArticleBlock[] }>;
 
 function Button({ href = "#", children, tone = "blue" }: { href?: string; children: React.ReactNode; tone?: "blue" | "red" | "light" }) {
   return <Link className={`kadik-button kadik-button-${tone}`} href={href}>{children}<span aria-hidden="true">↗</span></Link>;
 }
 
-function ContactForm({ compact = false, volunteer = false }: { compact?: boolean; volunteer?: boolean }) {
+function ContactForm() {
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -71,39 +97,100 @@ function ContactForm({ compact = false, volunteer = false }: { compact?: boolean
     const form = new FormData(formElement);
     try {
       const response = await fetch("/api/kadik/contact", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({
-        name: form.get("name") || "Kampanya ziyaretçisi", email: form.get("email"), phone: form.get("phone"), subject: volunteer ? `Gönüllülük başvurusu: ${form.get("subject") || "Genel"}` : form.get("subject"), message: form.get("message") || "Kampanya formu", consent: form.get("consent") === "on",
+        name: form.get("name") || "Konsey ziyaretçisi", email: form.get("email"), phone: form.get("phone"), subject: form.get("subject"), message: form.get("message") || "Konsey iletişim formu", consent: form.get("consent") === "on",
       }) });
       setStatus(response.ok ? "Mesajınız alındı. Ekibimiz en kısa sürede size dönecek." : "Form gönderilemedi. Lütfen daha sonra tekrar deneyin.");
       if (response.ok) formElement.reset();
     } catch { setStatus("Form gönderilemedi. Lütfen daha sonra tekrar deneyin."); }
     setBusy(false);
   }
-  return <form className={`kadik-form ${compact ? "kadik-form-compact" : ""}`} onSubmit={submit}>
-    {compact && <input required type="email" name="email" placeholder="E-posta adresiniz" />}
-    {!compact && <div className="kadik-form-grid"><input required name="name" placeholder="Adınız Soyadınız" /><input required type="email" name="email" placeholder="E-posta adresiniz" /></div>}
-    {volunteer && <div className="kadik-form-grid"><input name="phone" placeholder="Telefon numaranız" /><select name="subject" defaultValue=""><option value="" disabled>Nasıl katkı sunabilirsiniz?</option><option>Kapı kapı çalışma</option><option>Telefon görüşmeleri</option><option>Etkinlik düzenleme</option><option>Diğer</option></select></div>}
-    {!compact && !volunteer && <input name="subject" placeholder="Konu" />}
-    {!compact && <textarea required name="message" rows={5} placeholder={volunteer ? "Bize kendinizden bahsedin" : "Mesajınız"} />}
+  return <form className="kadik-form" onSubmit={submit}>
+    <div className="kadik-form-grid"><input required name="name" placeholder="Adınız Soyadınız" /><input required type="email" name="email" placeholder="E-posta adresiniz" /></div>
+    <input name="subject" placeholder="Konu" />
+    <textarea required name="message" rows={5} placeholder="Mesajınız" />
     <label className="kadik-consent"><input required type="checkbox" name="consent" /> <span>Gönderdiğim bilgilerin saklanmasını ve benimle iletişime geçilmesini kabul ediyorum.</span></label>
-    <button className="kadik-button kadik-button-red" disabled={busy}>{busy ? "Gönderiliyor…" : volunteer ? "Gönüllü Ol" : compact ? "Kampanyaya Katıl" : "Mesaj Gönder"}<span aria-hidden="true">↗</span></button>
+    <button className="kadik-button kadik-button-red" disabled={busy}>{busy ? "Gönderiliyor…" : "Mesaj Gönder"}<span aria-hidden="true">↗</span></button>
+    {status && <p className="kadik-form-status" role="status">{status}</p>}
+  </form>;
+}
+
+/** Üyelik başvuru formu: şirket/sektör bilgisi serbest metin alanlarıyla
+ * toplanır (kampanya döneminden kalan "nasıl katkı sunabilirsiniz" dropdown'ı
+ * kaldırıldı). Alanlar `/api/kadik/contact` sözleşmesini bozmadan tek bir
+ * başvuru gövdesine derlenir; konu satırı başvuruyu mesaj listesinde
+ * ayırt edilebilir kılar. */
+function MembershipForm() {
+  const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setBusy(true); setStatus("");
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const value = (key: string) => String(form.get(key) ?? "").trim();
+    const company = value("company");
+    const details = ([
+      ["Şirket / kurum", company],
+      ["Görev / unvan", value("position")],
+      ["Sektör", value("sector")],
+      ["Şehir", value("city")],
+      ["Web sitesi", value("website")],
+      ["Referans üye", value("reference")],
+    ] as const).filter(([, field]) => field.length > 0).map(([label, field]) => `${label}: ${field}`);
+    const message = [value("message"), details.length > 0 ? "" : null, ...details].filter((line) => line !== null).join("\n").trim();
+    try {
+      const response = await fetch("/api/kadik/contact", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({
+        name: value("name"), email: value("email"), phone: value("phone"),
+        subject: company ? `Üyelik başvurusu: ${company}` : "Üyelik başvurusu",
+        message, consent: form.get("consent") === "on",
+      }) });
+      setStatus(response.ok ? "Başvurunuz alındı. Konsey sekreteryası değerlendirme sonrasında sizinle iletişime geçecek." : "Başvuru gönderilemedi. Lütfen daha sonra tekrar deneyin.");
+      if (response.ok) formElement.reset();
+    } catch { setStatus("Başvuru gönderilemedi. Lütfen daha sonra tekrar deneyin."); }
+    setBusy(false);
+  }
+  return <form className="kadik-form" onSubmit={submit} aria-label="Üyelik başvuru formu">
+    <div className="kadik-form-grid">
+      <label className="kadik-field"><span>Ad Soyad</span><input required name="name" autoComplete="name" placeholder="Adınız Soyadınız" /></label>
+      <label className="kadik-field"><span>E-posta</span><input required type="email" name="email" autoComplete="email" placeholder="ornek@sirket.com" /></label>
+    </div>
+    <div className="kadik-form-grid">
+      <label className="kadik-field"><span>Telefon</span><input required name="phone" inputMode="tel" autoComplete="tel" placeholder="+90 5xx xxx xx xx" /></label>
+      <label className="kadik-field"><span>Şirket / kurum</span><input required name="company" autoComplete="organization" placeholder="Şirketinizin adı" /></label>
+    </div>
+    <div className="kadik-form-grid">
+      <label className="kadik-field"><span>Görev / unvan</span><input required name="position" autoComplete="organization-title" placeholder="Genel müdür, kurucu, yönetici…" /></label>
+      <label className="kadik-field"><span>Sektör</span><input required name="sector" placeholder="İnşaat, tekstil, lojistik, teknoloji…" /></label>
+    </div>
+    <div className="kadik-form-grid">
+      <label className="kadik-field"><span>Şehir</span><input name="city" autoComplete="address-level2" placeholder="İstanbul" /></label>
+      <label className="kadik-field"><span>Web sitesi (opsiyonel)</span><input name="website" inputMode="url" placeholder="www.sirketiniz.com" /></label>
+    </div>
+    <label className="kadik-field"><span>Referans üye (opsiyonel)</span><input name="reference" placeholder="Sizi konseye yönlendiren üye" /></label>
+    <label className="kadik-field"><span>Başvuru notu</span><textarea required name="message" rows={5} placeholder="Faaliyet alanınız, üyelikten beklentiniz ve katkı sunmak istediğiniz sektör kurulu" /></label>
+    <label className="kadik-consent"><input required type="checkbox" name="consent" /> <span>Başvuru bilgilerimin üyelik değerlendirmesi için saklanmasını ve benimle iletişime geçilmesini kabul ediyorum.</span></label>
+    <button className="kadik-button kadik-button-red" disabled={busy}>{busy ? "Gönderiliyor…" : "Üyelik Başvurusu Gönder"}<span aria-hidden="true">↗</span></button>
     {status && <p className="kadik-form-status" role="status">{status}</p>}
   </form>;
 }
 
 function Header({ active }: { active: PageKey }) {
   const [open, setOpen] = useState(false);
-  const isServicesPage = ["events", "volunteer", "issues"].includes(active);
+  const isCorporatePage = active === "about" || active === "board" || active === "contact";
+  const isActivityPage = active === "events" || active === "issues" || active === "posts";
   return <header className="kadik-header">
     <div className="kadik-header-inner">
-      <Link href="/" className="kadik-logo"><span className="kadik-brand-mark" aria-hidden="true">✦</span><span className="kadik-brand-text">KADIK</span></Link>
+      <Link href="/" className="kadik-logo" aria-label={`${BRAND_FULL} ana sayfa`}>
+        <img src={`${ASSET_ROOT}/kadik-logo.png`} alt="" />
+        <span className="kadik-brand-lockup"><strong>{BRAND_SHORT}</strong><small>{BRAND_FULL}</small></span>
+      </Link>
       <nav className="kadik-nav" aria-label="Ana menü">{navItems.map((item) => <div className="kadik-nav-item" key={item.href}>
-        <Link className={active === item.key || (item.key === "services" && isServicesPage) ? "is-active" : ""} href={item.href}>{item.label}</Link>
+        <Link className={active === item.key || (item.key === "about" && isCorporatePage) || (item.key === "events" && isActivityPage) ? "is-active" : ""} href={item.href}>{item.label}</Link>
         {"children" in item && <div className="kadik-dropdown">{item.children.map((child) => <Link key={child.href} href={child.href}>{child.label}</Link>)}</div>}
       </div>)}</nav>
       <button className="kadik-menu-button" onClick={() => setOpen(!open)} aria-label="Menüyü aç" aria-expanded={open}><span /><span /><span /></button>
     </div>
     {open && <nav className="kadik-mobile-nav" aria-label="Mobil menü">{navItems.map((item) => <div key={item.href}>
-      <Link className={active === item.key || (item.key === "services" && isServicesPage) ? "is-active" : ""} href={item.href} onClick={() => setOpen(false)}>{item.label}</Link>
+      <Link className={active === item.key || (item.key === "about" && isCorporatePage) || (item.key === "events" && isActivityPage) ? "is-active" : ""} href={item.href} onClick={() => setOpen(false)}>{item.label}</Link>
       {"children" in item && item.children.map((child) => <Link className="kadik-mobile-child" key={child.href} href={child.href} onClick={() => setOpen(false)}>{child.label}</Link>)}
     </div>)}</nav>}
   </header>;
@@ -111,11 +198,11 @@ function Header({ active }: { active: PageKey }) {
 
 function Footer() {
   return <footer className="kadik-footer"><div className="kadik-footer-grid">
-    <div><div className="kadik-footer-logo"><span className="kadik-brand-mark" aria-hidden="true">✦</span><span className="kadik-brand-text">KADIK</span></div><p>Birlikte daha adil, özgür ve dayanışmacı bir gelecek kuruyoruz.</p></div>
-    <div><h3>Hızlı Erişim</h3><Link href="/hakkimizda">Hakkımızda</Link><Link href="/etkinlikler">Etkinlikler</Link><Link href="/gonulluluk">Gönüllülük</Link><Link href="/duyurular">Duyurular</Link></div>
-    <div><h3>İletişim</h3><p>İstanbul, Türkiye</p><Link href="tel:+902120000000">+90 (212) 000 00 00</Link><Link href="mailto:merhaba@kadik.org">merhaba@kadik.org</Link></div>
+    <div><div className="kadik-footer-logo"><img src={`${ASSET_ROOT}/kadik-logo.png`} alt="" /><span className="kadik-brand-lockup"><strong>{BRAND_SHORT}</strong><small>{BRAND_FULL}</small></span></div><p>İş dünyasını ortak akıl, güven ve uluslararası iş birlikleri etrafında buluşturan bağımsız bir konsey.</p></div>
+    <div><h3>Kurumsal</h3><Link href="/hakkimizda">Hakkımızda</Link><Link href="/kurul-uyeleri">Kurul Üyeleri</Link><Link href="/uyelik">Üyelik</Link><Link href="/iletisim">İletişim</Link><Link href="/gizlilik-politikasi">Gizlilik</Link></div>
+    <div><h3>Faaliyetler</h3><Link href="/etkinlikler">Etkinlikler</Link><Link href="/duyurular">Duyurular</Link><Link href="/yazilar">Yayınlar</Link><Link href="/galeri">Galeri</Link></div>
     <div><h3>Bizi Takip Edin</h3><p className="kadik-socials"><Link href="#facebook">f</Link><Link href="#youtube">▶</Link><Link href="#x">𝕏</Link></p><Button href="/iletisim">Bize Ulaşın</Button></div>
-  </div><div className="kadik-footer-bottom"><span>© 2026 Kadık. Tüm hakları saklıdır.</span><span><Link href="/gizlilik-politikasi">Gizlilik</Link><Link href="/kullanim-sartlari">Kullanım Koşulları</Link></span></div></footer>;
+  </div><div className="kadik-footer-bottom"><span>© 2026 {BRAND_FULL}. Tüm hakları saklıdır.</span><span><Link href="/gizlilik-politikasi">Gizlilik</Link><Link href="/kullanim-sartlari">Kullanım Koşulları</Link></span></div></footer>;
 }
 
 function Banner({ title, active }: { title: string; active: PageKey }) {
@@ -128,25 +215,42 @@ function Shell({ children, title, active }: { children: React.ReactNode; title: 
 
 function SectionHeading({ eyebrow, title }: { eyebrow?: string; title: string }) { return <div className="kadik-section-heading">{eyebrow && <span>{eyebrow}</span>}<h2>{title}</h2></div>; }
 
-export function KadikHome() {
+function BoardPreview({ members }: { members: readonly PublicTeamMemberListItem[] }) {
+  return <section className="kadik-section kadik-board-preview"><div className="kadik-container">
+    <div className="kadik-section-heading kadik-board-heading"><span>KYBELE ATASEVER DÜNYA İŞ KONSEYİ</span><h2>Kurul üyelerimiz</h2><p>Farklı sektörlerden iş insanlarını ortak akıl ve yeni iş birlikleri için aynı masada buluşturuyoruz.</p><Button href="/kurul-uyeleri">Tüm kurul</Button></div>
+    {members.length > 0 ? <div className="kadik-board-grid">{members.map((member) => <article className="kadik-board-card" key={member.entityId}><img src={member.image.url} alt={member.name} /><div><span>{member.role}</span><h3>{member.name}</h3></div></article>)}</div> : <div className="kadik-board-empty"><strong>Kurul kadrosu hazırlanıyor.</strong><p>Kurul üyelerini yönetim panelindeki “Kurul Üyeleri” bölümünden ekleyip yayınlayabilirsiniz.</p><Link href="/kurul-uyeleri">Kurul üyeleri sayfasını görüntüle ↗</Link></div>}
+  </div></section>;
+}
+
+export function KadikHome({ team = [], posts = [] }: { team?: readonly PublicTeamMemberListItem[]; posts?: readonly KadikPostListItem[] }) {
   return <KadikMotion><Header active="home" /><main>
-    <section className="kadik-hero"><div className="kadik-hero-overlay" /><div className="kadik-hero-content"><h1>Değişim için<br />birlikteyiz</h1><p>Yan yana, omuz omuza.</p><ContactForm compact /></div></section>
-    <section className="kadik-section kadik-intro kadik-container"><div><SectionHeading eyebrow="BİZİMLE TANIŞIN" title="Geleceğe birlikte yön verelim." /></div><div><p className="kadik-lead">Çalışanların kendini güvende hissettiği, gençlerin fırsatlara ulaştığı ve her komşumuzun söz sahibi olduğu bir şehir için çalışıyoruz.</p><p>Dayanışmayı büyütmek için mahallelerde buluşuyor, sorunları birlikte dinliyor ve kalıcı çözümleri birlikte hayata geçiriyoruz.</p><Button href="/hakkimizda">Hikâyemizi keşfet</Button></div></section>
-    <section className="kadik-section kadik-dark-section"><div className="kadik-container"><SectionHeading eyebrow="ÖNCELİKLERİMİZ" title="Sesimizi birleştirerek değişimi büyütüyoruz." /><div className="kadik-card-grid kadik-card-grid-3">{["Adil ve güvenli çalışma", "Eğitimde fırsat eşitliği", "Yaşanabilir mahalleler"].map((title, i) => <article className="kadik-principle-card" key={title}><span>0{i + 1}</span><h3>{title}</h3><p>Her kararın merkezine insanı ve dayanışmayı koyuyoruz.</p><Link href="/duyurular">Detayları gör ↗</Link></article>)}</div></div></section>
-    <section className="kadik-image-band" style={{ backgroundImage: `url(${images.campaign})` }}><div className="kadik-image-band-overlay" /><div className="kadik-container"><h2>Birlikte daha güçlü,<br />birlikte daha özgür.</h2><Button href="/gonulluluk" tone="red">Gönüllü ol</Button></div></section>
-    <section className="kadik-section kadik-container"><SectionHeading eyebrow="GÜNCEL" title="Sahadan notlar" /><div className="kadik-post-grid">{posts.slice(0, 3).map((post) => <PostCard key={post.title} post={post} />)}</div><div className="kadik-center"><Button href="/yazilar">Tüm yazılar</Button></div></section>
+    <section className="kadik-hero"><div className="kadik-hero-overlay" /><div className="kadik-hero-content"><span className="kadik-hero-kicker">KYBELE ATASEVER DÜNYA İŞ KONSEYİ</span><h1>İş dünyasını<br />geleceğe bağlıyoruz.</h1><p>Güven, ortak akıl ve sürdürülebilir iş birlikleri.</p><Button href="/uyelik" tone="red">Üyelik hakkında</Button></div></section>
+    <section className="kadik-section kadik-intro kadik-container"><div><SectionHeading eyebrow="KONSEYİMİZ" title="Sınırları aşan bir iş ağı." /></div><div><p className="kadik-lead">Kybele ve KADİK; girişimcileri, şirket yöneticilerini ve sektör liderlerini ortak değerler etrafında buluşturan bir dünya iş konseyi olarak çalışır.</p><p>Bilgi paylaşımını, ticari bağlantıları ve yeni nesil iş birliklerini güçlendiren programlar düzenliyoruz.</p><Button href="/hakkimizda">Konseyi tanıyın</Button></div></section>
+    <section className="kadik-section kadik-dark-section"><div className="kadik-container"><SectionHeading eyebrow="FAALİYET ALANLARIMIZ" title="Üyelerimiz için gerçek bağlantılar, somut fırsatlar." /><div className="kadik-card-grid kadik-card-grid-3">{[["01", "İş geliştirme", "Yeni pazarlara açılmak ve doğru ortaklarla buluşmak için programlar."], ["02", "Sektör kurulları", "Sektörel deneyimi ortak akılla büyüten çalışma grupları."], ["03", "Uluslararası ağ", "Dünya genelinde yatırım, ticaret ve temsil bağlantıları."]].map(([number, title, text]) => <article className="kadik-principle-card" key={title}><span>{number}</span><h3>{title}</h3><p>{text}</p><Link href="/etkinlikler">Faaliyetleri keşfet ↗</Link></article>)}</div></div></section>
+    <section className="kadik-image-band" style={{ backgroundImage: `url(${images.band})` }}><div className="kadik-image-band-overlay" /><div className="kadik-container"><span className="kadik-image-kicker">İŞ BİRLİĞİ · VİZYON · GÜVEN</span><h2>Birlikte büyüyen<br />bir iş ekosistemi.</h2><Button href="/uyelik" tone="red">Üye olun</Button></div></section>
+    <BoardPreview members={team} />
+    <section className="kadik-section kadik-container"><SectionHeading eyebrow="GÜNCEL" title="Konseyden haberler" />
+      {posts.length > 0 ? <><div className="kadik-post-grid">{posts.slice(0, 3).map((post) => <PostCard key={post.slug} post={post} />)}</div><div className="kadik-center"><Button href="/yazilar">Tüm yayınlar</Button></div></> : <p className="kadik-empty-state" role="status">Yayınlar hazırlanıyor. Yönetim panelindeki “Yayınlar ve Haberler” bölümünden yazı ekleyip yayınladığınızda bu alan otomatik güncellenir.</p>}
+    </section>
   </main><Footer /></KadikMotion>;
 }
 
-function PostCard({ post }: { post: typeof posts[number] }) { return <article className="kadik-post-card"><Link href={post.href}><img src={post.image} alt="" /><div className="kadik-post-card-body"><span>{post.category} · {post.date}</span><h3>{post.title}</h3><p>Birlikte düşünmek, birlikte üretmek ve birlikte değiştirmek için…</p><b>Devamını oku ↗</b></div></Link></article>; }
+export function KadikBoard({ members }: { members: readonly PublicTeamMemberListItem[] }) {
+  return <Shell title="Kurul Üyeleri" active="board"><section className="kadik-section kadik-container">
+    <div className="kadik-board-intro"><SectionHeading eyebrow="KONSEY YÖNETİMİ" title="Kurul üyelerimiz" /><p className="kadik-lead">Kybele ve KADİK Dünya İş Konseyi üyeleriyle tanışın; farklı sektörleri temsil eden iş insanlarımızla bağlantı kurun.</p></div>
+    {members.length > 0 ? <div className="kadik-board-grid kadik-board-grid-page">{members.map((member) => <article className="kadik-board-card" key={member.entityId}><img src={member.image.url} alt={member.name} /><div><span>{member.role}</span><h3>{member.name}</h3></div></article>)}</div> : <div className="kadik-board-empty"><strong>Kurul üyeleri yakında burada.</strong><p>Yeni kurul üyeleri yönetim panelinden eklenip yayınlandığında bu sayfada görünecek.</p></div>}
+  </section></Shell>;
+}
 
-export function KadikAbout() { return <Shell title="Hakkımızda" active="about"><section className="kadik-section kadik-container kadik-two-col"><div><SectionHeading title="Yeni bir yön seçiyoruz." /></div><div><p className="kadik-lead">Çocuklarımızın iyi eğitim aldığı, yaşlılarımızın güvende olduğu, herkes için sağlıklı ve müreffeh bir toplum için çalışıyoruz.</p><p>İnandığımız değişim, yalnızca seçim günlerinde değil; her gün mahallelerde, iş yerlerinde ve hayatın içinde kurulur.</p><Button href="/gonulluluk">Bize katıl</Button></div></section><section className="kadik-container"><img className="kadik-wide-image" src={images.about} alt="Birlikte çalışan gönüllüler" /></section><section className="kadik-section kadik-stats"><div className="kadik-container"><SectionHeading eyebrow="RAKAMLARLA" title="Birlikte başardıklarımız" /><div className="kadik-stat-grid">{[["18", "Mahalle buluşması"], ["42", "Gönüllü ekip"], ["12", "Sosyal proje"], ["7", "Yıllık deneyim"]].map(([number, label]) => <div key={label}><strong>{number}</strong><span>{label}</span></div>)}</div></div></section><section className="kadik-section kadik-container"><SectionHeading eyebrow="HİKÂYEMİZ" title="Dünden bugüne dayanışma" /><div className="kadik-timeline">{[["2019", "İlk mahalle buluşmaları", "Komşularımızın sesini dinlemek için yola çıktık."], ["2022", "Gönüllü ağımız büyüdü", "Farklı alanlarda çalışan ekiplerimizi bir araya getirdik."], ["2026", "Yeni bir dönem", "Şehrin her köşesinde birlikte üretmeye devam ediyoruz."]].map(([year, title, text]) => <article key={year}><span>{year}</span><div><h3>{title}</h3><p>{text}</p></div></article>)}</div></section></Shell>; }
+function PostCard({ post }: { post: KadikPostListItem }) { return <article className="kadik-post-card"><Link href={`/yazilar/${post.slug}`}><img src={post.image} alt="" /><div className="kadik-post-card-body"><span>{post.category.toLocaleUpperCase("tr")} · {post.dateLabel}</span><h3>{post.title}</h3><p>{post.excerpt}</p><b>Devamını oku ↗</b></div></Link></article>; }
+
+export function KadikAbout() { return <Shell title="Hakkımızda" active="about"><section className="kadik-section kadik-container kadik-two-col"><div><SectionHeading title="Birlikte büyüyen bir ekosistem." /></div><div><p className="kadik-lead">Kybele ve KADİK; girişimcileri, şirket yöneticilerini ve sektör liderlerini güvene dayalı bir dünya iş ağı içinde buluşturur.</p><p>Konseyimiz; ticari bağlantıları güçlendiren, bilgi paylaşımını artıran ve üyelerinin uluslararası ölçekte gelişimine katkı sunan programlar tasarlar.</p><Button href="/kurul-uyeleri">Kurul üyelerini tanıyın</Button></div></section><section className="kadik-container"><img className="kadik-wide-image" src={images.about} alt="İş insanlarının toplantısı" /></section><section className="kadik-section kadik-stats"><div className="kadik-container"><SectionHeading eyebrow="RAKAMLARLA" title="Ortak değerlerimiz" /><div className="kadik-stat-grid">{[["01", "Güven odaklı ağ"], ["02", "Sektör kurulu"], ["03", "Uluslararası vizyon"], ["04", "Sürdürülebilir büyüme"]].map(([number, label]) => <div key={label}><strong>{number}</strong><span>{label}</span></div>)}</div></div></section><section className="kadik-section kadik-container"><SectionHeading eyebrow="KONSEYİN HİKÂYESİ" title="Fikirden küresel iş ağına" /><div className="kadik-timeline">{[["2024", "Kybele vizyonu doğdu", "İş dünyasının farklı sektörlerini ortak hedeflerde buluşturma fikriyle yola çıktık."], ["2025", "KADİK ağı kuruldu", "Üyelerimiz için bilgi, bağlantı ve gelişim odaklı bir yapı oluşturduk."], ["2026", "Dünya iş konseyi", "Yeni pazarlara açılan, güvenilir ve sürdürülebilir iş birliklerini büyütüyoruz."]].map(([year, title, text]) => <article key={year}><span>{year}</span><div><h3>{title}</h3><p>{text}</p></div></article>)}</div></section></Shell>; }
 
 const calendarEvents = [
-  { date: "2026-09-01", title: "Gönüllü buluşması" },
-  { date: "2026-09-02", title: "Birlikte değiştiriyoruz" },
-  { date: "2026-09-17", title: "Mahalle dayanışma buluşması" },
-  { date: "2026-09-26", title: "Gönüllü ekip çalışması" },
+  { date: "2026-09-08", title: "Sektör kurulları ortak toplantısı" },
+  { date: "2026-09-15", title: "İhracat ve dış pazarlar paneli" },
+  { date: "2026-09-17", title: "Üye şirketler tanışma buluşması" },
+  { date: "2026-09-29", title: "Finansmana erişim çalıştayı" },
 ];
 function dateKey(date: Date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
 export function KadikEvents() {
@@ -174,42 +278,104 @@ export function KadikEvents() {
     </div>
     {mode === "Ay" ? <div className="kadik-calendar"><div className="kadik-weekdays">{["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"].map((label) => <span key={label}>{label}</span>)}</div><div className="kadik-days">{cells.map((date) => <div className={`kadik-day ${date.getMonth() !== month.getMonth() ? "is-outside" : ""}`} key={dateKey(date)}>
       <button aria-label={`${date.toLocaleDateString("tr-TR")} etkinlikleri`} onClick={() => { setDay(dateKey(date)); setMode("Gün"); }}>{date.getDate()}</button>
-      {found.filter((event) => event.date === dateKey(date)).map((event) => <Link key={event.title} href="/gonulluluk">{event.title}</Link>)}
-    </div>)}</div></div> : <div className="kadik-event-list">{list.map((event) => <article key={event.date + event.title}><time dateTime={event.date}>{event.date}</time><h2>{event.title}</h2><Button href="/gonulluluk">Katıl</Button></article>)}{list.length === 0 && <p role="status">Bu tarih için etkinlik bulunamadı.</p>}</div>}
+      {found.filter((event) => event.date === dateKey(date)).map((event) => <Link key={event.title} href="/etkinlikler">{event.title}</Link>)}
+    </div>)}</div></div> : <div className="kadik-event-list">{list.map((event) => <article key={event.date + event.title}><time dateTime={event.date}>{event.date}</time><h2>{event.title}</h2><Button href="/uyelik">Katıl</Button></article>)}{list.length === 0 && <p role="status">Bu tarih için etkinlik bulunamadı.</p>}</div>}
   </section></Shell>;
 }
 
-export function KadikVolunteer() { return <Shell title="Gönüllülük" active="volunteer"><section className="kadik-section kadik-container kadik-volunteer"><div><SectionHeading title="Bize katılın!" /><p className="kadik-lead">Kampanyamızda yer almak için formu doldurun.</p><p>Birlikte kapı kapı çalışabilir, etkinlikler düzenleyebilir, fikirlerinizi paylaşabilirsiniz.</p></div><ContactForm volunteer /></section></Shell>; }
+export function KadikMembership() {
+  return <Shell title="Üyelik Başvurusu" active="membership"><section className="kadik-section kadik-container kadik-membership-grid">
+    <div>
+      <SectionHeading eyebrow="KONSEY AİLESİ" title="İş ağınızı büyütün." />
+      <p className="kadik-lead">Kybele ve KADİK üyeliğiyle bilgiye, bağlantıya ve yeni ticari fırsatlara daha yakın olun.</p>
+      <p>Üyelik; şirket sahipleri, yöneticiler ve profesyoneller için kurumsal bir başvuru süreciyle işler. Başvurunuz konsey sekreteryası tarafından değerlendirilir, ardından sizi uygun sektör kurulu ve çalışma gruplarıyla buluştururuz.</p>
+      <ol className="kadik-membership-steps">
+        <li><b>01</b><span>Başvuru formunu şirket ve sektör bilgilerinizle doldurun.</span></li>
+        <li><b>02</b><span>Sekreterya başvurunuzu inceler ve sizinle ön görüşme yapar.</span></li>
+        <li><b>03</b><span>Yönetim kurulu değerlendirmesinin ardından üyelik kaydınız tamamlanır.</span></li>
+        <li><b>04</b><span>Sektör kurullarına, etkinliklere ve iş birliği programlarına katılmaya başlarsınız.</span></li>
+      </ol>
+    </div>
+    <MembershipForm />
+  </section></Shell>;
+}
 
-const issues = ["İş ve ekonomi", "Sağlık ve sosyal güvence", "Çevre", "Bütçe ve adalet", "Güvenli mahalleler", "Gaziler", "Eğitim", "Kadınların eşitliği"];
-export function KadikIssues() { return <Shell title="Duyurular" active="issues"><section className="kadik-section kadik-container"><SectionHeading eyebrow="ÖNCELİKLER" title="Değişim için ilkelerimiz" /><p className="kadik-intro-copy">Şehrimizin geleceğine dair kararları şeffaflık, dayanışma ve ortak akılla alıyoruz.</p><div className="kadik-issue-grid">{issues.map((issue, i) => <article key={issue}><span>0{i + 1}</span><h3>{issue}</h3><p>Herkes için daha adil ve yaşanabilir bir hayat kurmak için somut adımlar.</p><Link href="/iletisim">Daha fazla bilgi ↗</Link></article>)}</div></section><section className="kadik-cta-band"><div className="kadik-container"><h2>Değişim için desteğine ihtiyacımız var.</h2><Button href="/gonulluluk" tone="red">Şimdi katıl</Button></div></section></Shell>; }
+export function KadikIssues() { return <Shell title="Duyurular" active="issues"><section className="kadik-section kadik-container"><SectionHeading eyebrow="KONSEYDEN" title="Gündem ve duyurular" /><p className="kadik-intro-copy">Üyelerimizi etkinlikler, sektör kurulları, iş fırsatları ve konsey çalışmalarındaki gelişmeler hakkında düzenli olarak bilgilendiriyoruz.</p><div className="kadik-issue-grid">{["Sektör kurulları", "Üyelik duyuruları", "Uluslararası iş fırsatları", "Eğitim ve gelişim", "Ticaret heyetleri", "Konsey buluşmaları", "Yayınlar", "İş birlikleri"].map((issue, i) => <article key={issue}><span>0{i + 1}</span><h3>{issue}</h3><p>İş dünyasının gündemini, üyelerimizin gelişimini ve yeni bağlantıları destekleyen güncel başlıklar.</p><Link href="/iletisim">Detaylı bilgi ↗</Link></article>)}</div></section><section className="kadik-cta-band"><div className="kadik-container"><h2>Konsey gündeminden haberdar olun.</h2><Button href="/iletisim" tone="red">Bize ulaşın</Button></div></section></Shell>; }
 
-export function KadikPosts({ initialCategory }: { initialCategory?: string }) {
-  const categories: Record<string, string> = { makale: "Makale", haber: "Haber", blog: "Blog" };
-  const [filter, setFilter] = useState(categories[initialCategory ?? ""] ?? "Tümü");
+export function KadikPosts({ posts = [], initialCategory }: { posts?: readonly KadikPostListItem[]; initialCategory?: string }) {
+  const categories = Array.from(new Set(posts.map((post) => post.category))).sort((first, second) => first.localeCompare(second, "tr"));
+  const initial = categories.find((category) => category.toLocaleLowerCase("tr") === (initialCategory ?? "").toLocaleLowerCase("tr"));
+  const [filter, setFilter] = useState(initial ?? "Tümü");
   const [search, setSearch] = useState("");
-  const visible = posts.filter((post) => (filter === "Tümü" || post.category === filter.toLocaleUpperCase("tr")) && post.title.toLocaleLowerCase("tr").includes(search.toLocaleLowerCase("tr")));
-  return <Shell title="Yazılar" active="posts"><section className="kadik-section kadik-container"><div className="kadik-posts-layout"><div>
-    <div className="kadik-filter-row"><span>Yazı türü:</span>{["Tümü", "Makale", "Haber", "Blog"].map((item) => <button aria-pressed={filter === item} className={filter === item ? "is-selected" : ""} key={item} onClick={() => {
+  const visible = posts.filter((post) => (filter === "Tümü" || post.category === filter) && post.title.toLocaleLowerCase("tr").includes(search.toLocaleLowerCase("tr")));
+  return <Shell title="Yayınlar" active="posts"><section className="kadik-section kadik-container"><div className="kadik-posts-layout"><div>
+    <div className="kadik-filter-row"><span>Yazı türü:</span>{["Tümü", ...categories].map((item) => <button type="button" aria-pressed={filter === item} className={filter === item ? "is-selected" : ""} key={item} onClick={() => {
       setFilter(item);
       const url = new URL(window.location.href);
       if (item === "Tümü") url.searchParams.delete("kategori"); else url.searchParams.set("kategori", item.toLocaleLowerCase("tr"));
       window.history.replaceState(null, "", url);
     }}>{item}</button>)}</div>
-    <div className="kadik-list-posts">{visible.map((post) => <PostCard key={post.title} post={post} />)}{visible.length === 0 && <p role="status">Aramanıza uygun yazı bulunamadı.</p>}</div>
+    <div className="kadik-list-posts">{visible.map((post) => <PostCard key={post.slug} post={post} />)}{visible.length === 0 && <p className="kadik-empty-state" role="status">{posts.length === 0 ? "Yayınlar hazırlanıyor. Yönetim panelinden yazı ekleyip yayınladığınızda burada listelenir." : "Aramanıza uygun yazı bulunamadı."}</p>}</div>
     </div><aside className="kadik-sidebar"><div><h3>Arama</h3><input aria-label="Yazılarda ara" placeholder="Ara…" value={search} onChange={(event) => setSearch(event.target.value)} /></div>
-    <div><h3>Kategoriler</h3>{Object.entries(categories).map(([key, label]) => <Link key={key} href={`/yazilar?kategori=${key}`}>{label} ({posts.filter((post) => post.category === label.toLocaleUpperCase("tr")).length})</Link>)}<Link href="/duyurular">Duyurular</Link></div></aside></div></section></Shell>;
+    <div><h3>Kategoriler</h3>{categories.map((category) => <Link key={category} href={`/yazilar?kategori=${category.toLocaleLowerCase("tr")}`}>{category} ({posts.filter((post) => post.category === category).length})</Link>)}<Link href="/duyurular">Duyurular</Link></div></aside></div></section></Shell>;
 }
 
-export function KadikPostDetail() { return <Shell title="Vergi dolandırıcılığıyla mücadelede en başarılı yöntemler nelerdir?" active="post"><article className="kadik-section kadik-container kadik-article"><div className="kadik-article-meta">HABER · 24 EKİM 2026 · KADIK EKİBİ · 3 YORUM</div><img className="kadik-article-image" src={posts[0].image} alt="" /><p className="kadik-lead">Güvenilir bilgiye erişim, dayanışma ve şeffaflık; dolandırıcılığa karşı en güçlü savunmamızdır.</p>{["Birlikte fark ediyoruz", "Bilgiyle güçleniyoruz", "Komşularımızı koruyoruz"].map((heading) => <section key={heading}><h2>{heading}</h2><p>Toplumun her kesiminin doğru bilgiye ulaşabildiği, sorularını çekinmeden sorabildiği ve ihtiyaç duyduğunda destek alabildiği bir düzen için çalışıyoruz. Şüpheli bir durumla karşılaştığınızda resmi kanalları kullanın, doğrulanmamış bilgileri paylaşmayın ve çevrenizdekileri bilgilendirin.</p></section>)}<div className="kadik-article-tags">ETİKETLER: <span>HABER</span><span>TOPLUM</span><span>DAYANIŞMA</span></div></article></Shell>; }
+function ArticleBlocks({ blocks }: { blocks: readonly KadikArticleBlock[] }) {
+  return <>{blocks.map((block, index) => {
+    switch (block.type) {
+      case "text":
+        // Panel tarafında `validateAndSanitizeRichText` ile temizlenmiş HTML.
+        return <section key={index} dangerouslySetInnerHTML={{ __html: block.html }} />;
+      case "image":
+        return <figure className="kadik-figure" key={index}><img src={block.url} alt={block.caption ?? ""} />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>;
+      case "kpi":
+        return <section key={index}>{block.heading && <h2>{block.heading}</h2>}<div className="kadik-kpi-block">{block.items.map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div></section>;
+      case "quote":
+        return <blockquote className="kadik-quote-block" key={index}><p>{block.text}</p>{block.author && <cite>{block.author}</cite>}</blockquote>;
+      case "banner":
+        return <aside className="kadik-banner-block" key={index}><h3>{block.heading}</h3><p>{block.text}</p>{block.ctaLabel && block.ctaUrl && <Button href={block.ctaUrl} tone="red">{block.ctaLabel}</Button>}</aside>;
+    }
+  })}</>;
+}
 
-export function KadikContact() { return <Shell title="İletişim" active="contact"><section className="kadik-section kadik-container"><div className="kadik-contact-grid"><div><SectionHeading title="Bize ulaşın" /><p>Fikirlerinizi, sorularınızı ve önerilerinizi dinlemek için buradayız.</p><div className="kadik-contact-items"><p><b>Adres</b>İstanbul, Türkiye</p><p><b>Telefon</b>+90 (212) 000 00 00</p><p><b>E-posta</b>merhaba@kadik.org</p></div></div><ContactForm /></div></section></Shell>; }
+export function KadikPostDetail({ post }: { post: KadikPostDetailData }) {
+  return <Shell title={post.title} active="post"><article className="kadik-section kadik-container kadik-article">
+    <div className="kadik-article-meta">{post.category.toLocaleUpperCase("tr")} · {post.dateLabel} · {post.author.toLocaleUpperCase("tr")}</div>
+    <img className="kadik-article-image" src={post.image} alt="" />
+    {post.excerpt && <p className="kadik-lead">{post.excerpt}</p>}
+    <ArticleBlocks blocks={post.blocks} />
+    <div className="kadik-article-tags">ETİKETLER: <span>{post.category.toLocaleUpperCase("tr")}</span><span>KADİK</span><span>İŞ DÜNYASI</span></div>
+  </article></Shell>;
+}
+
+/** Global 404 yüzeyi: aynı başlık/banner/footer kabuğunu kullanır, ziyaretçiyi
+ * ana sayfa ve gerçek site bölümlerine geri bağlar (`app/not-found.tsx`). */
+export function KadikNotFound() {
+  return <Shell title="Sayfa Bulunamadı" active="notfound"><section className="kadik-section kadik-container kadik-404">
+    <div>
+      <p className="kadik-404-code">404</p>
+      <h2>Aradığınız sayfaya ulaşamadık.</h2>
+      <p>Bağlantı taşınmış, adresi değişmiş ya da yayından kaldırılmış olabilir. Konsey içeriklerine aşağıdaki bölümlerden ulaşabilir, aradığınızı bulamazsanız sekreteryaya yazabilirsiniz.</p>
+      <div className="kadik-404-actions"><Button href="/" tone="red">Ana sayfaya dön</Button><Button href="/iletisim" tone="light">İletişime geçin</Button></div>
+    </div>
+    <nav className="kadik-404-links" aria-label="Site bölümleri">
+      <Link href="/hakkimizda"><strong>Hakkımızda</strong><span>Konseyin vizyonu, çalışma alanları ve hikâyesi.</span></Link>
+      <Link href="/kurul-uyeleri"><strong>Kurul Üyeleri</strong><span>Yönetim kurulu ve sektör temsilcilerimiz.</span></Link>
+      <Link href="/yazilar"><strong>Yayınlar</strong><span>Haberler, makaleler ve konsey değerlendirmeleri.</span></Link>
+      <Link href="/etkinlikler"><strong>Etkinlikler</strong><span>Toplantı, panel ve program takvimi.</span></Link>
+      <Link href="/uyelik"><strong>Üyelik Başvurusu</strong><span>Konsey ailesine katılmak için başvuru formu.</span></Link>
+      <Link href="/galeri"><strong>Galeri</strong><span>Faaliyetlerimizden fotoğraf seçkisi.</span></Link>
+    </nav>
+  </section></Shell>;
+}
+
+export function KadikContact() { return <Shell title="İletişim" active="contact"><section className="kadik-section kadik-container"><div className="kadik-contact-grid"><div><SectionHeading eyebrow="KONSEY SEKRETERYASI" title="İş birliğini konuşalım." /><p>Üyelik, sektör kurulları, etkinlikler ve uluslararası iş bağlantıları hakkında bize ulaşın.</p><div className="kadik-contact-items"><p><b>Adres</b>İstanbul, Türkiye</p><p><b>Telefon</b>+90 (212) 000 00 00</p><p><b>E-posta</b>merhaba@kadik.org</p></div></div><ContactForm /></div></section></Shell>; }
 
 export function KadikGallery() {
   const [active, setActive] = useState<string | null>(null);
   const [filter, setFilter] = useState("Tümü");
   const dialog = useRef<HTMLDialogElement>(null);
-  const categories = ["Meydanlar", "Gönüllüler", "Etkinlikler"];
+  const categories = ["Etkinlikler", "Toplantılar", "İş Gezileri"];
   useEffect(() => {
     if (!active) return;
     const node = dialog.current;
@@ -226,5 +392,5 @@ export function KadikGallery() {
   </dialog></Shell>;
 }
 
-const legalSections = [["1. Giriş", "Kadık olarak kişisel verilerinizin korunmasına önem veriyoruz. Bu metin, web sitemizi kullanırken hangi bilgilerin toplandığını ve nasıl kullanıldığını açıklar."], ["2. Toplanan veriler", "İletişim formlarında paylaştığınız ad, e-posta, telefon ve mesaj bilgileri yalnızca talebinizi karşılamak ve sizinle iletişim kurmak amacıyla işlenir."], ["3. Saklama ve güvenlik", "Veriler yetkisiz erişime karşı korunan sistemlerde, gerekli olduğu süre boyunca saklanır. Yasal yükümlülükler dışında üçüncü kişilerle paylaşılmaz."], ["4. Haklarınız", "Kişisel verilerinize erişme, düzeltme, silme ve işlemeye itiraz etme hakkına sahipsiniz. Talepleriniz için merhaba@kadik.org adresinden bize ulaşabilirsiniz."]];
-export function KadikLegal({ terms = false }: { terms?: boolean }) { return <Shell title={terms ? "Kullanım Koşulları" : "Gizlilik Politikası"} active={terms ? "terms" : "privacy"}><section className="kadik-section kadik-container kadik-legal"><p className="kadik-lead">Bu metin, Kadık web sitesini kullanırken haklarınızı ve sorumluluklarınızı açıklar.</p>{(terms ? [["1. Hizmetin kullanımı", "Siteyi yalnızca hukuka uygun amaçlarla kullanmayı kabul edersiniz. İçerikleri izinsiz çoğaltamaz, site güvenliğini tehlikeye atacak girişimlerde bulunamazsınız."], ["2. İçerik ve bağlantılar", "Sitedeki içerikler bilgilendirme amacıyla sunulur. Harici bağlantıların içeriklerinden Kadık sorumlu değildir."], ["3. Değişiklikler", "Koşullar gerektiğinde güncellenebilir. Güncel metin bu sayfada yayınlanır."]] : legalSections).map(([heading, text]) => <section key={heading}><h2>{heading}</h2><p>{text}</p></section>)}</section></Shell>; }
+const legalSections = [["1. Giriş", "Kybele ve KADİK olarak kişisel verilerinizin korunmasına önem veriyoruz. Bu metin, web sitemizi kullanırken hangi bilgilerin toplandığını ve nasıl kullanıldığını açıklar."], ["2. Toplanan veriler", "İletişim ve üyelik formlarında paylaştığınız bilgiler yalnızca talebinizi karşılamak ve sizinle iletişim kurmak amacıyla işlenir."], ["3. Saklama ve güvenlik", "Veriler yetkisiz erişime karşı korunan sistemlerde, gerekli olduğu süre boyunca saklanır. Yasal yükümlülükler dışında üçüncü kişilerle paylaşılmaz."], ["4. Haklarınız", "Kişisel verilerinize erişme, düzeltme, silme ve işlemeye itiraz etme hakkına sahipsiniz. Talepleriniz için merhaba@kadik.org adresinden bize ulaşabilirsiniz."]];
+export function KadikLegal({ terms = false }: { terms?: boolean }) { return <Shell title={terms ? "Kullanım Koşulları" : "Gizlilik Politikası"} active={terms ? "terms" : "privacy"}><section className="kadik-section kadik-container kadik-legal"><p className="kadik-lead">Bu metin, Kybele ve KADİK web sitesini kullanırken haklarınızı ve sorumluluklarınızı açıklar.</p>{(terms ? [["1. Hizmetin kullanımı", "Siteyi yalnızca hukuka uygun amaçlarla kullanmayı kabul edersiniz. İçerikleri izinsiz çoğaltamaz, site güvenliğini tehlikeye atacak girişimlerde bulunamazsınız."], ["2. İçerik ve bağlantılar", "Sitedeki içerikler bilgilendirme amacıyla sunulur. Harici bağlantıların içeriklerinden Kybele ve KADİK sorumlu değildir."], ["3. Değişiklikler", "Koşullar gerektiğinde güncellenebilir. Güncel metin bu sayfada yayınlanır."]] : legalSections).map(([heading, text]) => <section key={heading}><h2>{heading}</h2><p>{text}</p></section>)}</section></Shell>; }

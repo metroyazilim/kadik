@@ -85,8 +85,8 @@ export function TeamListView({ rows }: { rows: readonly CollectionRow[] }) {
   if (items.length === 0) {
     return (
       <EmptyState
-        title="Henüz ekip üyesi yok"
-        description="“Yeni üye” ile ilk kaydı oluşturun; kayıt kendi adresinde açılır."
+        title="Henüz kurul üyesi yok"
+        description="“Yeni kurul üyesi” ile ilk kaydı oluşturun; kayıt kendi adresinde açılır."
       />
     );
   }
@@ -100,7 +100,7 @@ export function TeamListView({ rows }: { rows: readonly CollectionRow[] }) {
             "border-b border-brand-border bg-brand-muted-surface/75 px-5 py-3.5 text-[10px] font-bold uppercase tracking-wider text-brand-muted",
           )}
         >
-          <span>Ekip üyesi</span>
+          <span>Kurul üyesi</span>
           {LOCALES.map((locale) => (
             <span key={locale} className="text-center">
               {locale.toUpperCase()}
@@ -121,7 +121,7 @@ export function TeamListView({ rows }: { rows: readonly CollectionRow[] }) {
         <ArchiveDeleteDialog
           open={archiveTarget !== null}
           onClose={() => { setArchiveTarget(null); setActionError(null); }}
-          entityLabel={(archiveTarget.displayPayload as TeamMemberPayload | null)?.name ?? "Ekip üyesi"}
+          entityLabel={(archiveTarget.displayPayload as TeamMemberPayload | null)?.name ?? "Kurul üyesi"}
           archived={archiveTarget.archived}
           report={dependencyReport}
           onArchive={handleArchive}

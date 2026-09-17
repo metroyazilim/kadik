@@ -12,9 +12,13 @@ export function getStorageConfig(): StorageConfig {
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY?.trim();
   const bucketName =
     process.env.R2_BUCKET?.trim() || process.env.R2_BUCKET_NAME?.trim() || "metro-media";
+  // Read the documented canonical names first; keeping the legacy aliases
+  // prevents existing deployments from losing their public media URLs.
   const publicBaseUrl = (
+    process.env.R2_PUBLIC_BASE_URL ||
     process.env.R2_PUBLIC_BASE ||
     process.env.R2_PUBLIC_URL ||
+    process.env.MEDIA_BASE_URL ||
     process.env.NEXT_PUBLIC_MEDIA_BASE_URL ||
     process.env.R2_CUSTOM_DOMAIN ||
     ""

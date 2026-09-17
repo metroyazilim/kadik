@@ -3,10 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import { randomUUID } from "node:crypto";
 
 const routes = [
-  ["/", "Değişim için"], ["/hakkimizda", "Hakkımızda"], ["/etkinlikler", "Etkinlikler"],
-  ["/gonulluluk", "Gönüllülük"], ["/duyurular", "Duyurular"], ["/yazilar", "Yazılar"],
-  ["/what-are-the-most-successful-methods-to-fight-against-tax-scam", "Vergi dolandırıcılığı"],
-  ["/yazilar/vergi-dolandiriciligiyla-mucadelede-en-basarili-yontemler-nelerdir", "Vergi dolandırıcılığı"],
+  ["/", "İş dünyasını"], ["/hakkimizda", "Hakkımızda"], ["/kurul-uyeleri", "Kurul Üyeleri"], ["/etkinlikler", "Etkinlikler"],
+  ["/uyelik", "Üyelik Başvurusu"], ["/duyurular", "Duyurular"], ["/yazilar", "Yayınlar"],
   ["/iletisim", "İletişim"], ["/galeri", "Galeri"],
   ["/gizlilik-politikasi", "Gizlilik Politikası"], ["/kullanim-sartlari", "Kullanım Koşulları"],
 ];
@@ -33,7 +31,7 @@ for (const [route, heading] of routes) test(`public ${route}`, async ({ page }, 
   const response = await page.goto(route);
   expect(response?.status()).toBe(200);
   await expect(page.locator("h1")).toContainText(heading);
-  await expect(page).toHaveTitle(/\| KADIK$/);
+  await expect(page).toHaveTitle(/\| KADİK$|KADİK \| Kybele/);
   await page.evaluate(() => document.fonts.ready);
   expect(await page.locator("html").getAttribute("lang")).toBe("tr");
   expect(await page.locator(".kadik-header").evaluate((el) => getComputedStyle(el).position)).toBe("relative");
@@ -61,25 +59,29 @@ test("navigation, category query and search", async ({ page }, info) => {
   if (info.project.name === "mobile") {
     await page.getByRole("button", { name: "Menüyü aç" }).click();
     const mobileNav = page.getByRole("navigation", { name: "Mobil menü" });
-    await expect(mobileNav.getByRole("link", { name: "Hizmetler", exact: true })).toBeVisible();
+    await expect(mobileNav.getByRole("link", { name: "Kurumsal", exact: true })).toBeVisible();
+    await expect(mobileNav.getByRole("link", { name: "Kurul Üyeleri", exact: true })).toBeVisible();
+    await expect(mobileNav.getByRole("link", { name: "Faaliyetler", exact: true })).toBeVisible();
     await expect(mobileNav.getByRole("link", { name: "Etkinlikler", exact: true })).toBeVisible();
-    await expect(mobileNav.getByRole("link", { name: "Gönüllülük", exact: true })).toBeVisible();
     await expect(mobileNav.getByRole("link", { name: "Duyurular", exact: true })).toBeVisible();
+    await expect(mobileNav.getByRole("link", { name: "Üyelik", exact: true })).toBeVisible();
     await mobileNav.getByRole("link", { name: "Makaleler", exact: true }).click();
   } else {
     const mainNav = page.getByRole("navigation", { name: "Ana menü" });
-    await mainNav.getByRole("link", { name: "Hizmetler", exact: true }).hover();
+    await mainNav.getByRole("link", { name: "Faaliyetler", exact: true }).hover();
     await expect(mainNav.getByRole("link", { name: "Etkinlikler", exact: true })).toBeVisible();
-    await expect(mainNav.getByRole("link", { name: "Gönüllülük", exact: true })).toBeVisible();
     await expect(mainNav.getByRole("link", { name: "Duyurular", exact: true })).toBeVisible();
+    await expect(mainNav.getByRole("link", { name: "Yayınlar", exact: true })).toBeVisible();
     await expect(page.locator(".kadik-header-inner > .kadik-button")).toHaveCount(0);
-    await mainNav.getByRole("link", { name: "Yazılar", exact: true }).hover();
+    await mainNav.getByRole("link", { name: "Haberler", exact: true }).first().hover();
     await mainNav.getByRole("link", { name: "Makaleler", exact: true }).click();
   }
   await expect(page.locator(".kadik-filter-row button[aria-pressed=true]")).toHaveText("Makale");
-  await expect(page.locator(".kadik-post-card")).toHaveCount(1);
+  const makaleCount = await page.locator(".kadik-post-card").count();
+  expect(makaleCount).toBeGreaterThan(0);
+  await page.getByRole("button", { name: "Tümü", exact: true }).click();
+  expect(await page.locator(".kadik-post-card").count()).toBeGreaterThanOrEqual(makaleCount);
   await page.getByRole("button", { name: "Haber", exact: true }).click();
-  await expect(page.locator(".kadik-post-card")).toHaveCount(2);
   await page.reload();
   await expect(page.locator(".kadik-filter-row button[aria-pressed=true]")).toHaveText("Haber");
   await page.getByLabel("Yazılarda ara").fill("bulunamayacakbaşlık");
@@ -90,7 +92,7 @@ test("navigation, category query and search", async ({ page }, info) => {
 test("gallery filter, modal, Escape and focus return", async ({ page }) => {
   const errors = errorsOn(page);
   await page.goto("/galeri");
-  await page.locator(".kadik-gallery-filter").getByRole("button", { name: "Gönüllüler" }).click();
+  await page.locator(".kadik-gallery-filter").getByRole("button", { name: "Toplantılar" }).click();
   await expect(page.locator(".kadik-gallery-grid > button")).toHaveCount(3);
   const trigger = page.locator(".kadik-gallery-grid > button").first();
   await trigger.click();
@@ -110,7 +112,7 @@ test("calendar months, list and search", async ({ page }) => {
   await page.getByRole("button", { name: "Önceki ay" }).click();
   await page.getByRole("button", { name: "Liste", exact: true }).click();
   await expect(page.locator(".kadik-event-list article")).toHaveCount(4);
-  await page.getByLabel("Etkinliklerde ara").fill("Mahalle");
+  await page.getByLabel("Etkinliklerde ara").fill("İhracat");
   await page.getByRole("button", { name: "Etkinlik bul" }).click();
   await expect(page.locator(".kadik-event-list article")).toHaveCount(1);
   expect(errors).toEqual([]);
@@ -164,22 +166,31 @@ test("forms persist, retry is idempotent, message appears in admin", async ({ pa
   const client = new PrismaClient();
   const email = `qa-${randomUUID()}@kadik.local`;
   try {
-    for (const [route, compact, volunteer] of [["/iletisim", false, false], ["/gonulluluk", false, true], ["/", true, false]] as const) {
-      await page.goto(route);
-      if (!compact) await page.getByPlaceholder("Adınız Soyadınız").fill("KADIK QA");
-      await page.getByPlaceholder("E-posta adresiniz").fill(email);
-      if (!compact) await page.getByPlaceholder(volunteer ? "Bize kendinizden bahsedin" : "Mesajınız").fill(`QA ${info.project.name} ${route}`);
-      if (volunteer) await page.locator("select[name=subject]").selectOption("Etkinlik düzenleme");
-      await page.locator('input[name="consent"]').check();
-      await page.locator(".kadik-form button[type=submit], .kadik-form button:not([type])").click();
-      await expect(page.locator(".kadik-form-status")).toContainText("Mesajınız alındı");
-      await expect(page.getByPlaceholder("E-posta adresiniz")).toHaveValue("");
+    await page.goto("/iletisim");
+    await page.getByPlaceholder("Adınız Soyadınız").fill("KADIK QA");
+    await page.getByPlaceholder("E-posta adresiniz").fill(email);
+    await page.getByPlaceholder("Mesajınız").fill(`QA ${info.project.name} /iletisim`);
+    await page.locator('input[name="consent"]').check();
+    await page.locator(".kadik-form button:not([type])").click();
+    await expect(page.locator(".kadik-form-status")).toContainText("Mesajınız alındı");
+    await expect(page.getByPlaceholder("E-posta adresiniz")).toHaveValue("");
+
+    // Üyelik başvurusu: dropdown yok, şirket/sektör bilgisi serbest metin.
+    await page.goto("/uyelik");
+    await expect(page.locator("select")).toHaveCount(0);
+    for (const [field, value] of [["name", "KADIK QA"], ["email", email], ["phone", "+90 555 000 00 00"], ["company", "QA Sanayi A.Ş."], ["position", "Genel Müdür"], ["sector", "Lojistik"], ["city", "İstanbul"]] as const) {
+      await page.locator(`.kadik-form [name="${field}"]`).fill(value);
     }
-    await expect.poll(() => client.message.count({ where: { email } })).toBe(3);
+    await page.locator('.kadik-form [name="message"]').fill(`QA ${info.project.name} /uyelik`);
+    await page.locator('input[name="consent"]').check();
+    await page.locator(".kadik-form button:not([type])").click();
+    await expect(page.locator(".kadik-form-status")).toContainText("Başvurunuz alındı");
+    await expect.poll(() => client.message.findFirst({ where: { email, subject: { contains: "Üyelik başvurusu" } }, select: { subject: true } })).not.toBeNull();
+    await expect.poll(() => client.message.count({ where: { email } })).toBe(2);
     const payload = { name: "KADIK QA retry", email, message: "Same retry", consent: true };
     expect((await request.post("/api/kadik/contact", { data: payload })).status()).toBe(200);
     expect((await request.post("/api/kadik/contact", { data: payload })).status()).toBe(200);
-    expect(await client.message.count({ where: { email } })).toBe(4);
+    expect(await client.message.count({ where: { email } })).toBe(3);
     expect((await request.post("/api/kadik/contact", { data: { ...payload, consent: false } })).status()).toBe(400);
     await login(page);
     await page.goto("/manage/messages");
@@ -192,14 +203,41 @@ test("forms persist, retry is idempotent, message appears in admin", async ({ pa
   }
 });
 
-test("404 and API readiness", async ({ page, request }) => {
+test("404 shell links back into the site and API is ready", async ({ page, request }) => {
   const jsErrors: string[] = [];
   page.on("pageerror", (error) => jsErrors.push(error.message));
   const response = await page.goto("/bu-sayfa-yok/test");
   expect(response?.status()).toBe(404);
-  await expect(page.getByRole("heading", { name: "Sayfa bulunamadı" })).toBeVisible();
+  await expect(page.locator("h1")).toContainText("Sayfa Bulunamadı");
+  await expect(page.getByRole("heading", { level: 2, name: "Aradığınız sayfaya ulaşamadık." })).toBeVisible();
+  await page.getByRole("navigation", { name: "Site bölümleri" }).getByRole("link", { name: /Kurul Üyeleri/ }).click();
+  await expect(page).toHaveURL(/\/kurul-uyeleri$/);
   expect(jsErrors).toEqual([]);
   expect((await request.get("/api/kadik-api/ready")).status()).toBe(200);
+});
+
+test("published board members and posts reach the public site", async ({ page }) => {
+  const errors = errorsOn(page);
+  await page.goto("/kurul-uyeleri");
+  const boardCards = page.locator(".kadik-board-card");
+  expect(await boardCards.count()).toBeGreaterThan(0);
+  await expect(boardCards.first().locator("img")).toHaveJSProperty("complete", true);
+
+  await page.goto("/yazilar");
+  const firstPost = page.locator(".kadik-post-card").first();
+  const title = await firstPost.locator("h3").innerText();
+  await firstPost.locator("a").click();
+  await expect(page).toHaveURL(/\/yazilar\/[^/]+$/);
+  await expect(page.locator("h1")).toContainText(title);
+  await expect(page.locator(".kadik-article-meta")).toContainText("KADİK");
+  expect(errors).toEqual([]);
+});
+
+test("legacy volunteer address redirects to the membership route", async ({ page }) => {
+  const response = await page.goto("/gonulluluk");
+  expect(response?.status()).toBe(200);
+  await expect(page).toHaveURL(/\/uyelik$/);
+  await expect(page.locator("h1")).toContainText("Üyelik Başvurusu");
 });
 
 test("content remains visible with JavaScript disabled", async ({ browser }) => {

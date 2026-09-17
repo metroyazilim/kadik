@@ -21,10 +21,10 @@ export default async function TeamPage({ searchParams }: { searchParams: SearchP
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader
-        eyebrow="Ekip"
-        title="Ekip Üyeleri"
+        eyebrow="Kurul"
+        title="Kurul Üyeleri"
         description="Her ekip üyesi Türkçe ve Global dilinde bağımsız kayıt/yayın durumuna sahiptir. Sırayı sürükleyerek değiştirin."
-        action={<CreateRecordButton action={createTeamMemberAction} label="Yeni üye" />}
+        action={<CreateRecordButton action={createTeamMemberAction} label="Yeni kurul üyesi" />}
       />
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">

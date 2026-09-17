@@ -50,7 +50,7 @@ const COLLECTION_COPY: Partial<
   team: {
     allButton: "Tüm ekip butonu",
     allHref: "Tüm ekip bağlantısı",
-    recordsLabel: "Ekip üyeleri",
+    recordsLabel: "Kurul üyeleri",
   },
   blog: {
     itemCta: "Kart butonu yazısı",
