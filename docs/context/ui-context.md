@@ -1,5 +1,9 @@
 # UI Context
 
+## KADIK public scroll motion (2026-09-17)
+
+`KadikMotion` yalnız public kabuğu kapsar. IntersectionObserver görünür alan girişinde tek sefer fade-up (28px, opacity 650ms/transform 750ms), görsellerde scale .97 ve kartlarda 0/85/170ms stagger uygular. İlk ekrandaki içerik gizlenmez. CSS/JS yokken içerik görünür, reduced-motion tüm geçişleri kapatır, klavye odağı bekleyen içeriği görünür yapar. MutationObserver filtreyle eklenen kartları izler; tüm observer/listener'lar cleanup edilir. Native dialog galeri lightbox'ında Escape/focus trap/focus dönüşü sağlar. Admin yüzeyi hareketlendirilmez.
+
 ## Theme
 
 Yönetim paneli açık temadır; koyu tema yoktur. Görsel dil `example-starter/organization-wpfuk` yönetim panelinden birebir alınmıştır: beyaz yüzeyler, `#f7f8fa` sayfa zemini, lacivert metin, kırmızı vurgu ve keskin (maksimum 4px) köşeler. Panel "kurumsal operasyon konsolu" gibi görünür: yoğun bilgi, ince çizgiler, büyük harf küçük punto etiketler, gölge yerine kenarlık.

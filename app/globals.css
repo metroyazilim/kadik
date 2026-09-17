@@ -2,7 +2,34 @@
 @source "../app";
 @source "../components";
 
-/* Starter Kurumsal public site tasarım token'ları */
+/* Starter public site tasarım token'ları */
+
+/* Public-only scroll reveal. Without JS all content stays visible. */
+.kadik-site [data-motion] { transition: opacity 650ms ease, transform 750ms cubic-bezier(.22,1,.36,1); transition-delay: var(--reveal-delay, 0ms); }
+.kadik-site [data-motion-state="pending"] { opacity: 0; transform: translate3d(0, 28px, 0); }
+.kadik-site [data-motion="zoom"][data-motion-state="pending"] { transform: translate3d(0, 18px, 0) scale(.97); }
+.kadik-site [data-motion-state="visible"], .kadik-site [data-motion]:focus-within { opacity: 1; transform: none; }
+.kadik-site :focus-visible { outline: 2px solid var(--kadik-blue); outline-offset: 5px; }
+.kadik-site .kadik-footer-grid a.kadik-button { display: inline-flex; align-items: center; justify-content: center; margin: 0; }
+.kadik-site .kadik-footer-grid .kadik-socials a { display: grid; place-items: center; margin: 0; }
+.kadik-site .kadik-legal h2, .kadik-site .kadik-article h2 { line-height: 1.2; margin-bottom: 16px; }
+.kadik-site .kadik-list-posts .kadik-post-card { display: block; }
+.kadik-site .kadik-list-posts .kadik-post-card > a { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); }
+.kadik-site .kadik-list-posts .kadik-post-card img { width: 100%; height: 100%; object-fit: cover; }
+.kadik-site .kadik-calendar-head { flex-wrap: wrap; }
+.kadik-site .kadik-day.is-outside { color: var(--kadik-muted); background: #f8f8fa; }
+.kadik-site .kadik-day > button { border: 0; background: transparent; color: inherit; cursor: pointer; }
+.kadik-event-list { display: grid; gap: 20px; }
+.kadik-event-list article { padding: 24px; border: 1px solid var(--kadik-line); }
+.kadik-event-list h2 { font-family: var(--kadik-serif); font-size: 28px; }
+.kadik-site dialog.kadik-lightbox { border: 0; width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; }
+.kadik-site dialog.kadik-lightbox:not([open]) { display: none; }
+.kadik-site dialog.kadik-lightbox::backdrop { background: rgba(11,14,29,.9); }
+@media (max-width: 640px) { .kadik-site .kadik-list-posts .kadik-post-card > a { display: block; } .kadik-site .kadik-list-posts .kadik-post-card img { aspect-ratio: 1.72; height: auto; } }
+@media (prefers-reduced-motion: reduce) {
+  .kadik-site *, .kadik-site *::before, .kadik-site *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .kadik-site [data-motion] { opacity: 1 !important; transform: none !important; }
+}
 @theme {
   --color-base: #ffffff;
   --color-ink: #0f0d1d;
@@ -167,11 +194,11 @@ button, input, textarea, select { font: inherit; }
 .kadik-form { display: grid; gap: 18px; }
 .kadik-form input, .kadik-form textarea, .kadik-form select, .kadik-sidebar input, .kadik-event-toolbar input { width: 100%; min-height: 57px; padding: 16px 18px; border: 1px solid var(--kadik-line); border-radius: 0; background: #fff; color: var(--kadik-ink); outline: none; }
 .kadik-form input:focus, .kadik-form textarea:focus, .kadik-form select:focus { border-color: var(--kadik-blue); }
-.kadik-form-compact input { display: inline-block; width: calc(55% - 10px); margin-right: 14px; border: 0; }
+.kadik-form-compact input[type="email"] { display: block; width: 100%; margin: 0; border: 0; }
 .kadik-form-compact .kadik-consent { justify-content: center; margin-top: 16px; }
 .kadik-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .kadik-consent { display: flex; align-items: flex-start; gap: 8px; color: inherit; font-size: 13px; line-height: 1.5; }
-.kadik-consent input { width: 14px; min-height: 14px; margin-top: 2px; accent-color: var(--kadik-red); }
+.kadik-form .kadik-consent input { flex: 0 0 16px; width: 16px; height: 16px; min-height: 16px; padding: 0; margin: 2px 0 0; accent-color: var(--kadik-red); }
 .kadik-form-status { margin: 0; padding: 12px 16px; background: rgba(91,135,232,.12); color: inherit; font-size: 14px; }
 .kadik-section { padding-block: 118px; }
 .kadik-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 94px; align-items: start; }

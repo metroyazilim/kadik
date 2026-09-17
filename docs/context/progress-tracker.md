@@ -1,5 +1,16 @@
 # Progress Tracker
 
+## KADIK güncel kayıt — 2026-09-17
+
+Kanonik checkout `/Users/berat/anton/kadik`; port 3901. Kalan alt bölümler kopyalanmış starter geçmişidir ve KADIK için tamamlanma iddiası değildir.
+
+- DB kesintisi kök nedeni: standalone PostgreSQL kapanmış; dev komutu tekrar açmıyordu. Otomatik readiness/startup ve yerel toparlama eklendi.
+- 404 veri sorguları kaldırıldı; 6 yeni root layout eklendi; admin login servis kesintisini anlaşılır gösterir.
+- Public scroll motion, reduced-motion, galeri/filtre/takvim ve form reset/idempotency düzeltildi.
+- Navbar bilgi mimarisi güncellendi: `Hizmetler` dropdown'ında Etkinlikler, Gönüllülük ve Duyurular; ayrı `Katıl` butonu kaldırıldı.
+- Tekrarlanabilir doğrulama: `playwright.kadik.config.ts`, `tests/kadik/site.spec.ts`, `scripts/verify-local-recovery.mjs`.
+- Güncel ayrıntı ve kanıt: `kadik-verification.md`; başlatma: `local-development.md`.
+
 Bu dosya disk gerçeğini ve sıradaki spec güdümlü çalışma birimlerini izler.
 
 Son güncelleme: 2026-09-11 — Yeni statik sayfa: Partnerler (`/partnerler`, `/en/partners`), Portföy menüsünün son alt öğesi. Anasayfanın "Marka Güveni" (`brandTrust`) bölümüyle aynı yayınlanmış `logoItems`'ı `loadPublicHomeView` üzerinden okuyup `BrandTrustPart`/`Marquee` ile render eder - ayrı bir içerik modeli veya admin ekranı eklenmedi, tek kaynak `/manage/home` kalır. Sayfa metinleri (`partnersPage.banner/subtitle/title/intro/empty`, `meta.partners`) `lib/i18n/dictionaries/{tr,en}.ts` + `lib/page-copy-registry.ts`'e (`/manage/pages/copy/partners`) eklendi, TR segmenti `partnerler` / EN segmenti `partners` `lib/i18n/static-pages.ts`'e işlendi (otomatik `/tr/partners` kalıcı yönlendirmesi dahil). Nav'daki "Portföy" alt menüsü hem kod içi `tr.ts`/`en.ts` hem de **yayınlanmış** `SiteContentTr`/`SiteContentEn.dictionary` DB satırındaki `nav` dizisine (admin panelinden özelleştirilmiş, `mergeDictionary` array'i bütün olarak override ediyor) elle eklendi - yalnızca dosya değişikliği canlı nav'a yansımaz. Her yeni üst-seviye statik TR route'u (`app/<segment>/page.tsx`) kendi `layout.tsx`'ini taşımak zorunda (`app/layout.tsx` yok, `<html>` kök `[locale]/layout.tsx`'ten `LocaleLayout` ile gelir) - unutulursa "Missing <html> and <body> tags" runtime hatası verir; `app/partnerler/layout.tsx` diğer statik sayfalarla birebir aynı desende eklendi. `tsc`/`eslint` temiz, TR ve EN sayfalar `localhost:3900`'de tarayıcıda ve `curl` ile doğrulandı (200, logolar HTML'de, nav linki her iki dilde de gerçek href üretiyor).

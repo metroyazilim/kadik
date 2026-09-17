@@ -1,5 +1,9 @@
 # Architecture Context
 
+## KADIK yerel runtime (2026-09-17)
+
+`npm run dev` → `scripts/local-db.mjs` readiness/schema/admin kontrolü → `scripts/dev.mjs` Next 3901. Yalnız bu projeye ait `.local/postgres`, `127.0.0.1:55432/kadik` eşleşmesinde otomatik açılır; 15 saniyelik geliştirme kontrolü beklenmedik kapanmadan sonra tekrar başlatır. Veri/şema/admin yeniden seed edilmez. `.env.local` ve `.local/` Git dışındadır. `/api/kadik-api/ready` gerçek DB sorgusuna göre 200/503 döner. Statik 404 veritabanı sorgulamaz. Yeni public segmentler `KadikLayout` ile html/body/global CSS sağlar. Admin oturum ve rol kontrolleri starter'dan korunur.
+
 ## Stack
 
 | Layer | Technology | Role |

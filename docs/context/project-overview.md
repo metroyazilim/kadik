@@ -1,5 +1,7 @@
 # Extech — Corporate Starter Web Sitesi ve İçerik Yönetimi
 
+> KADIK uyarlaması (2026-09-17): Bu checkout `/Users/berat/anton/kadik`, kullanıcı portu 3901'dir. Aşağıdaki starter geçmişi KADIK tamamlanma kanıtı değildir. Güncel kapsam `18-progress-tracker.md`, doğrulama `kadik-verification.md`, yerel çalıştırma `local-development.md` içindedir. Public özel sayfalar halen örnek içerik kullanır; mesaj akışı gerçek DB/admin bağlantılıdır.
+
 ## Overview
 
 Extech, Corporate Starter'ın iki dilli (tr = Türkçe, en = Global) kurumsal web sitesi ve bu sitenin tüm içeriğini üreten yönetim uygulamasıdır. Ziyaretçiler yayınlanmış kurumsal içeriği (anasayfa, hakkımızda, hizmetler, ürünler, projeler, ekip, SSS, blog, yasal metinler, iletişim) görür. Yetkili yöneticiler aynı içeriği `/manage` altındaki yönetim panelinden düzenler, taslak olarak saklar ve dil bazında yayınlar. Türkçe ve Global dışındaki diller uygulama i18n'i değildir; ziyaretçinin tarayıcı/Google çevirisiyle karşılanır ve ayrı route, sözlük veya revizyon üretmez. Ürün, ancak bir yöneticinin düzenlediği içeriğin yayınlandıktan sonra ilgili public adreste birebir görünmesiyle başarılı sayılır.
