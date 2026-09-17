@@ -27,7 +27,11 @@ services:
     ports:
       - "${APP_PORT:-3000}:3000"
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-metro}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-metro_yazilim}?schema=public
+      POSTGRES_USER: ${POSTGRES_USER:-metro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-metro_yazilim}
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
       AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET}
       ADMIN_EMAIL: ${ADMIN_EMAIL:?set ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD}

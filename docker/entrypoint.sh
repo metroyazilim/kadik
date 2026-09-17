@@ -6,8 +6,27 @@
 set -eu
 
 if [ -z "${DATABASE_URL:-}" ]; then
-  echo "entrypoint: DATABASE_URL is required" >&2
-  exit 1
+  if [ -n "${POSTGRES_USER:-}" ] && [ -n "${POSTGRES_PASSWORD:-}" ] && [ -n "${POSTGRES_DB:-}" ]; then
+    # docker-compose.yml passes discrete Postgres credentials rather than a
+    # pre-built connection string specifically so a generated
+    # POSTGRES_PASSWORD containing URL-reserved characters (`/`, `@`, `:`,
+    # `%`, ...) - an entirely normal thing for a random secret - never
+    # breaks libpq's URI parser the way raw shell string interpolation
+    # into `postgresql://user:pass@host/db` does (observed: an unescaped
+    # `/` in the password made libpq parse a password substring as the
+    # port). `encodeURIComponent` via the already-present Node runtime
+    # percent-encodes both fields correctly.
+    DATABASE_URL=$(node -e '
+      const enc = encodeURIComponent;
+      const host = process.env.DATABASE_HOST || "db";
+      const port = process.env.DATABASE_PORT || "5432";
+      console.log(`postgresql://${enc(process.env.POSTGRES_USER)}:${enc(process.env.POSTGRES_PASSWORD)}@${host}:${port}/${enc(process.env.POSTGRES_DB)}?schema=public`);
+    ')
+    export DATABASE_URL
+  else
+    echo "entrypoint: DATABASE_URL is required" >&2
+    exit 1
+  fi
 fi
 
 # libpq rejects Prisma's client-only query parameters outright ("invalid URI
