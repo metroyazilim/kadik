@@ -8,6 +8,7 @@ import {
   TEAM_MEMBER_CONTENT_TYPE,
   POST_CONTENT_TYPE,
 } from "@/lib/content-model/payload-validation";
+import { KADIK_LOCALES, KADIK_PATHS, type KadikPageKey } from "@/lib/kadik-i18n";
 import { LOCALES, SITE_URL } from "@/lib/i18n/config";
 import { STATIC_PAGE_KEYS, staticPath } from "@/lib/i18n/static-pages";
 import { prisma } from "@/lib/db";
@@ -39,6 +40,25 @@ function staticSitemapEntries(): MetadataRoute.Sitemap {
   return entries;
 }
 
+function kadikSitemapEntries(): MetadataRoute.Sitemap {
+  const entries: MetadataRoute.Sitemap = [];
+  const pageKeys = Object.keys(KADIK_PATHS) as KadikPageKey[];
+
+  for (const pageKey of pageKeys) {
+    if (pageKey === "notfound" || pageKey === "post") {
+      continue;
+    }
+
+    for (const locale of KADIK_LOCALES) {
+      entries.push({
+        url: `${SITE_URL}${KADIK_PATHS[pageKey][locale]}`,
+      });
+    }
+  }
+
+  return entries;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const rowsByType = await Promise.all(
     SITEMAP_CONTENT_TYPES.map((contentType) => getAllPublishedRoutesForSitemap(prisma, contentType)),
@@ -47,6 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticSitemapEntries(),
+    ...kadikSitemapEntries(),
     ...entries.map((entry) => ({
       url: `${SITE_URL}${entry.url}`,
       lastModified: entry.lastModified,

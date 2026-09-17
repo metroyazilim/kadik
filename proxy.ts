@@ -1,6 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "./lib/session-token";
 
+/**
+ * Apex production domain (`kadiklondon.org`) is not launched yet - it must
+ * show a static holding page regardless of the requested path, while the
+ * real site stays fully reachable on `staging.kadiklondon.org` and every
+ * other host (local dev, preview deployments). Comma-separated override via
+ * `COMING_SOON_HOSTS` so this never needs a code change to add/remove a
+ * domain from the holding-page set.
+ */
+const COMING_SOON_HOSTS = new Set(
+  (process.env.COMING_SOON_HOSTS ?? "kadiklondon.org,www.kadiklondon.org")
+    .split(",")
+    .map((host) => host.trim().toLowerCase())
+    .filter((host) => host.length > 0),
+);
+
 const PUBLIC_PATHS: Record<string, true> = {
   "/manage/login": true,
   "/manage/forgot-password": true,
@@ -24,6 +39,12 @@ const PUBLIC_PATHS: Record<string, true> = {
  * unuttum" and the emailed reset link both silently dead ends.
  */
 export async function proxy(request: NextRequest) {
+  const host = request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
+  if (COMING_SOON_HOSTS.has(host) && request.nextUrl.pathname !== "/coming-soon") {
+    return NextResponse.rewrite(new URL("/coming-soon", request.url));
+  }
+
+  if (!request.nextUrl.pathname.startsWith("/manage")) return NextResponse.next();
   if (PUBLIC_PATHS[request.nextUrl.pathname]) return NextResponse.next();
 
   const token = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
@@ -37,7 +58,11 @@ export async function proxy(request: NextRequest) {
 // (node_modules/next/dist/build/analysis/get-page-static-info.js), which
 // reads the literal identifier `config` regardless of proxy vs middleware.
 // A `proxyConfig` export is silently ignored, which would run this file's
-// logic on every route instead of only `/manage/:path*`.
+// logic on every route instead of only the matched paths below.
+//
+// Matcher now covers every path (not only `/manage/:path*`) so the
+// coming-soon host check above runs on every request; excludes Next's own
+// static asset/image pipelines, which never need either check.
 export const config = {
-  matcher: ["/manage/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

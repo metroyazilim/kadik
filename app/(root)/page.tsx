@@ -3,11 +3,11 @@ import { KadikHome } from "@/components/KadikSite";
 import { listKadikPosts } from "@/lib/public-content/kadik-view";
 import { listPublishedTeamMembers } from "@/lib/public-content/team";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "KADİK | Kybele Atasever Dünya İş Konseyi", description: "Kybele Atasever Dünya İş Konseyi; iş insanlarını, sektörleri ve uluslararası fırsatları ortak akılla buluşturur." };
-export default async function TurkishHomePage() {
+export const metadata: Metadata = { title: "KADİK London | Kybele Atasever World Business Council", description: "Kybele Atasever World Business Council brings business people, sectors and international opportunities together through shared judgement." };
+export default async function EnglishHomePage() {
   const [team, posts] = await Promise.all([
-    listPublishedTeamMembers("tr").catch(() => []),
-    listKadikPosts("tr"),
+    listPublishedTeamMembers("en").catch(() => []),
+    listKadikPosts("en"),
   ]);
-  return <KadikHome team={team} posts={posts} />;
+  return <KadikHome locale="en" team={team} posts={posts} />;
 }

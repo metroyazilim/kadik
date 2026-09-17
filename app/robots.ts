@@ -7,7 +7,10 @@ export const dynamic = "force-dynamic";
 export default function robots(): MetadataRoute.Robots {
   const directives = buildRobotsDirectives(`${SITE_URL}/sitemap.xml`);
   return {
-    rules: directives.rules.map((rule) => ({ userAgent: rule.userAgent, disallow: [...rule.disallow] })),
+    rules: directives.rules.map((rule) => ({
+      userAgent: rule.userAgent,
+      disallow: [...rule.disallow, "/api"],
+    })),
     sitemap: directives.sitemap,
   };
 }

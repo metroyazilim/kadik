@@ -38,13 +38,24 @@ psql_url() {
 PSQL_URL=$(psql_url)
 
 attempt=0
-until psql "$PSQL_URL" -tAc 'SELECT 1' >/dev/null 2>&1; do
+until psql_error=$(psql "$PSQL_URL" -tAc 'SELECT 1' 2>&1 >/dev/null); do
   attempt=$((attempt + 1))
   if [ "$attempt" -ge 60 ]; then
-    echo "entrypoint: database is not reachable after 60 attempts" >&2
+    echo "entrypoint: database is not reachable after 60 attempts. Last error: ${psql_error:-<no output>}" >&2
+    echo "entrypoint: DATABASE_URL host/port: $(printf '%s' "$PSQL_URL" | sed -E 's#.*://[^@]*@##; s#/.*##')" >&2
     exit 1
   fi
-  echo "entrypoint: waiting for database ($attempt)"
+  # Every 10th attempt: surface the real reason (DNS failure, connection
+  # refused, auth failure, ...) instead of a bare "waiting" line - a
+  # container-to-container networking problem (the actual cause the one
+  # time this loop ran out the full 60 attempts) looks identical to "Postgres
+  # is still booting" without this, and both produce nothing but silence
+  # for two minutes.
+  if [ $((attempt % 10)) -eq 0 ]; then
+    echo "entrypoint: waiting for database ($attempt) - ${psql_error:-<no output>}"
+  else
+    echo "entrypoint: waiting for database ($attempt)"
+  fi
   sleep 2
 done
 

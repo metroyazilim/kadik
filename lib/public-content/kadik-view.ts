@@ -13,14 +13,15 @@ import { getPublishedPostByRoute, listPublishedPosts, type PublicPostListItem } 
  */
 
 const DATE_FORMAT: Readonly<Intl.DateTimeFormatOptions> = { day: "numeric", month: "long", year: "numeric" };
+const DATE_TAG: Record<ContentLocale, string> = { en: "en-GB", tr: "tr-TR" };
 
-function toListItem(post: PublicPostListItem): KadikPostListItem {
+function toListItem(post: PublicPostListItem, locale: ContentLocale): KadikPostListItem {
   return {
     slug: post.slug,
     title: post.title,
     excerpt: post.excerpt,
     category: post.category,
-    dateLabel: post.publishedAt.toLocaleDateString("tr-TR", DATE_FORMAT),
+    dateLabel: post.publishedAt.toLocaleDateString(DATE_TAG[locale], DATE_FORMAT),
     image: post.coverImage.url,
   };
 }
@@ -42,11 +43,12 @@ function toArticleBlock(block: PublicContentBlock): KadikArticleBlock {
 
 export async function listKadikPosts(locale: ContentLocale): Promise<KadikPostListItem[]> {
   const posts = await listPublishedPosts(locale).catch(() => []);
-  return posts.map(toListItem);
+  return posts.map((post) => toListItem(post, locale));
 }
 
 export async function getKadikPost(locale: ContentLocale, slug: string): Promise<KadikPostDetailData | null> {
   const post = await getPublishedPostByRoute(locale, slug).catch(() => null);
   if (!post) return null;
-  return { ...toListItem(post), author: post.author, blocks: post.blocks.map(toArticleBlock) };
+  return { ...toListItem(post, locale), author: post.author, blocks: post.blocks.map(toArticleBlock) };
 }
+
