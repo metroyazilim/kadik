@@ -242,7 +242,7 @@ function Footer() {
     <div><h3>{t.footer.corporate}</h3><Link href={p("about")}>{t.nav.about}</Link><Link href={p("board")}>{t.nav.board}</Link><Link href={p("membership")}>{t.nav.membership}</Link><Link href={p("contact")}>{t.nav.contact}</Link><Link href={p("privacy")}>{t.footer.privacy}</Link></div>
     <div><h3>{t.footer.activities}</h3><Link href={p("events")}>{t.nav.events}</Link><Link href={p("issues")}>{t.nav.announcements}</Link><Link href={p("posts")}>{t.nav.news}</Link><Link href={p("gallery")}>{t.nav.gallery}</Link></div>
     <div><h3>{t.footer.followUs}</h3><p className="kadik-socials"><Link href="#facebook">f</Link><Link href="#youtube">▶</Link><Link href="#x">𝕏</Link></p><Button href={p("contact")}>{t.footer.contactCta}</Button></div>
-  </div><div className="kadik-footer-bottom"><span>© 2026 {t.brandFull}. {t.footer.rightsReserved}</span><span><Link href={p("privacy")}>{t.footer.privacy}</Link><Link href={p("terms")}>{t.footer.terms}</Link></span></div></footer>;
+  </div><div className="kadik-footer-bottom"><span>© 2026 {t.brandFull}. {t.footer.rightsReserved}</span><span><Link href={p("privacy")}>{t.footer.privacy}</Link><Link href={p("terms")}>{t.footer.terms}</Link><Link href={p("charter")}>{t.footer.charter}</Link></span></div></footer>;
 }
 
 function Banner({ title }: { title: string }) {
@@ -462,8 +462,11 @@ export function KadikGallery({ locale }: { locale: KadikLocale }) {
   </dialog></Shell></KadikPage>;
 }
 
-export function KadikLegal({ locale, terms = false }: { locale: KadikLocale; terms?: boolean }) {
+export function KadikLegal({ locale, terms = false, charter = false }: { locale: KadikLocale; terms?: boolean; charter?: boolean }) {
   const t = KADIK_DICT[locale].legal;
-  const sections = terms ? t.termsSections : t.privacySections;
-  return <KadikPage locale={locale} active={terms ? "terms" : "privacy"}><Shell title={terms ? t.termsTitle : t.privacyTitle}><section className="kadik-section kadik-container kadik-legal"><p className="kadik-lead">{t.lead}</p>{sections.map(([heading, text]) => <section key={heading}><h2>{heading}</h2><p>{text}</p></section>)}</section></Shell></KadikPage>;
+  const sections = charter ? t.charterSections : terms ? t.termsSections : t.privacySections;
+  const title = charter ? t.charterTitle : terms ? t.termsTitle : t.privacyTitle;
+  const lead = charter ? t.charterLead : t.lead;
+  const active = charter ? "charter" : terms ? "terms" : "privacy";
+  return <KadikPage locale={locale} active={active}><Shell title={title}><section className="kadik-section kadik-container kadik-legal"><p className="kadik-lead">{lead}</p>{sections.map(([heading, text]) => <section key={heading}><h2>{heading}</h2><p>{text}</p></section>)}</section></Shell></KadikPage>;
 }

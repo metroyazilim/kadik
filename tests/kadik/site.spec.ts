@@ -17,6 +17,7 @@ const publicPageKeys = [
   "gallery",
   "privacy",
   "terms",
+  "charter",
 ] as const satisfies readonly PublicPageKey[];
 
 const t = KADIK_DICT.en;
@@ -34,6 +35,7 @@ function routeHeading(key: PublicPageKey): string {
     case "gallery": return t.gallery.pageTitle;
     case "privacy": return t.legal.privacyTitle;
     case "terms": return t.legal.termsTitle;
+    case "charter": return t.legal.charterTitle;
   }
 }
 
