@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import nextEnv from "@next/env";
 import type { AdminContext } from "@/lib/content-model/admin-context";
-import { issueTestAdminContext } from "@/lib/content-model/admin-context-test-support";
+import { issueScriptAdminContext } from "@/lib/content-model/admin-context-script-support";
 import { prisma } from "@/lib/db";
 import { createMediaAsset } from "@/lib/media/service";
 import { sanitizeFilename, validateUploadBuffer } from "@/lib/media/validation";
@@ -47,7 +47,7 @@ export async function scriptAdminContext(): Promise<AdminContext> {
     );
   }
 
-  return issueTestAdminContext(admin);
+  return issueScriptAdminContext(admin);
 }
 
 async function readSource(source: string): Promise<Buffer> {
