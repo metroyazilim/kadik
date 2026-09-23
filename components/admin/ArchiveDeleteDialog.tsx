@@ -5,7 +5,6 @@ import { AlertTriangle } from "lucide-react";
 import type { EntityDependencyReport } from "@/lib/content-model/entity-dependency";
 import { primaryButton, secondaryButton } from "./ui";
 
-const LOCALE_LABEL: Record<string, string> = { tr: "Türkçe", en: "Global" };
 
 export type ArchiveDeleteDialogProps = Readonly<{
   open: boolean;
@@ -65,12 +64,8 @@ export function ArchiveDeleteDialog({
         ) : (
           <div className="mt-4 space-y-3 text-sm">
             <div>
-              <p className="font-medium text-brand-text">Yayınlanmış diller</p>
-              <p className="text-brand-muted">
-                {report.publishedLocales.length > 0
-                  ? report.publishedLocales.map((locale) => LOCALE_LABEL[locale] ?? locale).join(", ")
-                  : "Yayınlanmış dil yok."}
-              </p>
+              <p className="font-medium text-brand-text">Yayın durumu</p>
+              <p className="text-brand-muted">{report.publishedLocales.length > 0 ? "Sitede yayında." : "Sitede yayında değil."}</p>
             </div>
             <div>
               <p className="font-medium text-brand-text">Canlı public bağlantılar</p>
@@ -78,7 +73,7 @@ export function ArchiveDeleteDialog({
                 <ul className="mt-1 list-disc space-y-0.5 ps-5 text-brand-muted">
                   {report.liveRoutes.map((route) => (
                     <li key={route.url}>
-                      {LOCALE_LABEL[route.locale] ?? route.locale}: <code className="font-mono">{route.url}</code>
+                      <code className="font-mono">{route.url}</code>
                     </li>
                   ))}
                 </ul>
@@ -127,7 +122,7 @@ export function ArchiveDeleteDialog({
             title={
               deleteEligible
                 ? undefined
-                : "Kayıt yayında: kalıcı silme yayınlanmış çevirileri ve canlı adresleri de kaldırır."
+                : "Kayıt yayında: kalıcı silme sitedeki içeriği ve adresini de kaldırır."
             }
             className="rounded-lg px-3 py-2 text-sm font-semibold text-brand-danger hover:bg-brand-danger/10 disabled:cursor-not-allowed disabled:opacity-40"
           >

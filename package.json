@@ -19,6 +19,8 @@
     "db:create": "node scripts/create-local-db.mjs",
     "db:reset-admin-password": "tsx scripts/reset-admin-password.ts",
     "db:seed-kadik": "tsx scripts/seed-kadik-content.ts",
+    "db:seed-kadik-pages": "tsx scripts/seed-kadik-pages.ts",
+    "db:export": "node scripts/export-db.mjs",
     "media:import": "tsx scripts/media-import.ts"
   },
   "prisma": {

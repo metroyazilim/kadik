@@ -90,11 +90,11 @@ export async function saveFaqDraftAction(_previous: ActionState, formData: FormD
     });
 
     if (!result.ok) {
-      return { error: `Bu dilde arada başka bir değişiklik kaydedilmiş (v${result.current.version}). Sayfayı yenileyip tekrar deneyin.` };
+      return { error: `Bu kayıt siz düzenlerken başka biri tarafından değiştirildi. Sayfayı yenileyip tekrar deneyin.` };
     }
 
     revalidatePath("/manage/faq");
-    return { success: `${locale.toUpperCase()} kaydedildi.` };
+    return { success: "Kaydedildi." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Soru kaydedilemedi. Alanları kontrol edip tekrar deneyin." };
@@ -112,7 +112,7 @@ export async function publishFaqAction(_previous: ActionState, formData: FormDat
   const expectedDraftRevisionId = text(formData, "draftRevisionId");
 
   if (!translationId || !expectedDraftRevisionId) {
-    return { error: "Bu dilde kaydedilmiş içerik yok; önce Kaydet deyin." };
+    return { error: "Kaydedilecek içerik bulunamadı. Sayfayı yenileyip tekrar deneyin." };
   }
 
   try {
@@ -134,7 +134,7 @@ export async function publishFaqAction(_previous: ActionState, formData: FormDat
     }
 
     revalidatePublicFaqSurfaces();
-    return { success: `${locale.toUpperCase()} yayınlandı.` };
+    return { success: "Kaydedildi ve sitede yayınlandı." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Yayınlama başarısız oldu." };

@@ -78,3 +78,11 @@ export function alternatesFor(locale: Locale, route: string) {
     languages,
   };
 }
+
+/**
+ * The single language content is edited in from the admin panel. The KADİK
+ * public site is English-only (visitors can use the Google Translate widget),
+ * so editors never switch languages and every collection record is written
+ * and published in this locale.
+ */
+export const ADMIN_CONTENT_LOCALE: Locale = "en";

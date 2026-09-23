@@ -1,4 +1,15 @@
 import type { Metadata } from "next";
 import { KadikLegal } from "@/components/KadikSite";
-export const metadata: Metadata = { title: "Terms of Use | KADİK" };
-export default function TermsPage() { return <KadikLegal locale="en" terms />; }
+import { getKadikSiteContent, kadikMetadata } from "@/lib/kadik-content/store";
+
+// Content is edited in the admin panel ("Sayfalar") and read on every request.
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return kadikMetadata("terms");
+}
+
+export default async function Page() {
+  const { dict } = await getKadikSiteContent();
+  return <KadikLegal locale="en" dict={dict} terms />;
+}

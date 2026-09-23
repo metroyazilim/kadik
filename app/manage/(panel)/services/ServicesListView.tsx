@@ -5,7 +5,9 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { ArchiveDeleteDialog } from "@/components/admin/ArchiveDeleteDialog";
 import { SortableList } from "@/components/admin/SortableList";
-import { LocaleStatusBadge, ToneBadge } from "@/components/admin/StatusBadge";
+import { ToneBadge } from "@/components/admin/StatusBadge";
+import { STATUS_LABEL, STATUS_TONE } from "@/components/admin/record-status";
+import { ADMIN_CONTENT_LOCALE } from "@/lib/i18n/config";
 import { EmptyState } from "@/components/admin/StateSurfaces";
 import { cn, dangerLinkButton, iconButton, tableWrap } from "@/components/admin/ui";
 import type { EntityDependencyReport } from "@/lib/content-model/entity-dependency";
@@ -18,8 +20,8 @@ import {
   reorderServicesAction,
 } from "./actions";
 
-const LOCALES = ["tr", "en"] as const;
-const ROW_GRID = "grid grid-cols-[minmax(0,1fr)_repeat(2,60px)_auto] items-center gap-3";
+const LOCALES = [ADMIN_CONTENT_LOCALE] as const;
+const ROW_GRID = "grid grid-cols-[minmax(0,1fr)_110px_auto] items-center gap-3";
 
 /**
  * The Service list table. Editing is a link to `/manage/services/<id>`, not
@@ -110,11 +112,7 @@ export function ServicesListView({ rows }: { rows: readonly CollectionRow[] }) {
           )}
         >
           <span>Hizmet</span>
-          {LOCALES.map((locale) => (
-            <span key={locale} className="text-center">
-              {locale.toUpperCase()}
-            </span>
-          ))}
+          <span className="text-center">Durum</span>
           <span className="text-right">İşlem</span>
         </div>
         <div className="divide-y divide-brand-border" aria-busy={isPending}>
@@ -164,7 +162,7 @@ function ServiceRow({ row, onArchive }: { row: CollectionRow; onArchive: () => v
       </div>
       {LOCALES.map((locale) => (
         <div key={locale} className="flex justify-center">
-          <LocaleStatusBadge locale={locale} status={row.statuses[locale]} />
+          <ToneBadge tone={STATUS_TONE[row.statuses[locale]]} label={STATUS_LABEL[row.statuses[locale]]} />
         </div>
       ))}
       <div className="flex items-center justify-end gap-1">

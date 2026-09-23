@@ -9,9 +9,9 @@ export default async function AuditPage({ searchParams }: { searchParams: Search
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
-        eyebrow="Audit Terminali"
-        title="Güvenli Denetim Kayıtları"
-        description="Cursor tabanlı, kesintisiz geriye ve ileriye dönük audit geçmişi."
+        eyebrow="Sistem"
+        title="Denetim Terminali"
+        description="Panelde yapılan her işlem (giriş, kaydetme, yayınlama, medya, silme) kim tarafından ve ne zaman yapıldığıyla burada. Aşağıdaki satıra yazarak kayıtları filtreleyebilirsiniz."
       />
       <AuditPanel cursor={query.cursor} direction={query.direction} />
     </div>

@@ -2,10 +2,13 @@
 
 import { Pencil } from "lucide-react";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactNode } from "react";
 import { ArchiveDeleteDialog } from "@/components/admin/ArchiveDeleteDialog";
-import { SortableList } from "@/components/admin/SortableList";
-import { LocaleStatusBadge, ToneBadge } from "@/components/admin/StatusBadge";
+import { RowThumbnail } from "@/components/admin/RowThumbnail";
+import { SortableDragHandleIcon, SortableList } from "@/components/admin/SortableList";
+import { ToneBadge } from "@/components/admin/StatusBadge";
+import { STATUS_LABEL, STATUS_TONE } from "@/components/admin/record-status";
+import { ADMIN_CONTENT_LOCALE } from "@/lib/i18n/config";
 import { EmptyState } from "@/components/admin/StateSurfaces";
 import { cn, dangerLinkButton, iconButton, tableWrap } from "@/components/admin/ui";
 import type { EntityDependencyReport } from "@/lib/content-model/entity-dependency";
@@ -18,10 +21,10 @@ import {
   reorderTeamMembersAction,
 } from "./actions";
 
-const LOCALES = ["tr", "en"] as const;
-const ROW_GRID = "grid grid-cols-[minmax(0,1fr)_repeat(2,60px)_auto] items-center gap-3";
+const LOCALES = [ADMIN_CONTENT_LOCALE] as const;
+const ROW_GRID = "grid grid-cols-[minmax(0,1fr)_110px_auto] items-center gap-3";
 
-export function TeamListView({ rows }: { rows: readonly CollectionRow[] }) {
+export function TeamListView({ rows, thumbnails = {} }: { rows: readonly CollectionRow[]; thumbnails?: Readonly<Record<string, string>> }) {
   const [items, setItems] = useState(rows);
   const [prevRows, setPrevRows] = useState(rows);
   if (rows !== prevRows) {
@@ -101,18 +104,27 @@ export function TeamListView({ rows }: { rows: readonly CollectionRow[] }) {
           )}
         >
           <span>Kurul üyesi</span>
-          {LOCALES.map((locale) => (
-            <span key={locale} className="text-center">
-              {locale.toUpperCase()}
-            </span>
-          ))}
+          <span className="text-center">Durum</span>
           <span className="text-right">İşlem</span>
         </div>
         <div className="divide-y divide-brand-border" aria-busy={isPending}>
           <SortableList
             items={items.map((row) => ({ id: row.entityId, row }))}
             onReorder={handleReorder}
-            renderItem={({ row }) => <TeamRow row={row} onArchive={() => openArchiveDialog(row)} />}
+            renderItem={({ row }, { setNodeRef, style, dragHandleProps }) => (
+              <div ref={setNodeRef} style={style} className="bg-brand-surface">
+                <TeamRow
+                  row={row}
+                  thumbnail={thumbnails[row.entityId]}
+                  handle={
+                    <button type="button" {...dragHandleProps}>
+                      <SortableDragHandleIcon />
+                    </button>
+                  }
+                  onArchive={() => openArchiveDialog(row)}
+                />
+              </div>
+            )}
           />
         </div>
       </div>
@@ -134,12 +146,25 @@ export function TeamListView({ rows }: { rows: readonly CollectionRow[] }) {
   );
 }
 
-function TeamRow({ row, onArchive }: { row: CollectionRow; onArchive: () => void }) {
+function TeamRow({
+  row,
+  thumbnail,
+  handle,
+  onArchive,
+}: {
+  row: CollectionRow;
+  thumbnail?: string;
+  handle: ReactNode;
+  onArchive: () => void;
+}) {
   const payload = row.displayPayload as TeamMemberPayload | null;
 
   return (
     <div className={cn(ROW_GRID, "px-3 py-3")}>
-      <div className="min-w-0">
+      <div className="flex min-w-0 items-center gap-3">
+        {handle}
+        <RowThumbnail url={thumbnail} />
+        <div className="min-w-0">
         <Link
           href={`/manage/team/${row.entityId}`}
           className="truncate text-sm font-bold text-brand-text transition-colors hover:text-brand-primary"
@@ -152,10 +177,11 @@ function TeamRow({ row, onArchive }: { row: CollectionRow; onArchive: () => void
             <ToneBadge tone="danger" label="Arşivlendi" />
           </span>
         ) : null}
+        </div>
       </div>
       {LOCALES.map((locale) => (
         <div key={locale} className="flex justify-center">
-          <LocaleStatusBadge locale={locale} status={row.statuses[locale]} />
+          <ToneBadge tone={STATUS_TONE[row.statuses[locale]]} label={STATUS_LABEL[row.statuses[locale]]} />
         </div>
       ))}
       <div className="flex items-center justify-end gap-1">

@@ -1,16 +1,15 @@
 "use client";
 
-import { TranslationAssistant } from "@/components/admin/TranslationAssistant";
 import { SlugPreview } from "@/components/admin/SlugPreview";
 import { useActionState, useState } from "react";
-import type { Locale } from "@/lib/i18n/config";
+import { ADMIN_CONTENT_LOCALE, type Locale } from "@/lib/i18n/config";
 import type { ServicePayload } from "@/lib/content-model/payload-validation";
 import { saveServiceDraftAction, saveAndPublishServiceAction, type ServiceEditViewData } from "./actions";
 import { EditorPageLayout } from "@/components/admin/EditorPageLayout";
 import { EditorPublishPanel } from "@/components/admin/EditorPublishPanel";
 import { EditorSection } from "@/components/admin/EditorSection";
 import { FieldGrid } from "@/components/admin/FieldGrid";
-import { LocaleStatusTabs, STATUS_LABEL, STATUS_TONE } from "@/components/admin/LocaleStatusTabs";
+import { STATUS_LABEL, STATUS_TONE } from "@/components/admin/record-status";
 import { fieldHint, fieldInput, fieldLabel } from "@/components/admin/ui";
 import { MediaField } from "@/components/admin/MediaField";
 import { ContentBlockEditor } from "@/components/admin/ContentBlockEditor";
@@ -23,34 +22,12 @@ import { ContentBlockEditor } from "@/components/admin/ContentBlockEditor";
  */
 export function ServiceEditorPanel({
   entityId,
-  initialLocale = "tr",
   data,
 }: {
   entityId: string;
-  initialLocale?: Locale;
   data: ServiceEditViewData;
 }) {
-  const [activeLocale, setActiveLocale] = useState<Locale>(initialLocale);
-
-  function selectLocale(locale: Locale) {
-    setActiveLocale(locale);
-    window.history.replaceState(null, "", `/manage/services/${entityId}?locale=${locale}`);
-  }
-
-  return (
-    <div className="space-y-4">
-      <LocaleStatusTabs
-        label="Hizmet dilleri"
-        activeLocale={activeLocale}
-        statuses={Object.fromEntries(
-          (["tr", "en"] as const).map((locale) => [locale, data.view.translations[locale]?.status ?? "missing"]),
-        )}
-        onSelect={selectLocale}
-        actions={<TranslationAssistant entityId={entityId} />}
-      />
-      <ServiceLocaleForm key={activeLocale} entityId={entityId} locale={activeLocale} editView={data} />
-    </div>
-  );
+  return <ServiceLocaleForm entityId={entityId} locale={ADMIN_CONTENT_LOCALE} editView={data} />;
 }
 
 function ServiceLocaleForm({
@@ -135,7 +112,7 @@ function ServiceLocaleForm({
             statusLabel={STATUS_LABEL[status]}
             statusTone={STATUS_TONE[status]}
             version={translation?.version}
-            hint="Kaydet ve yayınla bu dili tek adımda yayına alır. Kaydet ise yayınlamadan saklar."
+            hint="Kaydet dediğinizde değişiklik hemen sitede yayına girer."
             isSavingDraft={isSavingDraft}
             isPublishing={isPublishing}
             canPublish

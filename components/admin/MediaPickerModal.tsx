@@ -212,7 +212,7 @@ export function MediaPickerModal({
               </h2>
               <p className="text-xs text-brand-muted">
                 {multiple ? "Kütüphaneden birden fazla medya seçin veya doğrudan yeni dosya yükleyin." : "Kütüphaneden medya seçin veya doğrudan yeni dosya yükleyin."}
-                {activeLocale ? ` (${activeLocale.toUpperCase()} için)` : ""}
+                
               </p>
             </div>
           </div>

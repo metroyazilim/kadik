@@ -3,13 +3,11 @@ import {
   FileText,
   FolderKanban,
   Image,
-  Layers,
   LayoutDashboard,
   MessagesSquare,
   Newspaper,
   Package,
   Search,
-  Settings,
   ShieldCheck,
   Users,
   type LucideIcon,
@@ -17,9 +15,7 @@ import {
 
 export type AdminNavKey =
   | "overview"
-  | "home"
   | "pages"
-  | "site-settings"
   | "posts"
   | "services"
   | "products"
@@ -60,7 +56,7 @@ export const ADMIN_NAV_SECTIONS: readonly AdminNavSection[] = [
         key: "messages",
         label: "Mesajlar ve Başvurular",
         href: "/manage/messages",
-        publicHref: "/uyelik",
+        publicHref: "/membership",
         icon: MessagesSquare,
       },
     ],
@@ -68,15 +64,8 @@ export const ADMIN_NAV_SECTIONS: readonly AdminNavSection[] = [
   {
     label: "Site İçeriği",
     items: [
-      { key: "home", label: "Ana Sayfa", href: "/manage/home", publicHref: "/", icon: Layers },
-      { key: "pages", label: "Sayfalar", href: "/manage/pages", publicHref: "/hakkimizda", icon: FileText },
-      {
-        key: "site-settings",
-        label: "Site Ayarları",
-        href: "/manage/site-settings",
-        publicHref: "/",
-        icon: Settings,
-      },
+      // Every public page - home included - is edited from this one list.
+      { key: "pages", label: "Sayfalar", href: "/manage/pages", publicHref: "/", icon: FileText },
     ],
   },
   {
@@ -86,38 +75,48 @@ export const ADMIN_NAV_SECTIONS: readonly AdminNavSection[] = [
         key: "team",
         label: "Kurul Üyeleri",
         href: "/manage/team",
-        publicHref: "/kurul-uyeleri",
+        publicHref: "/board",
         icon: Users,
       },
       {
         key: "posts",
         label: "Yayınlar ve Haberler",
         href: "/manage/posts",
-        publicHref: "/yazilar",
+        publicHref: "/news",
         icon: Newspaper,
       },
-      { key: "faq", label: "SSS", href: "/manage/faq", publicHref: "/sss", icon: CircleHelp },
     ],
   },
   {
-    label: "Diğer Koleksiyonlar",
-    items: [
-      { key: "services", label: "Hizmetler", href: "/manage/services", icon: FileText },
-      { key: "products", label: "Ürünler", href: "/manage/products", icon: Package },
-      { key: "projects", label: "Projeler", href: "/manage/projects", icon: FolderKanban },
-    ],
+    label: "SEO",
+    items: [{ key: "seo", label: "SEO Ayarları", href: "/manage/seo", icon: Search }],
   },
   {
-    label: "SEO ve Sistem",
+    label: "Sistem",
     items: [
-      { key: "seo", label: "SEO", href: "/manage/seo", icon: Search },
-      { key: "audit", label: "Audit", href: "/manage/audit", icon: ShieldCheck },
+      { key: "audit", label: "Denetim Terminali", href: "/manage/audit", icon: ShieldCheck },
       { key: "users", label: "Kullanıcılar", href: "/manage/users", icon: Users },
     ],
   },
 ] as const;
 
-export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = ADMIN_NAV_SECTIONS.flatMap((section) => section.items);
+/**
+ * Legacy starter-template collections (services, products, projects, FAQ)
+ * render nothing on the KADİK site.
+ * They are hidden from the menu but their routes and data stay intact; the
+ * sidebar still highlights nothing for them and the top bar shows their name.
+ */
+export const HIDDEN_ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
+  { key: "faq", label: "SSS", href: "/manage/faq", icon: CircleHelp },
+  { key: "services", label: "Hizmetler", href: "/manage/services", icon: FileText },
+  { key: "products", label: "Ürünler", href: "/manage/products", icon: Package },
+  { key: "projects", label: "Projeler", href: "/manage/projects", icon: FolderKanban },
+];
+
+export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
+  ...ADMIN_NAV_SECTIONS.flatMap((section) => section.items),
+  ...HIDDEN_ADMIN_NAV_ITEMS,
+];
 
 export function isAdminNavKey(value: string): value is AdminNavKey {
   return ADMIN_NAV_ITEMS.some((item) => item.key === value);

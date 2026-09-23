@@ -134,7 +134,7 @@ export async function saveProjectDraftAction(_previous: ActionState, formData: F
     });
 
     if (!result.ok) {
-      return { error: `Bu dilde arada başka bir değişiklik kaydedilmiş (v${result.current.version}). Sayfayı yenileyip tekrar deneyin.` };
+      return { error: `Bu kayıt siz düzenlerken başka biri tarafından değiştirildi. Sayfayı yenileyip tekrar deneyin.` };
     }
 
     await syncFieldMediaUsage(prisma, { entityId, locale, surface: PROJECT_CONTENT_TYPE, field: "coverImage", assetIds: [payload.coverImageAssetId] });
@@ -143,7 +143,7 @@ export async function saveProjectDraftAction(_previous: ActionState, formData: F
     await syncFieldMediaUsage(prisma, { entityId, locale, surface: PROJECT_CONTENT_TYPE, field: "solutionBlocks", assetIds: solutionAssetIds });
 
     revalidatePath("/manage/projects");
-    return { success: `${locale.toUpperCase()} kaydedildi.` };
+    return { success: "Kaydedildi." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Proje kaydedilemedi. Alanları kontrol edip tekrar deneyin." };
@@ -162,7 +162,7 @@ export async function publishProjectAction(_previous: ActionState, formData: For
   const slug = await resolveRecordSlug(prisma, entityId, locale, text(formData, "title"));
 
   if (!translationId || !expectedDraftRevisionId || !slug) {
-    return { error: "Bu dilde kaydedilmiş içerik yok; önce Kaydet deyin." };
+    return { error: "Kaydedilecek içerik bulunamadı. Sayfayı yenileyip tekrar deneyin." };
   }
 
   try {
@@ -183,7 +183,7 @@ export async function publishProjectAction(_previous: ActionState, formData: For
 
     if (!result.ok) {
       if ("routeConflict" in result && result.routeConflict) {
-        return { error: `"${slug}" adresi bu dilde başka bir proje tarafından kullanılıyor.` };
+        return { error: `"${slug}" adresi başka bir proje tarafından kullanılıyor.` };
       }
       return { error: "Yayınlama sırasında çakışma oluştu. Sayfayı yenileyip tekrar deneyin." };
     }
@@ -208,7 +208,7 @@ export async function publishProjectAction(_previous: ActionState, formData: For
     }
 
     revalidatePublicProjectSurfaces();
-    return { success: `${locale.toUpperCase()} yayınlandı.` };
+    return { success: "Kaydedildi ve sitede yayınlandı." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Yayınlama başarısız oldu." };

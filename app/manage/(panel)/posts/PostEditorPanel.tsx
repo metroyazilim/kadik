@@ -1,6 +1,6 @@
 "use client";
 
-import { TranslationAssistant } from "@/components/admin/TranslationAssistant";
+import Link from "next/link";
 import { SlugPreview } from "@/components/admin/SlugPreview";
 import { useActionState, useState } from "react";
 import { ContentBlockEditor } from "@/components/admin/ContentBlockEditor";
@@ -8,44 +8,22 @@ import { EditorPageLayout } from "@/components/admin/EditorPageLayout";
 import { EditorPublishPanel } from "@/components/admin/EditorPublishPanel";
 import { EditorSection } from "@/components/admin/EditorSection";
 import { FieldGrid } from "@/components/admin/FieldGrid";
-import { LocaleStatusTabs, STATUS_LABEL, STATUS_TONE } from "@/components/admin/LocaleStatusTabs";
+import { STATUS_LABEL, STATUS_TONE } from "@/components/admin/record-status";
 import { MediaField } from "@/components/admin/MediaField";
 import { fieldHint, fieldInput, fieldLabel, fieldTextarea } from "@/components/admin/ui";
 import type { PostPayload } from "@/lib/content-model/payload-validation";
-import type { Locale } from "@/lib/i18n/config";
+import { ADMIN_CONTENT_LOCALE, type Locale } from "@/lib/i18n/config";
 import { saveAndPublishPostAction, savePostDraftAction, type PostEditViewData } from "./actions";
 
 /** Blog post editor with collection-edit main column plus contextual publish panel. */
 export function PostEditorPanel({
   entityId,
-  initialLocale = "tr",
   data,
 }: {
   entityId: string;
-  initialLocale?: Locale;
   data: PostEditViewData;
 }) {
-  const [activeLocale, setActiveLocale] = useState<Locale>(initialLocale);
-
-  function selectLocale(locale: Locale) {
-    setActiveLocale(locale);
-    window.history.replaceState(null, "", `/manage/posts/${entityId}?locale=${locale}`);
-  }
-
-  return (
-    <div className="space-y-4">
-      <LocaleStatusTabs
-        label="Blog yazısı dilleri"
-        activeLocale={activeLocale}
-        statuses={Object.fromEntries(
-          (["tr", "en"] as const).map((locale) => [locale, data.view.translations[locale]?.status ?? "missing"]),
-        )}
-        onSelect={selectLocale}
-        actions={<TranslationAssistant entityId={entityId} />}
-      />
-      <PostLocaleForm key={activeLocale} entityId={entityId} locale={activeLocale} editView={data} />
-    </div>
-  );
+  return <PostLocaleForm entityId={entityId} locale={ADMIN_CONTENT_LOCALE} editView={data} />;
 }
 
 function PostLocaleForm({
@@ -81,7 +59,7 @@ function PostLocaleForm({
       <EditorPageLayout
         main={
           <div className="space-y-4">
-            <EditorSection title="Temel bilgiler" id="post-basics" description="Blog listeleme, detay sayfası ve URL bilgileri." defaultOpen>
+            <EditorSection title="Temel bilgiler" id="post-basics" description="Haber listesi, detay sayfası ve adres bilgileri." defaultOpen>
               <div className="space-y-5">
                 <FieldGrid>
                   <label className={fieldLabel}>
@@ -105,26 +83,24 @@ function PostLocaleForm({
               </div>
             </EditorSection>
 
-            <EditorSection title="Yazı içeriği" id="post-content" description="Blog detayında gösterilen zengin içerik blokları." defaultOpen>
+            <EditorSection title="Yazı içeriği" id="post-content" description="Haber detay sayfasında gösterilen içerik blokları." defaultOpen>
               <ContentBlockEditor name="blocks" label="Yazı içeriği" defaultValue={payload?.blocks ?? []} assetPreviews={editView.assetPreviews} />
             </EditorSection>
 
-            <EditorSection title="Medya" id="post-media" description="Blog kapak görseli.">
+            <EditorSection title="Medya" id="post-media" description="Haber kapak görseli.">
               <MediaField label="Kapak görseli" contextFieldName="title" contextLabel={payload?.title ?? ""} value={image.url} assetId={image.assetId} onChange={(next) => setImage({ url: next.url, assetId: next.assetId })} />
             </EditorSection>
 
-            <EditorSection title="SEO" id="post-seo" description="Opsiyonel arama motoru başlığı ve açıklaması.">
-              <FieldGrid>
-                <label className={fieldLabel}>
-                  SEO başlığı (opsiyonel)
-                  <input name="seoTitle" className={fieldInput} defaultValue={payload?.seoTitle ?? ""} maxLength={70} />
-                </label>
-                <label className={fieldLabel}>
-                  SEO açıklaması (opsiyonel)
-                  <input name="seoDescription" className={fieldInput} defaultValue={payload?.seoDescription ?? ""} maxLength={160} />
-                </label>
-              </FieldGrid>
-            </EditorSection>
+            {/* SEO is edited on the SEO screen; the current values ride along unchanged. */}
+            <input type="hidden" name="seoTitle" value={payload?.seoTitle ?? ""} />
+            <input type="hidden" name="seoDescription" value={payload?.seoDescription ?? ""} />
+            <p className="px-1 text-xs text-brand-muted">
+              Bu haberin Google başlığı ve açıklaması{" "}
+              <Link href={`/manage/seo?item=post:${entityId}`} className="font-semibold text-brand-primary hover:underline">
+                SEO ekranından
+              </Link>{" "}
+              düzenlenir.
+            </p>
           </div>
         }
         aside={
@@ -132,7 +108,7 @@ function PostLocaleForm({
             statusLabel={STATUS_LABEL[status]}
             statusTone={STATUS_TONE[status]}
             version={translation?.version}
-            hint="Kaydet ve yayınla bu dili tek adımda yayına alır. Kaydet ise yayınlamadan saklar."
+            hint="Kaydet dediğinizde değişiklik hemen sitede yayına girer."
             isSavingDraft={isSavingDraft}
             isPublishing={isPublishing}
             canPublish

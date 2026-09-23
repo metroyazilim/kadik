@@ -7,11 +7,13 @@ import type { Metadata } from "next";
 // altında tetiklendiğini bilemez (route eşleşmesinden önce çalışır).
 import "@/app/globals.css";
 import { KadikNotFound } from "@/components/KadikSite";
+import { getKadikSiteContent, kadikMetadata } from "@/lib/kadik-content/store";
 
-export const metadata: Metadata = {
-  title: "Page Not Found | KADİK",
-  description: "The page you're looking for could not be found or may have moved. You can reach the council sections from here.",
-  robots: { index: false, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return { ...(await kadikMetadata("notFound")), robots: { index: false, follow: true } };
+}
 
-export default function NotFound() { return <KadikNotFound locale="en" />; }
+export default async function NotFound() {
+  const { dict } = await getKadikSiteContent();
+  return <KadikNotFound locale="en" dict={dict} />;
+}

@@ -124,7 +124,7 @@ export async function saveServiceDraftAction(_previous: ActionState, formData: F
 
     if (!result.ok) {
       return {
-        error: `Bu dilde arada başka bir değişiklik kaydedilmiş (v${result.current.version}). Sayfayı yenileyip tekrar deneyin.`,
+        error: `Bu kayıt siz düzenlerken başka biri tarafından değiştirildi. Sayfayı yenileyip tekrar deneyin.`,
       };
     }
 
@@ -137,7 +137,7 @@ export async function saveServiceDraftAction(_previous: ActionState, formData: F
     });
 
     revalidatePath("/manage/services");
-    return { success: `${locale.toUpperCase()} kaydedildi.` };
+    return { success: "Kaydedildi." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Hizmet kaydedilemedi. Alanları kontrol edip tekrar deneyin." };
@@ -156,7 +156,7 @@ export async function publishServiceAction(_previous: ActionState, formData: For
   const slug = await resolveRecordSlug(prisma, entityId, locale, text(formData, "title"));
 
   if (!translationId || !expectedDraftRevisionId || !slug) {
-    return { error: "Bu dilde kaydedilmiş içerik yok; önce Kaydet deyin." };
+    return { error: "Kaydedilecek içerik bulunamadı. Sayfayı yenileyip tekrar deneyin." };
   }
 
   try {
@@ -177,7 +177,7 @@ export async function publishServiceAction(_previous: ActionState, formData: For
 
     if (!result.ok) {
       if ("routeConflict" in result && result.routeConflict) {
-        return { error: `"${slug}" adresi bu dilde başka bir hizmet tarafından kullanılıyor.` };
+        return { error: `"${slug}" adresi başka bir hizmet tarafından kullanılıyor.` };
       }
       return { error: "Yayınlama sırasında çakışma oluştu. Sayfayı yenileyip tekrar deneyin." };
     }
@@ -203,7 +203,7 @@ export async function publishServiceAction(_previous: ActionState, formData: For
 
     revalidatePath("/manage/services");
     revalidatePublicServiceSurfaces();
-    return { success: `${locale.toUpperCase()} yayınlandı.` };
+    return { success: "Kaydedildi ve sitede yayınlandı." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Yayınlama başarısız oldu." };

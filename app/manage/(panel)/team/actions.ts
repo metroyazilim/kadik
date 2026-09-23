@@ -132,7 +132,7 @@ export async function saveTeamMemberDraftAction(_previous: ActionState, formData
     });
 
     if (!result.ok) {
-      return { error: `Bu dilde arada başka bir değişiklik kaydedilmiş (v${result.current.version}). Sayfayı yenileyip tekrar deneyin.` };
+      return { error: `Bu kayıt siz düzenlerken başka biri tarafından değiştirildi. Sayfayı yenileyip tekrar deneyin.` };
     }
 
     await syncFieldMediaUsage(prisma, {
@@ -144,7 +144,7 @@ export async function saveTeamMemberDraftAction(_previous: ActionState, formData
     });
 
     revalidatePath("/manage/team");
-    return { success: `${locale.toUpperCase()} kaydedildi.` };
+    return { success: "Kaydedildi." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Kurul üyesi kaydedilemedi. Alanları kontrol edip tekrar deneyin." };
@@ -163,7 +163,7 @@ export async function publishTeamMemberAction(_previous: ActionState, formData: 
   const slug = await resolveRecordSlug(prisma, entityId, locale, text(formData, "name"));
 
   if (!translationId || !expectedDraftRevisionId || !slug) {
-    return { error: "Bu dilde kaydedilmiş içerik yok; önce Kaydet deyin." };
+    return { error: "Kaydedilecek içerik bulunamadı. Sayfayı yenileyip tekrar deneyin." };
   }
 
   try {
@@ -184,7 +184,7 @@ export async function publishTeamMemberAction(_previous: ActionState, formData: 
 
     if (!result.ok) {
       if ("routeConflict" in result && result.routeConflict) {
-        return { error: `"${slug}" adresi bu dilde başka bir ekip üyesi tarafından kullanılıyor.` };
+        return { error: `"${slug}" adresi başka bir kurul üyesi tarafından kullanılıyor.` };
       }
       return { error: "Yayınlama sırasında çakışma oluştu. Sayfayı yenileyip tekrar deneyin." };
     }
@@ -209,7 +209,7 @@ export async function publishTeamMemberAction(_previous: ActionState, formData: 
     }
 
     revalidatePublicTeamSurfaces();
-    return { success: `${locale.toUpperCase()} yayınlandı.` };
+    return { success: "Kaydedildi ve sitede yayınlandı." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Yayınlama başarısız oldu." };

@@ -1,15 +1,6 @@
-import { PageHeader } from "@/components/admin/PageHeader";
-import { HomePanel } from "./HomePanel";
+import { redirect } from "next/navigation";
 
-export default function HomeLayoutPage() {
-  return (
-    <div className="mx-auto max-w-6xl">
-      <PageHeader
-        eyebrow="Anasayfa"
-        title="Anasayfa İçerikleri"
-        description="Anasayfa component ve sırası kodda sabittir. Mevcut bölümlerin metin, görsel, ikon, buton ve bağlantılarını düzenleyin."
-      />
-      <HomePanel />
-    </div>
-  );
+/** The home page is edited from "Sayfalar" like every other page; old links land there. */
+export default function LegacyHomeEditor() {
+  redirect("/manage/pages/home");
 }

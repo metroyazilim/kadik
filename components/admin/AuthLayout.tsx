@@ -36,8 +36,8 @@ export function AuthLayout({ children }: { children: ReactNode }) {
               KADIK İçerik Yönetimi
             </p>
             <p className="mt-3 max-w-md text-[15px] leading-relaxed text-brand-on-invert-muted">
-              Anasayfa bloklarını, hizmet ve ürün kataloglarını, blog yazılarını, medya kütüphanesini ve
-              Türkçe/Global yayın akışını tek panelden yönetin.
+              Site sayfalarını, kurul üyelerini, haberleri, medya kütüphanesini ve gelen başvuruları tek
+              panelden yönetin.
             </p>
             <p className="mt-8 text-[12px] font-bold uppercase tracking-wider text-brand-on-invert-muted">
               Güvenli yönetim erişimi

@@ -1,71 +1,102 @@
-import Link from "next/link";
-import { EmptyState } from "@/components/admin/StateSurfaces";
-import { ToneBadge } from "@/components/admin/StatusBadge";
-import { secondaryButton, tableCell, tableHeadCell, tableHeadRow, tableRow, tableWrap } from "@/components/admin/ui";
 import { prisma } from "@/lib/db";
+import { KADIK_PAGE_DEFINITIONS, isKadikContentKey } from "@/lib/kadik-content/pages";
+import { AuditTerminal, type AuditTerminalLine } from "./AuditTerminal";
 
-const AUDIT_PAGE_SIZE = 25;
+const AUDIT_PAGE_SIZE = 100;
 
-const ACTION_LABELS: Record<string, string> = {
-  create: "Oluşturuldu",
-  update: "Güncellendi",
-  delete: "Silindi",
-  login: "Giriş",
-  logout: "Çıkış",
-  "content.archive": "Arşivlendi",
-  "content.unarchive": "Arşivden çıkarıldı",
-  "content.hardDelete": "Kalıcı silindi",
-  "message.status.changed": "Durum değiştirildi",
+/** Plain-language description per action code; unknown codes show the code only. */
+const ACTION_DESCRIPTIONS: Record<string, string> = {
+  login: "panele giriş yaptı",
+  logout: "panelden çıkış yaptı",
+  create: "kayıt oluşturdu",
+  update: "kayıt güncelledi",
+  delete: "kayıt sildi",
+  "content.draft.save": "içerik kaydetti",
+  "content.publish": "içerik yayınladı",
+  "content.archive": "içerik arşivledi",
+  "content.unarchive": "içeriği arşivden çıkardı",
+  "content.hardDelete": "içeriği kalıcı sildi",
+  "kadik.page.publish": "sayfayı kaydedip yayınladı",
+  "media.upload": "medya yükledi",
+  "media.updateMetadata": "medya bilgilerini güncelledi",
+  "media.archive": "medyayı arşivledi",
+  "media.delete": "medyayı sildi",
+  "media.replaceUsage": "medyayı değiştirdi",
+  "message.status.changed": "mesaj durumunu değiştirdi",
+  "page.copy.publish": "sayfa metni yayınladı",
 };
 
 const ENTITY_LABELS: Record<string, string> = {
-  session: "Oturum",
-  content: "Site içeriği",
-  "site-content": "Site içeriği",
-  ContentEntity: "İçerik kaydı",
-  post: "Blog yazısı",
-  service: "Hizmet",
-  product: "Ürün",
-  project: "Proje",
-  "team-member": "Ekip üyesi",
-  faq: "SSS",
-  message: "Mesaj",
-  Message: "Mesaj",
+  session: "oturum",
+  ContentTranslation: "içerik",
+  ContentEntity: "içerik kaydı",
+  KadikPageContent: "sayfa",
+  MediaAsset: "medya",
+  Message: "mesaj",
+  message: "mesaj",
+  AdminUser: "kullanıcı",
 };
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeStyle: "medium" });
-
-function actionTone(action: string): "success" | "danger" | "primary" | "muted" {
-  if (action === "delete" || action === "content.hardDelete") return "danger";
-  if (action === "create" || action === "login") return "success";
+function tone(action: string): AuditTerminalLine["tone"] {
+  if (action.includes("delete") || action.includes("hardDelete")) return "danger";
+  if (action === "login" || action.includes("publish") || action.includes("upload")) return "success";
   if (action === "logout") return "muted";
-  return "primary";
+  return "info";
+}
+
+const TIME_PARTS = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/Istanbul",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23",
+});
+
+/** `YYYY-MM-DD HH:mm:ss` in Istanbul time. */
+function formatTime(date: Date): string {
+  const part = Object.fromEntries(TIME_PARTS.formatToParts(date).map((entry) => [entry.type, entry.value]));
+  return `${part.year}-${part.month}-${part.day} ${part.hour}:${part.minute}:${part.second}`;
+}
+
+function target(entity: string, entityId: string | null): string {
+  if (entity === "session") return "";
+  if (entity === "KadikPageContent" && entityId && isKadikContentKey(entityId)) return `sayfa:${KADIK_PAGE_DEFINITIONS[entityId].label}`;
+  const label = ENTITY_LABELS[entity] ?? entity;
+  return entityId ? `${label}#${entityId.slice(-8)}` : label;
 }
 
 /**
  * Metadata is admin-authored context, not a safe display surface: values can
- * carry slugs, payload fragments or e-mail addresses. Only the recorded key
- * names are shown - enough to know *what* was captured without rendering
- * arbitrary content into the terminal.
+ * carry slugs, payload fragments or e-mail addresses. Only numbers, booleans
+ * and short status/locale codes are printed; ids and free text are left out.
  */
-function metadataKeys(metadata: unknown): string {
-  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return "—";
-  const keys = Object.keys(metadata);
-  return keys.length === 0 ? "—" : keys.sort().join(", ");
+function details(metadata: unknown): string {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return "";
+  return Object.entries(metadata as Record<string, unknown>)
+    .filter(([key, value]) =>
+      !/id$/i.test(key) &&
+      (typeof value === "number" || typeof value === "boolean" || (typeof value === "string" && /^[a-z_]{2,16}$/i.test(value))),
+    )
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${String(value)}`)
+    .join(" ");
 }
 
 export type AuditDirection = "older" | "newer";
 
 /**
- * Cursor-paged audit terminal (Spec 13). Rows always render newest-first.
+ * Cursor-paged audit log (Spec 13), rendered as a terminal. The database is
+ * read newest-first; the terminal prints the window oldest-first so the most
+ * recent line sits at the bottom like `tail -f`.
  *
- * - `older`: rows strictly after the cursor in newest-first order - read
- *   directly with `orderBy: desc`.
- * - `newer`: rows strictly before it - read with `orderBy: asc` (so the
- *   cursor window walks backwards) and reversed for display.
+ * - `older`: rows strictly after the cursor in newest-first order.
+ * - `newer`: rows strictly before it - read ascending, then flipped.
  *
- * `take: PAGE_SIZE + 1` is a lookahead: the extra row only answers "is there
- * another page in this direction", it is never rendered.
+ * `take: PAGE_SIZE + 1` is a lookahead that only answers "is there another
+ * window in this direction"; it is never rendered.
  */
 export async function AuditPanel({ cursor, direction = "older" }: { cursor?: string; direction?: AuditDirection }) {
   const walkingBackwards = direction === "newer" && Boolean(cursor);
@@ -87,72 +118,30 @@ export async function AuditPanel({ cursor, direction = "older" }: { cursor?: str
 
   const hasMoreInDirection = rows.length > AUDIT_PAGE_SIZE;
   const window = rows.slice(0, AUDIT_PAGE_SIZE);
-  const entries = walkingBackwards ? [...window].reverse() : window;
+  const newestFirst = walkingBackwards ? [...window].reverse() : window;
 
-  const newestId = entries[0]?.id;
-  const oldestId = entries[entries.length - 1]?.id;
-  // Walking forward, a previous page exists whenever a cursor was supplied;
-  // walking backwards, the lookahead answers it for the newer direction.
+  const newestId = newestFirst[0]?.id;
+  const oldestId = newestFirst[newestFirst.length - 1]?.id;
   const hasNewer = walkingBackwards ? hasMoreInDirection : Boolean(cursor);
   const hasOlder = walkingBackwards ? true : hasMoreInDirection;
 
-  return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-brand-muted">
-          Cursor tabanlı geçmiş: sayfa numarası yok, kayıt eklenirken sayfa kayması olmaz.
-        </p>
-        <div className="flex gap-2">
-          {hasNewer && newestId ? (
-            <Link href={`/manage/audit?cursor=${newestId}&direction=newer`} className={secondaryButton}>
-              ↑ Daha yeni
-            </Link>
-          ) : null}
-          {hasOlder && oldestId ? (
-            <Link href={`/manage/audit?cursor=${oldestId}&direction=older`} className={secondaryButton}>
-              ↓ Daha eski
-            </Link>
-          ) : null}
-          {cursor ? (
-            <Link href="/manage/audit" className={secondaryButton}>
-              En başa dön
-            </Link>
-          ) : null}
-        </div>
-      </div>
+  const lines: AuditTerminalLine[] = [...newestFirst].reverse().map((entry) => ({
+    id: entry.id,
+    time: formatTime(entry.createdAt),
+    actor: entry.user?.email ?? "sistem",
+    action: entry.action.toUpperCase().replace(/\./g, "_"),
+    description: ACTION_DESCRIPTIONS[entry.action] ?? "",
+    target: target(entry.entity, entry.entityId),
+    details: details(entry.metadata),
+    tone: tone(entry.action),
+  }));
 
-      {entries.length === 0 ? (
-        <EmptyState title="Kayıt yok" description="Bu pencerede denetim kaydı bulunmuyor." />
-      ) : (
-        <div className={tableWrap}>
-          <table className="w-full min-w-[820px] text-start text-sm">
-            <thead>
-              <tr className={tableHeadRow}>
-                <th className={tableHeadCell}>İşlem</th>
-                <th className={tableHeadCell}>Varlık</th>
-                <th className={tableHeadCell}>Kayıt</th>
-                <th className={tableHeadCell}>Yapan</th>
-                <th className={tableHeadCell}>Zaman</th>
-                <th className={tableHeadCell}>Metadata alanları</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry) => (
-                <tr key={entry.id} className={tableRow}>
-                  <td className={tableCell}>
-                    <ToneBadge tone={actionTone(entry.action)} label={ACTION_LABELS[entry.action] ?? entry.action} />
-                  </td>
-                  <td className={tableCell}>{ENTITY_LABELS[entry.entity] ?? entry.entity}</td>
-                  <td className={`${tableCell} font-mono text-xs text-brand-muted`}>{entry.entityId ?? "—"}</td>
-                  <td className={tableCell}>{entry.user?.email ?? "—"}</td>
-                  <td className={`${tableCell} whitespace-nowrap text-brand-muted`}>{dateFormatter.format(entry.createdAt)}</td>
-                  <td className={`${tableCell} font-mono text-[11px] text-brand-muted`}>{metadataKeys(entry.metadata)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+  return (
+    <AuditTerminal
+      lines={lines}
+      olderHref={hasOlder && oldestId ? `/manage/audit?cursor=${oldestId}&direction=older` : null}
+      newerHref={hasNewer && newestId ? `/manage/audit?cursor=${newestId}&direction=newer` : null}
+      resetHref={cursor ? "/manage/audit" : null}
+    />
   );
 }

@@ -1,3 +1,15 @@
+import type { Metadata } from "next";
 import { KadikGallery } from "@/components/KadikSite";
-export const metadata = { title: "Gallery | KADİK" };
-export default function GalleryPage() { return <KadikGallery locale="en" />; }
+import { getKadikSiteContent, kadikMetadata } from "@/lib/kadik-content/store";
+
+// Content is edited in the admin panel ("Sayfalar") and read on every request.
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return kadikMetadata("gallery");
+}
+
+export default async function Page() {
+  const { dict } = await getKadikSiteContent();
+  return <KadikGallery locale="en" dict={dict} />;
+}

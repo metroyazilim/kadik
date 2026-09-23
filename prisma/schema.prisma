@@ -570,3 +570,16 @@ model PageSection {
   @@index([layoutId, order])
 }
 
+
+/// KADİK public sayfalarının (Anasayfa, Hakkımızda, Etkinlikler, …) yönetim
+/// panelinden düzenlenen içeriği. Her satır bir sayfadır; `data` yalnız
+/// `lib/kadik-content/pages.ts` şemasında tanımlı alanları taşır ve public
+/// render sırasında aynı şemayla doğrulanıp varsayılanların üstüne yazılır.
+/// Kaydetmek yayınlamaktır (taslak aşaması yok).
+model KadikPageContent {
+  key         String   @id
+  data        Json
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

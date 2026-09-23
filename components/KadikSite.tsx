@@ -17,23 +17,6 @@ import {
 const ASSET_ROOT = "/kadik";
 const BRAND_SHORT = "KADİK";
 
-const images = {
-  hero: `${ASSET_ROOT}/is-hero.webp`,
-  about: `${ASSET_ROOT}/is-hakkimizda.webp`,
-  band: `${ASSET_ROOT}/is-band.webp`,
-  gallery: [
-    `${ASSET_ROOT}/is-galeri-1.webp`,
-    `${ASSET_ROOT}/is-galeri-2.webp`,
-    `${ASSET_ROOT}/is-galeri-3.webp`,
-    `${ASSET_ROOT}/is-galeri-4.webp`,
-    `${ASSET_ROOT}/is-galeri-5.webp`,
-    `${ASSET_ROOT}/is-galeri-6.webp`,
-    `${ASSET_ROOT}/is-galeri-7.webp`,
-    `${ASSET_ROOT}/is-galeri-8.webp`,
-    `${ASSET_ROOT}/is-galeri-9.webp`,
-  ],
-};
-
 /** BCP 47 tag for `Date#toLocaleDateString`/string comparison helpers. */
 const DATE_LOCALE: Record<KadikLocale, string> = { en: "en-GB" };
 
@@ -42,9 +25,10 @@ const DATE_LOCALE: Record<KadikLocale, string> = { en: "en-GB" };
  * `Footer`, `Banner` and `Shell` never need `locale` or `active` threaded
  * through as props - they read this instead.
  */
-const KadikPageContext = createContext<{ locale: KadikLocale; active: KadikPageKey }>({
+const KadikPageContext = createContext<{ locale: KadikLocale; active: KadikPageKey; dict: KadikDictionary }>({
   locale: "en",
   active: "home",
+  dict: KADIK_DICT.en,
 });
 
 function useKadikPage() {
@@ -52,11 +36,15 @@ function useKadikPage() {
 }
 
 function useKadikDict(): KadikDictionary {
-  return KADIK_DICT[useKadikPage().locale];
+  return useKadikPage().dict;
 }
 
-function KadikPage({ locale, active, children }: { locale: KadikLocale; active: KadikPageKey; children: React.ReactNode }) {
-  return <KadikPageContext.Provider value={{ locale, active }}>{children}</KadikPageContext.Provider>;
+/** Every exported page receives the admin-managed dictionary (`lib/kadik-content`)
+ * from its server route; `KADIK_DICT` is only the factory fallback. */
+type KadikPageProps = { locale: KadikLocale; dict?: KadikDictionary };
+
+function KadikPage({ locale, active, dict, children }: { locale: KadikLocale; active: KadikPageKey; dict: KadikDictionary; children: React.ReactNode }) {
+  return <KadikPageContext.Provider value={{ locale, active, dict }}>{children}</KadikPageContext.Provider>;
 }
 
 /** Yönetim panelinde yazılıp yayınlanan `post` kayıtlarının public projeksiyonu.
@@ -241,7 +229,7 @@ function Footer() {
     <div><div className="kadik-footer-logo"><img src={`${ASSET_ROOT}/kadik-logo.png`} alt="" /><span className="kadik-brand-lockup"><strong>{BRAND_SHORT}</strong><small>{t.brandFull}</small></span></div><p>{t.footer.tagline}</p></div>
     <div><h3>{t.footer.corporate}</h3><Link href={p("about")}>{t.nav.about}</Link><Link href={p("board")}>{t.nav.board}</Link><Link href={p("membership")}>{t.nav.membership}</Link><Link href={p("contact")}>{t.nav.contact}</Link><Link href={p("privacy")}>{t.footer.privacy}</Link></div>
     <div><h3>{t.footer.activities}</h3><Link href={p("events")}>{t.nav.events}</Link><Link href={p("issues")}>{t.nav.announcements}</Link><Link href={p("posts")}>{t.nav.news}</Link><Link href={p("gallery")}>{t.nav.gallery}</Link></div>
-    <div><h3>{t.footer.followUs}</h3><p className="kadik-socials"><Link href="#facebook">f</Link><Link href="#youtube">▶</Link><Link href="#x">𝕏</Link></p><Button href={p("contact")}>{t.footer.contactCta}</Button></div>
+    <div><h3>{t.footer.followUs}</h3><p className="kadik-socials">{t.footer.socials.facebook && <Link href={t.footer.socials.facebook} aria-label="Facebook">f</Link>}{t.footer.socials.youtube && <Link href={t.footer.socials.youtube} aria-label="YouTube">▶</Link>}{t.footer.socials.x && <Link href={t.footer.socials.x} aria-label="X">𝕏</Link>}</p><Button href={p("contact")}>{t.footer.contactCta}</Button></div>
   </div><div className="kadik-footer-bottom"><span>© 2026 {t.brandFull}. {t.footer.rightsReserved}</span><span><Link href={p("privacy")}>{t.footer.privacy}</Link><Link href={p("terms")}>{t.footer.terms}</Link><Link href={p("charter")}>{t.footer.charter}</Link></span></div></footer>;
 }
 
@@ -266,14 +254,14 @@ function BoardPreview({ members }: { members: readonly PublicTeamMemberListItem[
   </div></section>;
 }
 
-export function KadikHome({ locale, team = [], posts = [] }: { locale: KadikLocale; team?: readonly PublicTeamMemberListItem[]; posts?: readonly KadikPostListItem[] }) {
-  const t = KADIK_DICT[locale];
+export function KadikHome({ locale, dict = KADIK_DICT[locale], team = [], posts = [] }: KadikPageProps & { team?: readonly PublicTeamMemberListItem[]; posts?: readonly KadikPostListItem[] }) {
+  const t = dict;
   const p = (key: KadikPageKey) => KADIK_PATHS[key][locale];
-  return <KadikPage locale={locale} active="home"><KadikMotion><Header /><main>
-    <section className="kadik-hero"><div className="kadik-hero-overlay" /><div className="kadik-hero-content"><span className="kadik-hero-kicker">{t.home.heroKicker}</span><h1>{t.home.heroTitleLine1}<br />{t.home.heroTitleLine2}</h1><p>{t.home.heroSubtitle}</p><Button href={p("membership")} tone="red">{t.home.heroCta}</Button></div></section>
+  return <KadikPage locale={locale} active="home" dict={dict}><KadikMotion><Header /><main>
+    <section className="kadik-hero" style={t.home.heroImage.url ? { backgroundImage: `url(${t.home.heroImage.url})` } : undefined}><div className="kadik-hero-overlay" /><div className="kadik-hero-content"><span className="kadik-hero-kicker">{t.home.heroKicker}</span><h1>{t.home.heroTitleLine1}<br />{t.home.heroTitleLine2}</h1><p>{t.home.heroSubtitle}</p><Button href={p("membership")} tone="red">{t.home.heroCta}</Button></div></section>
     <section className="kadik-section kadik-intro kadik-container"><div><SectionHeading eyebrow={t.home.introEyebrow} title={t.home.introTitle} /></div><div><p className="kadik-lead">{t.home.introLead}</p><p>{t.home.introText}</p><Button href={p("about")}>{t.home.introCta}</Button></div></section>
     <section className="kadik-section kadik-dark-section"><div className="kadik-container"><SectionHeading eyebrow={t.home.principlesEyebrow} title={t.home.principlesTitle} /><div className="kadik-card-grid kadik-card-grid-3">{t.home.principles.map((principle) => <article className="kadik-principle-card" key={principle.title}><span>{principle.number}</span><h3>{principle.title}</h3><p>{principle.text}</p><Link href={p("events")}>{t.home.principlesLink}</Link></article>)}</div></div></section>
-    <section className="kadik-image-band" style={{ backgroundImage: `url(${images.band})` }}><div className="kadik-image-band-overlay" /><div className="kadik-container"><span className="kadik-image-kicker">{t.home.bandKicker}</span><h2>{t.home.bandTitleLine1}<br />{t.home.bandTitleLine2}</h2><Button href={p("membership")} tone="red">{t.home.bandCta}</Button></div></section>
+    <section className="kadik-image-band" style={t.home.bandImage.url ? { backgroundImage: `url(${t.home.bandImage.url})` } : undefined}><div className="kadik-image-band-overlay" /><div className="kadik-container"><span className="kadik-image-kicker">{t.home.bandKicker}</span><h2>{t.home.bandTitleLine1}<br />{t.home.bandTitleLine2}</h2><Button href={p("membership")} tone="red">{t.home.bandCta}</Button></div></section>
     <BoardPreview members={team} />
     <section className="kadik-section kadik-container"><SectionHeading eyebrow={t.home.newsEyebrow} title={t.home.newsTitle} />
       {posts.length > 0 ? <><div className="kadik-post-grid">{posts.slice(0, 3).map((post) => <PostCard key={post.slug} post={post} />)}</div><div className="kadik-center"><Button href={p("posts")}>{t.home.newsCta}</Button></div></> : <p className="kadik-empty-state" role="status">{t.home.newsEmpty}</p>}
@@ -281,9 +269,9 @@ export function KadikHome({ locale, team = [], posts = [] }: { locale: KadikLoca
   </main><Footer /></KadikMotion></KadikPage>;
 }
 
-export function KadikBoard({ locale, members }: { locale: KadikLocale; members: readonly PublicTeamMemberListItem[] }) {
-  const t = KADIK_DICT[locale].board;
-  return <KadikPage locale={locale} active="board"><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
+export function KadikBoard({ locale, dict = KADIK_DICT[locale], members }: KadikPageProps & { members: readonly PublicTeamMemberListItem[] }) {
+  const t = dict.board;
+  return <KadikPage locale={locale} active="board" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
     <div className="kadik-board-intro"><SectionHeading eyebrow={t.introEyebrow} title={t.introTitle} /><p className="kadik-lead">{t.introLead}</p></div>
     {members.length > 0 ? <div className="kadik-board-grid kadik-board-grid-page">{members.map((member) => <article className="kadik-board-card" key={member.entityId}><img src={member.image.url} alt={member.name} /><div><span>{member.role}</span><h3>{member.name}</h3></div></article>)}</div> : <div className="kadik-board-empty"><strong>{t.emptyTitle}</strong><p>{t.emptyText}</p></div>}
   </section></Shell></KadikPage>;
@@ -295,12 +283,12 @@ function PostCard({ post }: { post: KadikPostListItem }) {
   return <article className="kadik-post-card"><Link href={kadikPostPath(locale, post.slug)}><img src={post.image} alt="" /><div className="kadik-post-card-body"><span>{post.category.toLocaleUpperCase(locale)} · {post.dateLabel}</span><h3>{post.title}</h3><p>{post.excerpt}</p><b>{t.home.readMore}</b></div></Link></article>;
 }
 
-export function KadikAbout({ locale }: { locale: KadikLocale }) {
-  const t = KADIK_DICT[locale].about;
+export function KadikAbout({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+  const t = dict.about;
   const boardHref = KADIK_PATHS.board[locale];
-  return <KadikPage locale={locale} active="about"><Shell title={t.pageTitle}>
+  return <KadikPage locale={locale} active="about" dict={dict}><Shell title={t.pageTitle}>
     <section className="kadik-section kadik-container kadik-two-col"><div><SectionHeading title={t.heroTitle} /></div><div><p className="kadik-lead">{t.lead}</p><p>{t.text}</p><Button href={boardHref}>{t.cta}</Button></div></section>
-    <section className="kadik-container"><img className="kadik-wide-image" src={images.about} alt={t.wideImageAlt} /></section>
+    {t.image.url && <section className="kadik-container"><img className="kadik-wide-image" src={t.image.url} alt={t.wideImageAlt} /></section>}
     <section className="kadik-section kadik-stats"><div className="kadik-container"><SectionHeading eyebrow={t.statsEyebrow} title={t.statsTitle} /><div className="kadik-stat-grid">{t.stats.map((stat) => <div key={stat.label}><strong>{stat.number}</strong><span>{stat.label}</span></div>)}</div></div></section>
     <section className="kadik-section kadik-container"><SectionHeading eyebrow={t.storyEyebrow} title={t.storyTitle} /><div className="kadik-timeline">{t.timeline.map((entry) => <article key={entry.year}><span>{entry.year}</span><div><h3>{entry.title}</h3><p>{entry.text}</p></div></article>)}</div></section>
   </Shell></KadikPage>;
@@ -308,21 +296,23 @@ export function KadikAbout({ locale }: { locale: KadikLocale }) {
 
 function dateKey(date: Date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
 
-export function KadikEvents({ locale }: { locale: KadikLocale }) {
-  const t = KADIK_DICT[locale].events;
+export function KadikEvents({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+  const t = dict.events;
   const membershipHref = KADIK_PATHS.membership[locale];
   const eventsHref = KADIK_PATHS.events[locale];
-  const [month, setMonth] = useState(new Date(2026, 8, 1));
-  const [day, setDay] = useState("2026-09-17");
+  // Opens on the current month; the first render uses the same date on server
+  // and client because both run within the same request window.
+  const [month, setMonth] = useState(() => { const today = new Date(); return new Date(today.getFullYear(), today.getMonth(), 1); });
+  const [day, setDay] = useState(() => dateKey(new Date()));
   const [mode, setMode] = useState(t.viewMonth);
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const first = (new Date(month.getFullYear(), month.getMonth(), 1).getDay() + 6) % 7;
   const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const cells = Array.from({ length: Math.ceil((first + days) / 7) * 7 }, (_, index) => new Date(month.getFullYear(), month.getMonth(), index - first + 1));
-  const found = t.events.filter((event) => event.title.toLocaleLowerCase(locale).includes(search.toLocaleLowerCase(locale)));
+  const found = t.events.filter((event) => event.date && event.title.toLocaleLowerCase(locale).includes(search.toLocaleLowerCase(locale)));
   const list = found.filter((event) => mode === t.viewDay ? event.date === day : event.date.startsWith(dateKey(month).slice(0, 7)));
-  return <KadikPage locale={locale} active="events"><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
+  return <KadikPage locale={locale} active="events" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
     <form className="kadik-event-toolbar" onSubmit={(event) => { event.preventDefault(); setSearch(query); }}>
       <input aria-label={t.searchAria} placeholder={t.searchPlaceholder} value={query} onChange={(event) => setQuery(event.target.value)} />
       <button type="submit">{t.searchButton}</button><div>{[t.viewList, t.viewMonth, t.viewDay].map((view) => <button key={view} type="button" aria-pressed={mode === view} className={mode === view ? "is-selected" : ""} onClick={() => setMode(view)}>{view}</button>)}</div>
@@ -341,9 +331,9 @@ export function KadikEvents({ locale }: { locale: KadikLocale }) {
   </section></Shell></KadikPage>;
 }
 
-export function KadikMembership({ locale }: { locale: KadikLocale }) {
-  const t = KADIK_DICT[locale].membership;
-  return <KadikPage locale={locale} active="membership"><Shell title={t.pageTitle}><section className="kadik-section kadik-container kadik-membership-grid">
+export function KadikMembership({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+  const t = dict.membership;
+  return <KadikPage locale={locale} active="membership" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container kadik-membership-grid">
     <div>
       <SectionHeading eyebrow={t.eyebrow} title={t.title} />
       <p className="kadik-lead">{t.lead}</p>
@@ -356,17 +346,17 @@ export function KadikMembership({ locale }: { locale: KadikLocale }) {
   </section></Shell></KadikPage>;
 }
 
-export function KadikIssues({ locale }: { locale: KadikLocale }) {
-  const t = KADIK_DICT[locale].announcements;
+export function KadikIssues({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+  const t = dict.announcements;
   const contactHref = KADIK_PATHS.contact[locale];
-  return <KadikPage locale={locale} active="issues"><Shell title={t.pageTitle}>
-    <section className="kadik-section kadik-container"><SectionHeading eyebrow={t.eyebrow} title={t.title} /><p className="kadik-intro-copy">{t.lead}</p><div className="kadik-issue-grid">{t.items.map((issue, i) => <article key={issue}><span>0{i + 1}</span><h3>{issue}</h3><p>{t.itemText}</p><Link href={contactHref}>{t.itemCta}</Link></article>)}</div></section>
+  return <KadikPage locale={locale} active="issues" dict={dict}><Shell title={t.pageTitle}>
+    <section className="kadik-section kadik-container"><SectionHeading eyebrow={t.eyebrow} title={t.title} /><p className="kadik-intro-copy">{t.lead}</p><div className="kadik-issue-grid">{t.items.map((issue, i) => <article key={`${i}-${issue}`}><span>{String(i + 1).padStart(2, "0")}</span><h3>{issue}</h3><p>{t.itemText}</p><Link href={contactHref}>{t.itemCta}</Link></article>)}</div></section>
     <section className="kadik-cta-band"><div className="kadik-container"><h2>{t.ctaTitle}</h2><Button href={contactHref} tone="red">{t.ctaButton}</Button></div></section>
   </Shell></KadikPage>;
 }
 
-export function KadikPosts({ locale, posts = [], initialCategory }: { locale: KadikLocale; posts?: readonly KadikPostListItem[]; initialCategory?: string }) {
-  const t = KADIK_DICT[locale].news;
+export function KadikPosts({ locale, dict = KADIK_DICT[locale], posts = [], initialCategory }: KadikPageProps & { posts?: readonly KadikPostListItem[]; initialCategory?: string }) {
+  const t = dict.news;
   const issuesHref = KADIK_PATHS.issues[locale];
   const postsHref = KADIK_PATHS.posts[locale];
   const categories = Array.from(new Set(posts.map((post) => post.category))).sort((first, second) => first.localeCompare(second, locale));
@@ -374,7 +364,7 @@ export function KadikPosts({ locale, posts = [], initialCategory }: { locale: Ka
   const [filter, setFilter] = useState(initial ?? t.all);
   const [search, setSearch] = useState("");
   const visible = posts.filter((post) => (filter === t.all || post.category === filter) && post.title.toLocaleLowerCase(locale).includes(search.toLocaleLowerCase(locale)));
-  return <KadikPage locale={locale} active="posts"><Shell title={t.pageTitle}><section className="kadik-section kadik-container"><div className="kadik-posts-layout"><div>
+  return <KadikPage locale={locale} active="posts" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container"><div className="kadik-posts-layout"><div>
     <div className="kadik-filter-row"><span>{t.typeLabel}</span>{[t.all, ...categories].map((item) => <button type="button" aria-pressed={filter === item} className={filter === item ? "is-selected" : ""} key={item} onClick={() => {
       setFilter(item);
       const url = new URL(window.location.href);
@@ -404,9 +394,9 @@ function ArticleBlocks({ blocks }: { blocks: readonly KadikArticleBlock[] }) {
   })}</>;
 }
 
-export function KadikPostDetail({ locale, post }: { locale: KadikLocale; post: KadikPostDetailData }) {
-  const t = KADIK_DICT[locale].article;
-  return <KadikPage locale={locale} active="post"><Shell title={post.title}><article className="kadik-section kadik-container kadik-article">
+export function KadikPostDetail({ locale, dict = KADIK_DICT[locale], post }: KadikPageProps & { post: KadikPostDetailData }) {
+  const t = dict.article;
+  return <KadikPage locale={locale} active="post" dict={dict}><Shell title={post.title}><article className="kadik-section kadik-container kadik-article">
     <div className="kadik-article-meta">{post.category.toLocaleUpperCase(locale)} · {post.dateLabel} · {post.author.toLocaleUpperCase(locale)}</div>
     <img className="kadik-article-image" src={post.image} alt="" />
     {post.excerpt && <p className="kadik-lead">{post.excerpt}</p>}
@@ -419,11 +409,11 @@ export function KadikPostDetail({ locale, post }: { locale: KadikLocale; post: K
  * the visitor back to the home page and the real site sections
  * (`app/not-found.tsx` always renders this with `locale="en"` - the apex
  * 404 has no locale context to detect a visitor's preferred language from). */
-export function KadikNotFound({ locale }: { locale: KadikLocale }) {
-  const t = KADIK_DICT[locale].notFound;
+export function KadikNotFound({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+  const t = dict.notFound;
   const homeHref = KADIK_PATHS.home[locale];
   const contactHref = KADIK_PATHS.contact[locale];
-  return <KadikPage locale={locale} active="notfound"><Shell title={t.pageTitle}><section className="kadik-section kadik-container kadik-404">
+  return <KadikPage locale={locale} active="notfound" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container kadik-404">
     <div>
       <p className="kadik-404-code">{t.code}</p>
       <h2>{t.heading}</h2>
@@ -431,18 +421,20 @@ export function KadikNotFound({ locale }: { locale: KadikLocale }) {
       <div className="kadik-404-actions"><Button href={homeHref} tone="red">{t.home}</Button><Button href={contactHref} tone="light">{t.contactCta}</Button></div>
     </div>
     <nav className="kadik-404-links" aria-label={t.linksLabel}>
-      {t.links.map((link) => <Link key={link.key} href={KADIK_PATHS[link.key][locale]}><strong>{link.title}</strong><span>{link.text}</span></Link>)}
+      {t.links.map((link, index) => <Link key={`${index}-${link.key}`} href={KADIK_PATHS[link.key][locale]}><strong>{link.title}</strong><span>{link.text}</span></Link>)}
     </nav>
   </section></Shell></KadikPage>;
 }
 
-export function KadikContact({ locale }: { locale: KadikLocale }) {
-  const t = KADIK_DICT[locale].contact;
-  return <KadikPage locale={locale} active="contact"><Shell title={t.pageTitle}><section className="kadik-section kadik-container"><div className="kadik-contact-grid"><div><SectionHeading eyebrow={t.eyebrow} title={t.title} /><p>{t.lead}</p><div className="kadik-contact-items"><p><b>{t.addressLabel}</b>{t.address}</p><p><b>{t.phoneLabel}</b>{t.phone}</p><p><b>{t.emailLabel}</b>{t.email}</p></div></div><ContactForm /></div></section></Shell></KadikPage>;
+export function KadikContact({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+  const t = dict.contact;
+  return <KadikPage locale={locale} active="contact" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container"><div className="kadik-contact-grid"><div><SectionHeading eyebrow={t.eyebrow} title={t.title} /><p>{t.lead}</p><div className="kadik-contact-items"><p><b>{t.addressLabel}</b>{t.address}</p><p><b>{t.phoneLabel}</b>{t.phone}</p><p><b>{t.emailLabel}</b>{t.email}</p></div></div><ContactForm /></div></section></Shell></KadikPage>;
 }
 
-export function KadikGallery({ locale }: { locale: KadikLocale }) {
-  const t = KADIK_DICT[locale].gallery;
+export function KadikGallery({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+  const t = dict.gallery;
+  const items = t.items.filter((item) => item.image.url);
+  const categories = Array.from(new Set(items.map((item) => item.category).filter((category) => category.length > 0)));
   const [active, setActive] = useState<string | null>(null);
   const [filter, setFilter] = useState(t.all);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -454,19 +446,16 @@ export function KadikGallery({ locale }: { locale: KadikLocale }) {
     document.body.style.overflow = "hidden";
     return () => { node?.close(); document.body.style.overflow = previous; };
   }, [active]);
-  return <KadikPage locale={locale} active="gallery"><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
-    <div className="kadik-gallery-filter">{[t.all, ...t.categories].map((category) => <button key={category} aria-pressed={filter === category} className={filter === category ? "is-selected" : ""} onClick={() => setFilter(category)}>{category}</button>)}</div>
-    <div className="kadik-gallery-grid">{images.gallery.map((image, i) => ({ image, index: i, category: t.categories[i % t.categories.length] })).filter((item) => filter === t.all || item.category === filter).map(({ image, index, category }) => <button key={image} aria-label={`${category} ${index + 1}`} onClick={() => setActive(image)}><img src={image} alt={`KADIK ${category.toLocaleLowerCase(locale)} ${index + 1}`} /><span>0{index + 1}</span></button>)}</div>
+  return <KadikPage locale={locale} active="gallery" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
+    <div className="kadik-gallery-filter">{[t.all, ...categories].map((category) => <button key={category} aria-pressed={filter === category} className={filter === category ? "is-selected" : ""} onClick={() => setFilter(category)}>{category}</button>)}</div>
+    <div className="kadik-gallery-grid">{items.map((item, index) => ({ ...item, index })).filter((item) => filter === t.all || item.category === filter).map(({ image, index, category, alt }) => <button key={`${index}-${image.url}`} aria-label={alt || `${category} ${index + 1}`} onClick={() => setActive(image.url)}><img src={image.url} alt={alt} /><span>{String(index + 1).padStart(2, "0")}</span></button>)}</div>
   </section><dialog ref={dialog} className="kadik-lightbox" aria-label={t.lightboxAria} onCancel={() => setActive(null)} onClick={(event) => { if (event.target === event.currentTarget) setActive(null); }}>
     <button autoFocus aria-label={t.close} onClick={() => setActive(null)}>×</button>{active && <img src={active} alt={t.enlargedAlt} />}
   </dialog></Shell></KadikPage>;
 }
 
-export function KadikLegal({ locale, terms = false, charter = false }: { locale: KadikLocale; terms?: boolean; charter?: boolean }) {
-  const t = KADIK_DICT[locale].legal;
-  const sections = charter ? t.charterSections : terms ? t.termsSections : t.privacySections;
-  const title = charter ? t.charterTitle : terms ? t.termsTitle : t.privacyTitle;
-  const lead = charter ? t.charterLead : t.lead;
+export function KadikLegal({ locale, dict = KADIK_DICT[locale], terms = false, charter = false }: KadikPageProps & { terms?: boolean; charter?: boolean }) {
   const active = charter ? "charter" : terms ? "terms" : "privacy";
-  return <KadikPage locale={locale} active={active}><Shell title={title}><section className="kadik-section kadik-container kadik-legal"><p className="kadik-lead">{lead}</p>{sections.map(([heading, text]) => <section key={heading}><h2>{heading}</h2><p>{text}</p></section>)}</section></Shell></KadikPage>;
+  const page = dict[active];
+  return <KadikPage locale={locale} active={active} dict={dict}><Shell title={page.title}><section className="kadik-section kadik-container kadik-legal"><p className="kadik-lead">{page.lead}</p>{page.sections.map((section, index) => <section key={`${index}-${section.heading}`}><h2>{section.heading}</h2><p>{section.text}</p></section>)}</section></Shell></KadikPage>;
 }

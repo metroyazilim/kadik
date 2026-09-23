@@ -15,3 +15,9 @@ Test: `npx playwright test --config=playwright.kadik.config.ts` (kurulu Chrome, 
 Kesinti testi: `node scripts/verify-local-recovery.mjs` (yalnız geliştirmede, KADIK DB'sini kısa süre durdurur, supervisor toparlanmasını/admin girişini doğrular ve finally tekrar açar). Build'i dev ile aynı anda çalıştırmayın; `npm run build` sonrası `npm run dev` ile yeniden başlatın.
 
 React DevTools önerisi ve `[HMR] connected` bilgi mesajıdır. `content.js ... tabs:outgoing.message.ready` temiz Chrome testinde görülmedi ve uygulama kaynaklarında bulunmadı; uygulama dışındaki bir tarayıcı uzantısı/entegrasyonu olası kaynaktır. Kaynak tespiti için kendi tarayıcınızda uzantısız profil ile karşılaştırın.
+
+Başlatma sırasında `prisma migrate deploy` ve `prisma generate` otomatik çalışır; yeni bir migration geldiğinde elle işlem gerekmez.
+
+Site sayfalarının metin/görsel/SEO içeriği `KadikPageContent` tablosundadır ve `/manage/pages` üzerinden düzenlenir. İlk ziyaret (veya `npm run db:seed-kadik-pages`) koddaki varsayılan içeriği tabloya aktarır.
+
+Veritabanı yedeği: `npm run db:export` → `backups/kadik-<tarih>.sql`. Başka bir sunucuya yükleme: boş bir veritabanına `psql "<DATABASE_URL>" -f kadik.sql`.

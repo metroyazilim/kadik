@@ -1,3 +1,15 @@
+import type { Metadata } from "next";
 import { KadikEvents } from "@/components/KadikSite";
-export const metadata = { title: "Events | KADİK" };
-export default function EventsPage() { return <KadikEvents locale="en" />; }
+import { getKadikSiteContent, kadikMetadata } from "@/lib/kadik-content/store";
+
+// Content is edited in the admin panel ("Sayfalar") and read on every request.
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return kadikMetadata("events");
+}
+
+export default async function Page() {
+  const { dict } = await getKadikSiteContent();
+  return <KadikEvents locale="en" dict={dict} />;
+}

@@ -96,8 +96,8 @@ export function CmdRecentOperations({ entries }: { entries: readonly AuditEntry[
           style={{ scrollBehavior: "smooth" }}
         >
           <div className="text-neutral-400 text-[11px] pb-2 border-b border-neutral-800/60 leading-relaxed">
-            <div>Metro Engine v2.4 Audit Monitor initialized.</div>
-            <div>Listening to database transaction logs & mutation events...</div>
+            <div>KADIK denetim kaydı izleniyor.</div>
+            <div>Son işlemler aşağıda, en yenisi en altta.</div>
           </div>
 
           {terminalLines.length === 0 ? (

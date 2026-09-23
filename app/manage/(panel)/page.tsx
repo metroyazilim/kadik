@@ -8,35 +8,26 @@ import { StatCard } from "@/components/admin/StatCard";
 import { CmdRecentOperations } from "./CmdRecentOperations";
 import { isAdminNavKey } from "@/components/admin/nav-items";
 import { secondaryButton } from "@/components/admin/ui";
-import {
-  FAQ_CONTENT_TYPE,
-  POST_CONTENT_TYPE,
-  PRODUCT_CONTENT_TYPE,
-  PROJECT_CONTENT_TYPE,
-  SERVICE_CONTENT_TYPE,
-  TEAM_MEMBER_CONTENT_TYPE,
-} from "@/lib/content-model/payload-validation";
+import { POST_CONTENT_TYPE, TEAM_MEMBER_CONTENT_TYPE } from "@/lib/content-model/payload-validation";
+import { ADMIN_CONTENT_LOCALE } from "@/lib/i18n/config";
+import { KADIK_CONTENT_KEYS } from "@/lib/kadik-content/pages";
 
 type SearchParams = Promise<{ panel?: string; item?: string }>;
 
 const COLLECTIONS = [
-  { contentType: SERVICE_CONTENT_TYPE, label: "Hizmetler", href: "/manage/services" },
-  { contentType: PRODUCT_CONTENT_TYPE, label: "Ürünler", href: "/manage/products" },
-  { contentType: PROJECT_CONTENT_TYPE, label: "Projeler", href: "/manage/projects" },
   { contentType: TEAM_MEMBER_CONTENT_TYPE, label: "Kurul Üyeleri", href: "/manage/team" },
-  { contentType: FAQ_CONTENT_TYPE, label: "SSS", href: "/manage/faq" },
-  { contentType: POST_CONTENT_TYPE, label: "Blog Yazıları", href: "/manage/posts" },
+  { contentType: POST_CONTENT_TYPE, label: "Yayınlar ve Haberler", href: "/manage/posts" },
 ] as const;
 
 const SITE_SHORTCUTS = [
-  { label: "Ana Sayfa", href: "/" },
-  { label: "Kurul Üyeleri", href: "/kurul-uyeleri" },
-  { label: "Yayınlar", href: "/yazilar" },
-  { label: "Etkinlikler", href: "/etkinlikler" },
-  { label: "Duyurular", href: "/duyurular" },
-  { label: "Üyelik", href: "/uyelik" },
-  { label: "Galeri", href: "/galeri" },
-  { label: "İletişim", href: "/iletisim" },
+  { label: "Anasayfa", href: "/" },
+  { label: "Kurul Üyeleri", href: "/board" },
+  { label: "Haberler", href: "/news" },
+  { label: "Etkinlikler", href: "/events" },
+  { label: "Duyurular", href: "/announcements" },
+  { label: "Üyelik", href: "/membership" },
+  { label: "Galeri", href: "/gallery" },
+  { label: "İletişim", href: "/contact" },
 ] as const;
 
 const AUDIT_ACTION_LABEL: Record<string, string> = {
@@ -65,16 +56,20 @@ export default async function ManageOverviewPage({ searchParams }: { searchParam
     redirect(`/manage/${query.panel}${item}`);
   }
 
-  const [collectionCounts, publishedTranslations, draftTranslations, newMessages, mediaAssets, recentAudit] =
+  const [collectionCounts, publishedRecords, draftRecords, newMessages, mediaAssets, recentAudit] =
     await Promise.all([
       Promise.all(
         COLLECTIONS.map(async (collection) => ({
           ...collection,
-          total: await prisma.contentEntity.count({ where: { contentType: collection.contentType } }),
+          total: await prisma.contentEntity.count({ where: { contentType: collection.contentType, archived: false } }),
         })),
       ),
-      prisma.contentTranslation.count({ where: { publishedRevisionId: { not: null } } }),
-      prisma.contentTranslation.count({ where: { publishedRevisionId: null, draftRevisionId: { not: null } } }),
+      prisma.contentTranslation.count({
+        where: { locale: ADMIN_CONTENT_LOCALE, publishedRevisionId: { not: null }, entity: { contentType: { in: COLLECTIONS.map((c) => c.contentType) }, archived: false } },
+      }),
+      prisma.contentTranslation.count({
+        where: { locale: ADMIN_CONTENT_LOCALE, publishedRevisionId: null, draftRevisionId: { not: null }, entity: { contentType: { in: COLLECTIONS.map((c) => c.contentType) }, archived: false } },
+      }),
       prisma.message.count({ where: { status: "UNREAD" } }),
       prisma.mediaAsset.count({ where: { archivedAt: null } }),
       prisma.auditLog.findMany({
@@ -93,8 +88,8 @@ export default async function ManageOverviewPage({ searchParams }: { searchParam
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Yayında çeviri" value={publishedTranslations} hint="Public tarafta görünen" tone="success" />
-        <StatCard label="Yayınlanmamış" value={draftTranslations} hint="Yayın bekleyen" tone="warning" />
+        <StatCard label="Yayındaki kayıt" value={publishedRecords} hint="Kurul üyesi ve haber" tone="success" />
+        <StatCard label="Yayında olmayan" value={draftRecords} hint="Kaydedilip yayınlanmamış" tone="warning" />
         <StatCard
           label="Yeni mesaj"
           value={newMessages}
@@ -105,8 +100,9 @@ export default async function ManageOverviewPage({ searchParams }: { searchParam
         <StatCard label="Medya" value={mediaAssets} hint="Arşivlenmemiş dosya" href="/manage/media" />
       </div>
 
-      <h2 className="mb-3 mt-8 text-sm font-bold text-brand-text">Koleksiyonlar</h2>
+      <h2 className="mb-3 mt-8 text-sm font-bold text-brand-text">İçerik</h2>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <StatCard label="Sayfalar" value={KADIK_CONTENT_KEYS.length} hint="Düzenlenebilir sayfa" href="/manage/pages" />
         {collectionCounts.map((collection) => (
           <StatCard
             key={collection.contentType}

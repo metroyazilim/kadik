@@ -80,6 +80,8 @@ done
 
 echo "entrypoint: applying migrations"
 ./node_modules/.bin/prisma migrate deploy --schema ./prisma/schema.prisma
+echo "entrypoint: moving shipped KADIK page copy into the database (new pages only)"
+./node_modules/.bin/tsx scripts/seed-kadik-pages.ts || echo "entrypoint: kadik page seed failed, continuing"
 
 entities=$(psql "$PSQL_URL" -tAc 'SELECT count(*) FROM "ContentEntity"')
 if [ "$entities" = "0" ]; then

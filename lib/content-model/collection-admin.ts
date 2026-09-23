@@ -136,15 +136,16 @@ export type CollectionStats = Readonly<{
  * are `count()` queries against indexed columns, so the header strip costs
  * nothing that grows with content size.
  */
-export async function collectionStats(client: PrismaClient, contentType: string): Promise<CollectionStats> {
+/** Counts one locale only when `locale` is given (the admin edits a single language). */
+export async function collectionStats(client: PrismaClient, contentType: string, locale?: ContentLocale): Promise<CollectionStats> {
   const [total, archived, publishedTranslations, draftTranslations] = await Promise.all([
     client.contentEntity.count({ where: { contentType } }),
     client.contentEntity.count({ where: { contentType, archived: true } }),
     client.contentTranslation.count({
-      where: { entity: { contentType }, publishedRevisionId: { not: null } },
+      where: { entity: { contentType }, publishedRevisionId: { not: null }, ...(locale ? { locale } : {}) },
     }),
     client.contentTranslation.count({
-      where: { entity: { contentType }, publishedRevisionId: null, draftRevisionId: { not: null } },
+      where: { entity: { contentType }, publishedRevisionId: null, draftRevisionId: { not: null }, ...(locale ? { locale } : {}) },
     }),
   ]);
   return { total, archived, publishedTranslations, draftTranslations };

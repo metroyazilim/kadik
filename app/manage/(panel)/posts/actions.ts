@@ -20,7 +20,7 @@ import { recordFallbackToNativeRedirect } from "@/lib/content-model/public-seo-r
 import { persistedOutboxRecorder } from "@/lib/content-model/outbox-store";
 import { contentAvailabilityTag, contentEntityTag, seoIndexTag } from "@/lib/content-model/cache-tags";
 import { ContentModelError } from "@/lib/content-model/errors";
-import { isLocale } from "@/lib/i18n/config";
+import { ADMIN_CONTENT_LOCALE, isLocale } from "@/lib/i18n/config";
 
 type ActionState = { error?: string; success?: string };
 
@@ -124,7 +124,7 @@ export async function savePostDraftAction(_previous: ActionState, formData: Form
 
     if (!result.ok) {
       return {
-        error: `Bu dilde arada başka bir değişiklik kaydedilmiş (v${result.current.version}). Sayfayı yenileyip tekrar deneyin.`,
+        error: `Bu kayıt siz düzenlerken başka biri tarafından değiştirildi. Sayfayı yenileyip tekrar deneyin.`,
       };
     }
 
@@ -137,7 +137,7 @@ export async function savePostDraftAction(_previous: ActionState, formData: Form
     });
 
     revalidatePath("/manage/posts");
-    return { success: `${locale.toUpperCase()} kaydedildi.` };
+    return { success: "Kaydedildi." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Gönderi kaydedilemedi. Alanları kontrol edip tekrar deneyin." };
@@ -156,7 +156,7 @@ export async function publishPostAction(_previous: ActionState, formData: FormDa
   const slug = await resolveRecordSlug(prisma, entityId, locale, text(formData, "title"));
 
   if (!translationId || !expectedDraftRevisionId || !slug) {
-    return { error: "Bu dilde kaydedilmiş içerik yok; önce Kaydet deyin." };
+    return { error: "Kaydedilecek içerik bulunamadı. Sayfayı yenileyip tekrar deneyin." };
   }
 
   try {
@@ -177,7 +177,7 @@ export async function publishPostAction(_previous: ActionState, formData: FormDa
 
     if (!result.ok) {
       if ("routeConflict" in result && result.routeConflict) {
-        return { error: `"${slug}" adresi bu dilde başka bir gönderi tarafından kullanılıyor.` };
+        return { error: `"${slug}" adresi başka bir gönderi tarafından kullanılıyor.` };
       }
       return { error: "Yayınlama sırasında çakışma oluştu. Sayfayı yenileyip tekrar deneyin." };
     }
@@ -203,7 +203,7 @@ export async function publishPostAction(_previous: ActionState, formData: FormDa
 
     revalidatePath("/manage/posts");
     revalidatePublicPostSurfaces();
-    return { success: `${locale.toUpperCase()} yayınlandı.` };
+    return { success: "Kaydedildi ve sitede yayınlandı." };
   } catch (error) {
     if (error instanceof ContentModelError) return { error: error.message };
     return { error: "Yayınlama başarısız oldu." };
@@ -256,4 +256,40 @@ export async function saveAndPublishPostAction(_previous: ActionState, formData:
 
   const refreshed = await refreshEditorFormPointers(prisma, formData, entityId, localeValue as ContentLocale);
   return publishPostAction(_previous, refreshed);
+}
+
+/**
+ * Used by the SEO screen: rewrites only `seoTitle`/`seoDescription` of the
+ * post's current content and publishes it through the same save+publish
+ * path as the editor, so validation, routes and cache tags stay identical.
+ */
+export async function savePostSeoAction(
+  entityId: string,
+  seo: { title: string; description: string },
+): Promise<{ ok: boolean; message: string }> {
+  await resolveAdminContext();
+  const view = await getEntityEditView(prisma, entityId, POST_CONTENT_TYPE);
+  const translation = view?.translations[ADMIN_CONTENT_LOCALE];
+  const payload = (translation?.draftPayload ?? translation?.publishedPayload ?? null) as PostPayload | null;
+  if (!translation || !payload) return { ok: false, message: "Haber bulunamadı ya da henüz kaydedilmemiş." };
+
+  const form = new FormData();
+  form.set("entityId", entityId);
+  form.set("locale", ADMIN_CONTENT_LOCALE);
+  form.set("translationId", translation.translationId);
+  form.set("expectedVersion", String(translation.version));
+  form.set("draftRevisionId", translation.draftRevisionId ?? "");
+  form.set("title", payload.title);
+  form.set("excerpt", payload.excerpt);
+  form.set("blocks", JSON.stringify(payload.blocks ?? []));
+  form.set("category", payload.category);
+  form.set("author", payload.author);
+  form.set("coverImageAssetId", payload.coverImageAssetId ?? "");
+  form.set("seoTitle", seo.title.trim().slice(0, 70));
+  form.set("seoDescription", seo.description.trim().slice(0, 160));
+
+  const result = await saveAndPublishPostAction({}, form);
+  revalidatePath("/manage/seo");
+  revalidatePath("/news", "layout");
+  return result.error ? { ok: false, message: result.error } : { ok: true, message: `"${payload.title}" SEO ayarları kaydedildi.` };
 }

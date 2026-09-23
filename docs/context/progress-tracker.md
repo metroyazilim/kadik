@@ -1,5 +1,16 @@
 # Progress Tracker
 
+## KADİK güncel kayıt — 2026-09-24
+
+- **Tüm public sayfalar yönetim paneline bağlandı.** Yeni `KadikPageContent` tablosu (migration `20260924120000_kadik_page_content`) her sayfa için tek JSON satırı tutar. Şema/alan tanımı `lib/kadik-content/pages.ts`; doğrulama `sanitize.ts`; okuma/yazma `store.ts`. Public sayfalar (`/`, `/about`, `/board`, `/events`, `/announcements`, `/news`, `/news/[slug]`, `/membership`, `/gallery`, `/contact`, `/privacy-policy`, `/terms`, `/charter`, 404) `getKadikSiteContent()` ile DB içeriğini `lib/kadik-i18n.ts` varsayılanlarının üstüne birleştirir; SEO başlık/açıklama da buradan gelir. Header/footer (marka, menü, footer, sosyal bağlantılar) "Header & Footer" kaydıdır.
+- **Tek giriş noktası:** Sidebar'daki "Ana Sayfa" kaldırıldı; anasayfa dahil her sayfa `/manage/pages` → `/manage/pages/<key>` editöründen düzenlenir. `/manage/home` ve `/manage/site-settings` eski adresleri buraya yönlendirir. Görseller MediaAsset kütüphanesinden seçilir (MediaUsage `surface = "kadik-page"`), listeler dnd-kit ile sıralanır.
+- **Admin tek dil, tek buton:** İçerik yalnız `ADMIN_CONTENT_LOCALE = "en"` (public site dili) ile düzenlenir; dil sekmeleri, çeviri asistanı ve JSON çeviri akışı kaldırıldı. Taslak/Yayınla ayrımı yok: tüm editörlerde tek "Kaydet" butonu kaydeder ve yayınlar.
+- Eski şablon ekranları (Hizmetler, Ürünler, Projeler, SSS, SEO denetimi) menüden gizlendi; route ve verileri duruyor.
+- **SEO Ayarları (`/manage/seo`):** Sidebar'da ayrı "SEO" bölümü; ekranın kendi kayıt listesi (sayfalar + haberler) var, `?item=page:<key>` / `?item=post:<id>` ile seçilir. Kontrol listesi (başlık 20-60, açıklama 70-160, paylaşım görseli) tamamsa listede ✓ görünür. Sayfalarda title, description ve paylaşım görseli (Open Graph/X) düzenlenir; public sayfalar canonical + OG/Twitter kartı üretir. Önerilen SEO metinleri migration `20260924150000_kadik_seo_copy` ile yazıldı (özelleştirilmiş SEO korunur). Sayfa editörü SEO'ya dokunmaz (`keepStoredSeo`); haber SEO'su `savePostSeoAction` ile aynı kaydet+yayınla yolundan geçer. Eski şablon SEO denetimi kaldırıldı.
+- **Denetim Terminali (`/manage/audit`):** Audit log terminal görünümünde (eski üstte, yeni altta, `grep` filtresi, tam ekran, cursor ile eski/yeni pencereler).
+- Kurul üyeleri ve haber listelerinde her satırın solunda görsel önizlemesi ve çalışan sürükle-bırak tutamacı var.
+- `npm run dev` artık bekleyen migration'ları uygular ve Prisma client'ı üretir. `npm run db:seed-kadik-pages` sayfa içeriğini DB'ye aktarır (idempotent), `npm run db:export` `backups/` altına SQL dump yazar.
+
 ## KADİK güncel kayıt — 2026-09-18
 
 - KADİK public sitesi tek yapısal dile indirildi: `/tr/*` route ağacı tamamen kaldırıldı (bir önceki turda `app/tr/**` ve `KadikLayoutTr.tsx` silinmişti; bu turda `lib/kadik-i18n.ts`'deki `KadikLocale` tipi `"en"` tekil değerine indirgendi, `KADIK_PATHS`'ten `tr` girdileri ve ~260 satırlık Türkçe `tr` sözlüğü kaldırıldı, `components/KadikLayout.tsx` her zaman `lang="en"` render eder). `next.config.ts`'deki eski Türkçe slug yönlendirmeleri (`/hakkimizda`, `/galeri`, `/gonulluluk` vb.) artık `/tr/...` yerine doğrudan İngilizce kanonik adrese (`/about`, `/gallery`, `/membership`...) 308 döner. `app/api/kadik-api` ve `app/api/kadik/contact` route'larındaki gömülü `locale: "tr"` değerleri `"en"` oldu.

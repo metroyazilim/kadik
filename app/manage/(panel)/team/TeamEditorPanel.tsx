@@ -1,16 +1,15 @@
 "use client";
 
-import { TranslationAssistant } from "@/components/admin/TranslationAssistant";
 import { SlugPreview } from "@/components/admin/SlugPreview";
 import { useActionState, useState } from "react";
-import type { Locale } from "@/lib/i18n/config";
+import { ADMIN_CONTENT_LOCALE, type Locale } from "@/lib/i18n/config";
 import type { TeamMemberPayload } from "@/lib/content-model/payload-validation";
 import { saveAndPublishTeamMemberAction, saveTeamMemberDraftAction, type TeamMemberEditViewData } from "./actions";
 import { EditorPageLayout } from "@/components/admin/EditorPageLayout";
 import { EditorPublishPanel } from "@/components/admin/EditorPublishPanel";
 import { EditorSection } from "@/components/admin/EditorSection";
 import { FieldGrid } from "@/components/admin/FieldGrid";
-import { LocaleStatusTabs, STATUS_LABEL, STATUS_TONE } from "@/components/admin/LocaleStatusTabs";
+import { STATUS_LABEL, STATUS_TONE } from "@/components/admin/record-status";
 import { fieldHint, fieldInput, fieldLabel, fieldTextarea } from "@/components/admin/ui";
 import { MediaField } from "@/components/admin/MediaField";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
@@ -18,34 +17,12 @@ import { RichTextEditor } from "@/components/admin/RichTextEditor";
 /** Team member editor with collection-edit main column plus contextual publish panel. */
 export function TeamEditorPanel({
   entityId,
-  initialLocale = "tr",
   data,
 }: {
   entityId: string;
-  initialLocale?: Locale;
   data: TeamMemberEditViewData;
 }) {
-  const [activeLocale, setActiveLocale] = useState<Locale>(initialLocale);
-
-  function selectLocale(locale: Locale) {
-    setActiveLocale(locale);
-    window.history.replaceState(null, "", `/manage/team/${entityId}?locale=${locale}`);
-  }
-
-  return (
-    <div className="space-y-4">
-      <LocaleStatusTabs
-        label="Kurul üyesi dilleri"
-        activeLocale={activeLocale}
-        statuses={Object.fromEntries(
-          (["tr", "en"] as const).map((locale) => [locale, data.view.translations[locale]?.status ?? "missing"]),
-        )}
-        onSelect={selectLocale}
-        actions={<TranslationAssistant entityId={entityId} />}
-      />
-      <TeamMemberLocaleForm key={activeLocale} entityId={entityId} locale={activeLocale} editView={data} />
-    </div>
-  );
+  return <TeamMemberLocaleForm entityId={entityId} locale={ADMIN_CONTENT_LOCALE} editView={data} />;
 }
 
 function TeamMemberLocaleForm({
@@ -123,18 +100,9 @@ function TeamMemberLocaleForm({
               </FieldGrid>
             </EditorSection>
 
-            <EditorSection title="SEO" id="team-seo" description="Opsiyonel arama motoru başlığı ve açıklaması.">
-              <FieldGrid>
-                <label className={fieldLabel}>
-                  SEO başlığı
-                  <input name="seoTitle" defaultValue={payload?.seoTitle ?? ""} className={fieldInput} />
-                </label>
-                <label className={fieldLabel}>
-                  SEO açıklaması
-                  <textarea name="seoDescription" defaultValue={payload?.seoDescription ?? ""} rows={2} maxLength={300} className={`${fieldInput} resize-y`} />
-                </label>
-              </FieldGrid>
-            </EditorSection>
+            {/* Board members have no page of their own on the KADİK site, so there is no SEO to set; stored values are kept. */}
+            <input type="hidden" name="seoTitle" value={payload?.seoTitle ?? ""} />
+            <input type="hidden" name="seoDescription" value={payload?.seoDescription ?? ""} />
           </div>
         }
         aside={
@@ -142,7 +110,7 @@ function TeamMemberLocaleForm({
             statusLabel={STATUS_LABEL[status]}
             statusTone={STATUS_TONE[status]}
             version={translation?.version}
-            hint="Kaydet ve yayınla bu dili tek adımda yayına alır. Kaydet ise yayınlamadan saklar."
+            hint="Kaydet dediğinizde değişiklik hemen sitede yayına girer."
             isSavingDraft={isSavingDraft}
             isPublishing={isPublishing}
             canPublish

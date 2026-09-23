@@ -33,9 +33,9 @@ function routeHeading(key: PublicPageKey): string {
     case "posts": return t.news.pageTitle;
     case "contact": return t.contact.pageTitle;
     case "gallery": return t.gallery.pageTitle;
-    case "privacy": return t.legal.privacyTitle;
-    case "terms": return t.legal.termsTitle;
-    case "charter": return t.legal.charterTitle;
+    case "privacy": return t.privacy.title;
+    case "terms": return t.terms.title;
+    case "charter": return t.charter.title;
   }
 }
 
