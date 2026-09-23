@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { resolveAdminContext } from "@/lib/content-model/admin-context";
 import { KADIK_PAGE_DEFINITIONS, isKadikContentKey, kadikPageDefaults } from "@/lib/kadik-content/pages";
-import { KadikContentError, saveKadikPage, saveKadikSeo } from "@/lib/kadik-content/store";
+import { KadikContentError, saveKadikOrganization, saveKadikPage, saveKadikSeo } from "@/lib/kadik-content/store";
 
 export type KadikPageActionResult = Readonly<{ ok: boolean; message: string }>;
 
@@ -61,5 +61,22 @@ export async function saveKadikSeoAction(
     if (error instanceof KadikContentError) return { ok: false, message: error.message };
     console.error("saveKadikSeoAction failed", error);
     return { ok: false, message: "SEO ayarları kaydedilemedi." };
+  }
+}
+
+export async function saveKadikOrganizationAction(
+  organization: Record<string, string>,
+  socials: Record<string, string>,
+): Promise<KadikPageActionResult> {
+  try {
+    const context = await resolveAdminContext();
+    await saveKadikOrganization(organization, socials, context.actorId);
+    revalidateKadikPage("global");
+    revalidatePath("/manage/seo");
+    return { ok: true, message: "Kurum bilgileri kaydedildi." };
+  } catch (error) {
+    if (error instanceof KadikContentError) return { ok: false, message: error.message };
+    console.error("saveKadikOrganizationAction failed", error);
+    return { ok: false, message: "Kurum bilgileri kaydedilemedi." };
   }
 }

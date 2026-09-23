@@ -94,9 +94,20 @@ export type KadikDictionary = Readonly<{
     privacy: string;
     terms: string;
     charter: string;
-    socials: Readonly<{ facebook: string; youtube: string; x: string }>;
+    socials: Readonly<{ facebook: string; youtube: string; x: string; linkedin: string; instagram: string }>;
   }>;
   breadcrumbHome: string;
+  /** Organisation facts for search engines (schema.org JSON-LD). Contact
+   * details come from `contact`, social profiles from `footer.socials`. */
+  organization: Readonly<{
+    name: string;
+    alternateName: string;
+    description: string;
+    foundingDate: string;
+    locality: string;
+    countryCode: string;
+    eventVenue: string;
+  }>;
   contactForm: Readonly<{
     namePlaceholder: string;
     emailPlaceholder: string;
@@ -322,9 +333,18 @@ const en: KadikDictionary = {
     privacy: "Privacy",
     terms: "Terms of Use",
     charter: "Charter",
-    socials: { facebook: "#facebook", youtube: "#youtube", x: "#x" },
+    socials: { facebook: "#facebook", youtube: "#youtube", x: "#x", linkedin: "", instagram: "" },
   },
   breadcrumbHome: "HOME",
+  organization: {
+    name: "Kybele Atasever World Business Council",
+    alternateName: "KADİK",
+    description: "KADİK is a London-based world business council that brings entrepreneurs, executives and industry leaders together around shared judgement, trust and international partnerships.",
+    foundingDate: "2025",
+    locality: "London",
+    countryCode: "GB",
+    eventVenue: "London, United Kingdom",
+  },
   contactForm: {
     namePlaceholder: "Your full name",
     emailPlaceholder: "Your email address",

@@ -5,9 +5,10 @@ import { listThumbnails } from "@/lib/content-model/list-thumbnails";
 import { POST_CONTENT_TYPE, type PostPayload } from "@/lib/content-model/payload-validation";
 import { ADMIN_CONTENT_LOCALE } from "@/lib/i18n/config";
 import { KADIK_PAGE_DEFINITIONS } from "@/lib/kadik-content/pages";
-import { ensureKadikPagesSeeded, listKadikSeo } from "@/lib/kadik-content/store";
+import { ensureKadikPagesSeeded, getKadikSiteContent, listKadikSeo } from "@/lib/kadik-content/store";
+import { organizationLd } from "@/lib/kadik-content/structured-data";
 import { kadikPostPath } from "@/lib/kadik-i18n";
-import { SeoWorkspace, type SeoEntry } from "./SeoEditor";
+import { SeoWorkspace, type SeoEntry, type SiteSeo } from "./SeoEditor";
 
 type SearchParams = Promise<{ item?: string }>;
 
@@ -20,10 +21,18 @@ type SearchParams = Promise<{ item?: string }>;
 export default async function SeoPage({ searchParams }: { searchParams: SearchParams }) {
   const { item } = await searchParams;
   await ensureKadikPagesSeeded().catch(() => 0);
-  const [pages, posts] = await Promise.all([
+  const [pages, posts, { dict }] = await Promise.all([
     listKadikSeo(),
     listCollectionPage(prisma, POST_CONTENT_TYPE, { page: 1, perPage: 100, displayLocale: ADMIN_CONTENT_LOCALE }),
+    getKadikSiteContent(),
   ]);
+  const site: SiteSeo = {
+    organization: { ...dict.organization },
+    socials: { ...dict.footer.socials },
+    email: dict.contact.email,
+    phone: dict.contact.phone,
+    jsonLd: JSON.stringify({ "@context": "https://schema.org", ...organizationLd(dict) }, null, 2),
+  };
   const covers = await listThumbnails(prisma, posts.rows, "coverImageAssetId");
 
   const pageEntries: SeoEntry[] = pages.map((row) => ({
@@ -66,7 +75,7 @@ export default async function SeoPage({ searchParams }: { searchParams: SearchPa
         title="SEO Ayarları"
         description="Soldaki listeden bir sayfa ya da haber seçin. Google başlığı, açıklaması ve sosyal medya paylaşım görseli ayrı ayrı düzenlenir; Kaydet dediğinizde hemen yayına girer."
       />
-      <SeoWorkspace pages={pageEntries} posts={postEntries} initialItem={item ?? null} />
+      <SeoWorkspace site={site} pages={pageEntries} posts={postEntries} initialItem={item ?? null} />
     </div>
   );
 }

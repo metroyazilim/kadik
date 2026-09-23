@@ -54,6 +54,7 @@ const area = (key: string, label: string, hint?: string): KadikScalarField => ({
 const image = (key: string, label: string): KadikScalarField => ({ kind: "image", key, label });
 const url = (key: string, label: string, hint?: string): KadikScalarField => ({ kind: "url", key, label, hint });
 
+/** Branded share cards (white logo on brand blue) from `scripts/og/generate-og-images.py`. */
 function staticSeoImage(file: string): KadikImage {
   return { url: `/kadik/${file}`, assetId: null };
 }
@@ -125,7 +126,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/",
     slices: ["home"],
     hasSeo: true,
-    seoDefaults: { title: "KADİK London | Kybele Atasever World Business Council", description: "KADİK is a London-based world business council connecting entrepreneurs, executives and sectors through trust, shared judgement and global partnerships.", image: staticSeoImage("is-hero.webp") },
+    seoDefaults: { title: "KADİK London | Kybele Atasever World Business Council", description: "KADİK is a London-based world business council connecting entrepreneurs, executives and sectors through trust, shared judgement and global partnerships.", image: staticSeoImage("og/default.png") },
     related: [
       { href: "/manage/team", label: "Kurul üyelerini düzenle" },
       { href: "/manage/posts", label: "Haberleri düzenle" },
@@ -224,7 +225,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/about",
     slices: ["about"],
     hasSeo: true,
-    seoDefaults: { title: "About KADİK | Kybele Atasever World Business Council", description: "Learn how the Kybele Atasever World Business Council brings entrepreneurs and industry leaders together to grow trade, knowledge and partnerships.", image: staticSeoImage("is-hakkimizda.webp") },
+    seoDefaults: { title: "About KADİK | Kybele Atasever World Business Council", description: "Learn how the Kybele Atasever World Business Council brings entrepreneurs and industry leaders together to grow trade, knowledge and partnerships.", image: staticSeoImage("og/about.png") },
     sections: [
       {
         id: "intro",
@@ -288,7 +289,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/board",
     slices: ["board"],
     hasSeo: true,
-    seoDefaults: { title: "Board Members | KADİK London Business Council", description: "Meet the KADİK board: business leaders from different sectors guiding the Kybele Atasever World Business Council's programmes and partnerships.", image: staticSeoImage("is-hakkimizda.webp") },
+    seoDefaults: { title: "Board Members | KADİK London Business Council", description: "Meet the KADİK board: business leaders from different sectors guiding the Kybele Atasever World Business Council's programmes and partnerships.", image: staticSeoImage("og/board.png") },
     related: [{ href: "/manage/team", label: "Kurul üyelerini düzenle" }],
     sections: [
       {
@@ -314,7 +315,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/events",
     slices: ["events"],
     hasSeo: true,
-    seoDefaults: { title: "Events & Calendar | KADİK London", description: "Upcoming KADİK events in London and beyond: sector board meetings, export panels, networking meet-ups and finance workshops for members.", image: staticSeoImage("is-band.webp") },
+    seoDefaults: { title: "Events & Calendar | KADİK London", description: "Upcoming KADİK events in London and beyond: sector board meetings, export panels, networking meet-ups and finance workshops for members.", image: staticSeoImage("og/events.png") },
     sections: [
       {
         id: "events",
@@ -363,7 +364,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/announcements",
     slices: ["announcements"],
     hasSeo: true,
-    seoDefaults: { title: "Announcements | KADİK London", description: "KADİK announcements on sector boards, membership, international business opportunities, trade delegations and training programmes.", image: staticSeoImage("is-band.webp") },
+    seoDefaults: { title: "Announcements | KADİK London", description: "KADİK announcements on sector boards, membership, international business opportunities, trade delegations and training programmes.", image: staticSeoImage("og/announcements.png") },
     sections: [
       {
         id: "content",
@@ -391,7 +392,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/news",
     slices: ["news", "article"],
     hasSeo: true,
-    seoDefaults: { title: "News & Insights | KADİK London", description: "News, articles and assessments from the Kybele Atasever World Business Council on trade, sector boards and international business.", image: staticSeoImage("is-galeri-2.webp") },
+    seoDefaults: { title: "News & Insights | KADİK London", description: "News, articles and assessments from the Kybele Atasever World Business Council on trade, sector boards and international business.", image: staticSeoImage("og/news.png") },
     related: [{ href: "/manage/posts", label: "Haberleri düzenle" }],
     sections: [
       {
@@ -432,7 +433,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/membership",
     slices: ["membership", "membershipForm"],
     hasSeo: true,
-    seoDefaults: { title: "Membership Application | Join KADİK London", description: "Apply to join the Kybele Atasever World Business Council. Share your company and sector details and connect with sector boards and new partners.", image: staticSeoImage("is-band.webp") },
+    seoDefaults: { title: "Membership Application | Join KADİK London", description: "Apply to join the Kybele Atasever World Business Council. Share your company and sector details and connect with sector boards and new partners.", image: staticSeoImage("og/membership.png") },
     related: [{ href: "/manage/messages", label: "Gelen başvuruları gör" }],
     sections: [
       {
@@ -504,7 +505,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/gallery",
     slices: ["gallery"],
     hasSeo: true,
-    seoDefaults: { title: "Photo Gallery | KADİK London", description: "Photos from KADİK events, sector board meetings and business trips, showing the Kybele Atasever World Business Council in action.", image: staticSeoImage("is-galeri-1.webp") },
+    seoDefaults: { title: "Photo Gallery | KADİK London", description: "Photos from KADİK events, sector board meetings and business trips, showing the Kybele Atasever World Business Council in action.", image: staticSeoImage("og/gallery.png") },
     sections: [
       {
         id: "photos",
@@ -544,7 +545,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/contact",
     slices: ["contact", "contactForm"],
     hasSeo: true,
-    seoDefaults: { title: "Contact KADİK | London Council Secretariat", description: "Contact the KADİK secretariat in London about membership, sector boards, events and international business connections.", image: staticSeoImage("is-hero.webp") },
+    seoDefaults: { title: "Contact KADİK | London Council Secretariat", description: "Contact the KADİK secretariat in London about membership, sector boards, events and international business connections.", image: staticSeoImage("og/contact.png") },
     related: [{ href: "/manage/messages", label: "Gelen mesajları gör" }],
     sections: [
       {
@@ -585,9 +586,9 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
       SEO_SECTION,
     ],
   },
-  privacy: legalPage("privacy", "Gizlilik Politikası", "/privacy-policy", { title: "Privacy Policy | KADİK London", description: "How the Kybele Atasever World Business Council collects, uses and protects personal data submitted through the KADİK website and its forms.", image: staticSeoImage("is-hero.webp") }),
-  terms: legalPage("terms", "Kullanım Şartları", "/terms", { title: "Terms of Use | KADİK London", description: "The terms that apply when you use the KADİK website, including acceptable use, content, external links and how these terms may change.", image: staticSeoImage("is-hero.webp") }),
-  charter: legalPage("charter", "Tüzük", "/charter", { title: "Charter | Kybele Atasever World Business Council", description: "The KADİK charter: the council's name, purpose, governance, General Assembly, Board of Directors, finances and rules for amendment.", image: staticSeoImage("is-hakkimizda.webp") }),
+  privacy: legalPage("privacy", "Gizlilik Politikası", "/privacy-policy", { title: "Privacy Policy | KADİK London", description: "How the Kybele Atasever World Business Council collects, uses and protects personal data submitted through the KADİK website and its forms.", image: staticSeoImage("og/privacy.png") }),
+  terms: legalPage("terms", "Kullanım Şartları", "/terms", { title: "Terms of Use | KADİK London", description: "The terms that apply when you use the KADİK website, including acceptable use, content, external links and how these terms may change.", image: staticSeoImage("og/terms.png") }),
+  charter: legalPage("charter", "Tüzük", "/charter", { title: "Charter | Kybele Atasever World Business Council", description: "The KADİK charter: the council's name, purpose, governance, General Assembly, Board of Directors, finances and rules for amendment.", image: staticSeoImage("og/charter.png") }),
   notFound: {
     key: "notFound",
     label: "404 Sayfası",
@@ -595,7 +596,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     publicPath: "/bu-sayfa-yok",
     slices: ["notFound"],
     hasSeo: true,
-    seoDefaults: { title: "Page Not Found | KADİK London", description: "The page you're looking for could not be found or may have moved. You can reach the council sections from here.", image: staticSeoImage("is-hero.webp") },
+    seoDefaults: { title: "Page Not Found | KADİK London", description: "The page you're looking for could not be found or may have moved. You can reach the council sections from here.", image: staticSeoImage("og/not-found.png") },
     sections: [
       {
         id: "content",
@@ -631,7 +632,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
     label: "Header & Footer (tüm sayfalar)",
     description: "Marka adı, menü yazıları, footer metinleri ve sosyal medya bağlantıları.",
     publicPath: null,
-    slices: ["brandFull", "breadcrumbHome", "nav", "footer"],
+    slices: ["brandFull", "breadcrumbHome", "nav", "footer", "organization"],
     hasSeo: false,
     seoDefaults: { title: "", description: "", image: { url: "", assetId: null } },
     sections: [
@@ -684,12 +685,29 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
       {
         id: "socials",
         title: "Sosyal medya",
-        description: "Boş bırakılan hesap footer'da gösterilmez.",
+        description: "Boş bırakılan hesap footer'da gösterilmez. Dolu olanlar Google'a kurumun resmi hesapları olarak da bildirilir.",
         base: "footer.socials",
         fields: [
           url("facebook", "Facebook adresi"),
           url("youtube", "YouTube adresi"),
           url("x", "X (Twitter) adresi"),
+          url("linkedin", "LinkedIn adresi"),
+          url("instagram", "Instagram adresi"),
+        ],
+      },
+      {
+        id: "organization",
+        title: "Kurum bilgileri (Google / JSON-LD)",
+        description: "Arama motorlarına kurumu tanıtan yapılandırılmış veri. E-posta, telefon ve adres İletişim sayfasından alınır.",
+        base: "organization",
+        fields: [
+          text("name", "Kurumun resmi adı"),
+          text("alternateName", "Kısa ad / marka"),
+          area("description", "Kurum açıklaması"),
+          text("foundingDate", "Kuruluş yılı"),
+          text("locality", "Şehir"),
+          text("countryCode", "Ülke kodu (ör. GB)"),
+          text("eventVenue", "Etkinliklerin varsayılan yeri"),
         ],
       },
     ],

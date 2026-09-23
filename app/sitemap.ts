@@ -1,76 +1,26 @@
 import type { MetadataRoute } from "next";
-import { getAllPublishedRoutesForSitemap } from "@/lib/content-model/route-reader";
-import { buildSitemapEntries } from "@/lib/content-model/public-seo";
-import {
-  SERVICE_CONTENT_TYPE,
-  PRODUCT_CONTENT_TYPE,
-  PROJECT_CONTENT_TYPE,
-  TEAM_MEMBER_CONTENT_TYPE,
-  POST_CONTENT_TYPE,
-} from "@/lib/content-model/payload-validation";
-import { KADIK_LOCALES, KADIK_PATHS, type KadikPageKey } from "@/lib/kadik-i18n";
-import { LOCALES, SITE_URL } from "@/lib/i18n/config";
-import { STATIC_PAGE_KEYS, staticPath } from "@/lib/i18n/static-pages";
-import { prisma } from "@/lib/db";
+import { SITE_URL } from "@/lib/i18n/config";
+import { KADIK_CONTENT_KEYS, KADIK_PAGE_DEFINITIONS } from "@/lib/kadik-content/pages";
+import { kadikPostPath } from "@/lib/kadik-i18n";
+import { listPublishedPosts } from "@/lib/public-content/post";
 
 export const dynamic = "force-dynamic";
 
-/** Story 6.2 CAP-2: every routable content type's own published, native
- * addresses - FAQ and legal pages are structurally excluded (no
- * ContentRoute is ever created for either, see SPEC.md's Constraints). */
-const SITEMAP_CONTENT_TYPES = [
-  SERVICE_CONTENT_TYPE,
-  PRODUCT_CONTENT_TYPE,
-  PROJECT_CONTENT_TYPE,
-  TEAM_MEMBER_CONTENT_TYPE,
-  POST_CONTENT_TYPE,
-] as const;
+const PRIORITY: Record<string, number> = { "/": 1, "/membership": 0.9, "/about": 0.8, "/board": 0.8, "/events": 0.8, "/news": 0.8 };
 
-/** Spec 2 section 9.1: the eight static-page keys at every locale's own
- * canonical (Turkish-prefixless, others locale-prefixed) address - never a
- * `/tr/` URL, never a fallback alias. No `lastModified`: these pages have
- * no CMS revision timestamp to report. */
-function staticSitemapEntries(): MetadataRoute.Sitemap {
-  const entries: MetadataRoute.Sitemap = [];
-  for (const key of STATIC_PAGE_KEYS) {
-    for (const locale of LOCALES) {
-      entries.push({ url: `${SITE_URL}${staticPath(locale, key)}` });
-    }
-  }
-  return entries;
-}
-
-function kadikSitemapEntries(): MetadataRoute.Sitemap {
-  const entries: MetadataRoute.Sitemap = [];
-  const pageKeys = Object.keys(KADIK_PATHS) as KadikPageKey[];
-
-  for (const pageKey of pageKeys) {
-    if (pageKey === "notfound" || pageKey === "post") {
-      continue;
-    }
-
-    for (const locale of KADIK_LOCALES) {
-      entries.push({
-        url: `${SITE_URL}${KADIK_PATHS[pageKey][locale]}`,
-      });
-    }
-  }
-
-  return entries;
-}
-
+/**
+ * The KADİK site only: every public page managed under "Sayfalar" plus each
+ * published news article. Legacy starter-template routes are not listed.
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const rowsByType = await Promise.all(
-    SITEMAP_CONTENT_TYPES.map((contentType) => getAllPublishedRoutesForSitemap(prisma, contentType)),
-  );
-  const entries = buildSitemapEntries(rowsByType.flat());
-
+  const pages: MetadataRoute.Sitemap = KADIK_CONTENT_KEYS.flatMap((key) => {
+    const path = KADIK_PAGE_DEFINITIONS[key].publicPath;
+    if (!path || key === "notFound") return [];
+    return [{ url: `${SITE_URL}${path === "/" ? "/" : path}`, changeFrequency: path === "/" || path === "/news" || path === "/events" ? "weekly" : "monthly", priority: PRIORITY[path] ?? 0.5 }];
+  });
+  const posts = await listPublishedPosts("en").catch(() => []);
   return [
-    ...staticSitemapEntries(),
-    ...kadikSitemapEntries(),
-    ...entries.map((entry) => ({
-      url: `${SITE_URL}${entry.url}`,
-      lastModified: entry.lastModified,
-    })),
+    ...pages,
+    ...posts.map((post) => ({ url: `${SITE_URL}${kadikPostPath("en", post.slug)}`, lastModified: post.publishedAt, changeFrequency: "monthly" as const, priority: 0.7 })),
   ];
 }

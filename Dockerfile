@@ -28,6 +28,8 @@ ENV NODE_ENV=production \
 RUN apk add --no-cache postgresql17-client
 
 COPY --from=build /app/public ./public
+# Fonts read at request time by the news share-card route (app/news/[slug]/opengraph-image.tsx).
+COPY --from=build /app/assets ./assets
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 # Full node_modules (not only the Next.js standalone trace): the entrypoint

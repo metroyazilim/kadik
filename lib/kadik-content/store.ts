@@ -93,7 +93,7 @@ export const getKadikSiteContent = cache(async (): Promise<KadikSiteContent> => 
 });
 
 /** Default share image when a page has none of its own. */
-const FALLBACK_SHARE_IMAGE = "/kadik/is-hero.webp";
+const FALLBACK_SHARE_IMAGE = "/kadik/og/default.png";
 
 function absoluteUrl(path: string): string {
   if (/^https?:\/\//i.test(path)) return path;
@@ -248,4 +248,12 @@ export async function saveKadikSeo(key: KadikContentKey, seo: unknown, actorId: 
   const stored = await prisma.kadikPageContent.findUnique({ where: { key }, select: { data: true } });
   const current = sanitizeKadikPageData(key, stored?.data);
   await saveKadikPage(key, { ...current, seo }, actorId);
+}
+
+/** Organisation facts + social profiles (Header & Footer page), edited from the SEO screen. */
+export async function saveKadikOrganization(organization: unknown, socials: unknown, actorId: string): Promise<void> {
+  const stored = await prisma.kadikPageContent.findUnique({ where: { key: "global" }, select: { data: true } });
+  const current = sanitizeKadikPageData("global", stored?.data) as Record<string, unknown>;
+  const footer = (current.footer ?? {}) as Record<string, unknown>;
+  await saveKadikPage("global", { ...current, organization, footer: { ...footer, socials } }, actorId);
 }
