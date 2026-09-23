@@ -223,7 +223,22 @@ export type KadikDictionary = Readonly<{
     join: string;
     dateFieldAria: string;
     dayCellAria: string;
-    events: readonly Readonly<{ date: string; title: string }>[];
+    /** Event details window */
+    details: string;
+    dateLabel: string;
+    timeLabel: string;
+    locationLabel: string;
+    register: string;
+    addToCalendar: string;
+    close: string;
+    emailHeading: string;
+    emailPlaceholder: string;
+    emailSubmit: string;
+    emailSending: string;
+    emailSuccess: string;
+    emailError: string;
+    emailUnavailable: string;
+    emailNote: string;
   }>;
   membership: Readonly<{
     pageTitle: string;
@@ -238,9 +253,8 @@ export type KadikDictionary = Readonly<{
     eyebrow: string;
     title: string;
     lead: string;
-    items: readonly string[];
-    itemText: string;
     itemCta: string;
+    empty: string;
     ctaTitle: string;
     ctaButton: string;
   }>;
@@ -276,8 +290,8 @@ export type KadikDictionary = Readonly<{
   }>;
   gallery: Readonly<{
     pageTitle: string;
-    items: readonly Readonly<{ image: KadikImage; category: string; alt: string }>[];
     all: string;
+    empty: string;
     close: string;
     lightboxAria: string;
     enlargedAlt: string;
@@ -473,12 +487,21 @@ const en: KadikDictionary = {
     join: "Join",
     dateFieldAria: "Event date",
     dayCellAria: "events on",
-    events: [
-      { date: "2026-09-08", title: "Sector boards joint meeting" },
-      { date: "2026-09-15", title: "Export and foreign markets panel" },
-      { date: "2026-09-17", title: "Member companies networking meet-up" },
-      { date: "2026-09-29", title: "Access to finance workshop" },
-    ],
+    details: "Details",
+    dateLabel: "Date",
+    timeLabel: "Time",
+    locationLabel: "Location",
+    register: "Register",
+    addToCalendar: "Add to calendar",
+    close: "Close",
+    emailHeading: "Send these details to my email",
+    emailPlaceholder: "Your email address",
+    emailSubmit: "Send",
+    emailSending: "Sending…",
+    emailSuccess: "Sent. Check your inbox for the event details and calendar invite.",
+    emailError: "The email could not be sent. Please try again later.",
+    emailUnavailable: "Email sending is not available right now. You can add the event to your calendar instead.",
+    emailNote: "We only use your address to send this event.",
   },
   membership: {
     pageTitle: "Membership Application",
@@ -498,9 +521,8 @@ const en: KadikDictionary = {
     eyebrow: "FROM THE COUNCIL",
     title: "Agenda and announcements",
     lead: "We regularly keep our members informed about events, sector boards, business opportunities and developments in council activities.",
-    items: ["Sector Boards", "Membership Announcements", "International Business Opportunities", "Training and Development", "Trade Delegations", "Council Gatherings", "Publications", "Partnerships"],
-    itemText: "Current topics covering the business world's agenda, our members' development and new connections.",
     itemCta: "Learn more ↗",
+    empty: "There are no announcements at the moment.",
     ctaTitle: "Stay informed on the council's agenda.",
     ctaButton: "Contact Us",
   },
@@ -536,11 +558,8 @@ const en: KadikDictionary = {
   },
   gallery: {
     pageTitle: "Gallery",
-    items: Array.from({ length: 9 }, (_, index) => {
-      const category = ["Events", "Meetings", "Business Trips"][index % 3];
-      return { image: staticImage(`is-galeri-${index + 1}.webp`), category, alt: `KADIK ${category.toLowerCase()} ${index + 1}` };
-    }),
     all: "All",
+    empty: "Photos are coming soon.",
     close: "Close",
     lightboxAria: "Gallery image",
     enlargedAlt: "Enlarged gallery image",

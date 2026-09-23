@@ -583,3 +583,56 @@ model KadikPageContent {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+/// KADİK etkinlik takvimi (`/events`). Tarih `YYYY-MM-DD`, saatler `HH:mm`;
+/// boş bırakılan alanlar public etkinlik penceresinde gösterilmez.
+model KadikEvent {
+  id              String   @id @default(cuid())
+  title           String
+  date            String
+  startTime       String?
+  endTime         String?
+  location        String?
+  /// Sanitised rich-text HTML.
+  description     String?
+  imageAssetId    String?
+  imageUrl        String?
+  registrationUrl String?
+  published       Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([date])
+}
+
+/// Duyurular sayfasındaki kartlar (`/announcements`), sürükle-bırak sırasıyla.
+model KadikAnnouncement {
+  id        String   @id @default(cuid())
+  title     String
+  text      String
+  date      String?
+  linkUrl   String?
+  linkLabel String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+}
+
+/// Galeri fotoğrafları (`/gallery`). `imageAssetId` medya kütüphanesinden
+/// seçilen görsel; `imageUrl` çözülmüş adres (paketle gelen görsellerde tek kaynak).
+model KadikGalleryItem {
+  id           String   @id @default(cuid())
+  imageAssetId String?
+  imageUrl     String
+  category     String   @default("")
+  caption      String   @default("")
+  order        Int      @default(0)
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([order])
+}

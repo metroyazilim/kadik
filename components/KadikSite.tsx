@@ -5,6 +5,7 @@ import Link from "next/link";
 import { KadikMotion } from "./KadikMotion";
 import GoogleTranslateWidget from "./GoogleTranslateWidget";
 import type { PublicTeamMemberListItem } from "@/lib/public-content/team";
+import type { KadikAnnouncementView, KadikEventView, KadikGalleryItemView } from "@/lib/kadik-content/collection-types";
 import {
   KADIK_DICT,
   KADIK_PATHS,
@@ -296,22 +297,106 @@ export function KadikAbout({ locale, dict = KADIK_DICT[locale] }: KadikPageProps
 
 function dateKey(date: Date) { return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; }
 
-export function KadikEvents({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+function formatEventDate(locale: KadikLocale, date: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString(DATE_LOCALE[locale], { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
+function eventTime(event: KadikEventView): string | null {
+  if (!event.startTime) return null;
+  return event.endTime ? `${event.startTime} – ${event.endTime}` : event.startTime;
+}
+
+/** "Send the details to my email": posts to `/api/kadik/events/<id>/email`. */
+function EventEmailForm({ event }: { event: KadikEventView }) {
+  const t = useKadikDict().events;
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error" | "unavailable">("idle");
+  async function submit(formEvent: FormEvent<HTMLFormElement>) {
+    formEvent.preventDefault();
+    const form = new FormData(formEvent.currentTarget);
+    setStatus("sending");
+    try {
+      const response = await fetch(`/api/kadik/events/${encodeURIComponent(event.id)}/email`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: form.get("email"), website: form.get("website") }),
+      });
+      setStatus(response.ok ? "sent" : response.status === 503 ? "unavailable" : "error");
+    } catch {
+      setStatus("error");
+    }
+  }
+  if (status === "sent") return <p className="kadik-form-status" role="status">{t.emailSuccess}</p>;
+  return <form className="kadik-event-email" onSubmit={submit}>
+    <h3>{t.emailHeading}</h3>
+    <div>
+      <input required type="email" name="email" autoComplete="email" placeholder={t.emailPlaceholder} aria-label={t.emailPlaceholder} />
+      {/* Honeypot: hidden from people, filled by bots. */}
+      <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="kadik-honeypot" />
+      <button className="kadik-button kadik-button-red" disabled={status === "sending"}>{status === "sending" ? t.emailSending : t.emailSubmit}</button>
+    </div>
+    <small>{t.emailNote}</small>
+    {status === "error" && <p className="kadik-form-status" role="status">{t.emailError}</p>}
+    {status === "unavailable" && <p className="kadik-form-status" role="status">{t.emailUnavailable}</p>}
+  </form>;
+}
+
+/** Event details window: every row appears only when the editor filled it in. */
+function EventDialog({ event, onClose }: { event: KadikEventView | null; onClose: () => void }) {
+  const { locale } = useKadikPage();
+  const t = useKadikDict().events;
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (!event) return;
+    const node = dialog.current;
+    node?.showModal();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { node?.close(); document.body.style.overflow = previous; };
+  }, [event]);
+  const time = event ? eventTime(event) : null;
+  return <dialog ref={dialog} className="kadik-event-modal" aria-labelledby="kadik-event-title" onCancel={onClose} onClick={(click) => { if (click.target === click.currentTarget) onClose(); }}>
+    {event && <div className="kadik-event-modal-panel">
+      <button className="kadik-event-modal-close" aria-label={t.close} onClick={onClose}>×</button>
+      {event.image && <img className="kadik-event-modal-image" src={event.image} alt="" />}
+      <div className="kadik-event-modal-body">
+        <h2 id="kadik-event-title">{event.title}</h2>
+        <dl className="kadik-event-facts">
+          <div><dt>{t.dateLabel}</dt><dd><time dateTime={event.date}>{formatEventDate(locale, event.date)}</time></dd></div>
+          {time && <div><dt>{t.timeLabel}</dt><dd>{time}</dd></div>}
+          {event.location && <div><dt>{t.locationLabel}</dt><dd>{event.location}</dd></div>}
+        </dl>
+        {event.descriptionHtml && <div className="kadik-event-description" dangerouslySetInnerHTML={{ __html: event.descriptionHtml }} />}
+        <div className="kadik-event-actions">
+          {event.registrationUrl && <a className="kadik-button kadik-button-red" href={event.registrationUrl} target={event.registrationUrl.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">{t.register}<span aria-hidden="true">↗</span></a>}
+          <a className="kadik-button kadik-button-light" href={`/api/kadik/events/${encodeURIComponent(event.id)}/ics`}>{t.addToCalendar}<span aria-hidden="true">↓</span></a>
+        </div>
+        <EventEmailForm key={event.id} event={event} />
+      </div>
+    </div>}
+  </dialog>;
+}
+
+export function KadikEvents({ locale, dict = KADIK_DICT[locale], events = [], initialEventId }: KadikPageProps & { events?: readonly KadikEventView[]; initialEventId?: string }) {
   const t = dict.events;
-  const membershipHref = KADIK_PATHS.membership[locale];
-  const eventsHref = KADIK_PATHS.events[locale];
-  // Opens on the current month; the first render uses the same date on server
-  // and client because both run within the same request window.
-  const [month, setMonth] = useState(() => { const today = new Date(); return new Date(today.getFullYear(), today.getMonth(), 1); });
+  const linked = initialEventId ? events.find((event) => event.id === initialEventId) ?? null : null;
+  // Opens on the current month (or the month of an event linked with
+  // `?event=<id>`, e.g. from the details email); server and client agree
+  // because both run within the same request window.
+  const [month, setMonth] = useState(() => {
+    if (linked) { const [year, monthNumber] = linked.date.split("-").map(Number); return new Date(year, monthNumber - 1, 1); }
+    const today = new Date(); return new Date(today.getFullYear(), today.getMonth(), 1);
+  });
   const [day, setDay] = useState(() => dateKey(new Date()));
   const [mode, setMode] = useState(t.viewMonth);
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
+  const [openEvent, setOpenEvent] = useState<KadikEventView | null>(linked);
   const first = (new Date(month.getFullYear(), month.getMonth(), 1).getDay() + 6) % 7;
   const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const cells = Array.from({ length: Math.ceil((first + days) / 7) * 7 }, (_, index) => new Date(month.getFullYear(), month.getMonth(), index - first + 1));
-  const found = t.events.filter((event) => event.date && event.title.toLocaleLowerCase(locale).includes(search.toLocaleLowerCase(locale)));
-  const list = found.filter((event) => mode === t.viewDay ? event.date === day : event.date.startsWith(dateKey(month).slice(0, 7)));
+  const found = events.filter((event) => event.title.toLocaleLowerCase(locale).includes(search.toLocaleLowerCase(locale)));
+  const list = found.filter((event) => mode === t.viewDay ? event.date === day : mode === t.viewList ? true : event.date.startsWith(dateKey(month).slice(0, 7)));
   return <KadikPage locale={locale} active="events" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
     <form className="kadik-event-toolbar" onSubmit={(event) => { event.preventDefault(); setSearch(query); }}>
       <input aria-label={t.searchAria} placeholder={t.searchPlaceholder} value={query} onChange={(event) => setQuery(event.target.value)} />
@@ -326,9 +411,20 @@ export function KadikEvents({ locale, dict = KADIK_DICT[locale] }: KadikPageProp
     </div>
     {mode === t.viewMonth ? <div className="kadik-calendar"><div className="kadik-weekdays">{t.weekdays.map((label) => <span key={label}>{label}</span>)}</div><div className="kadik-days">{cells.map((date) => <div className={`kadik-day ${date.getMonth() !== month.getMonth() ? "is-outside" : ""}`} key={dateKey(date)}>
       <button aria-label={`${date.toLocaleDateString(DATE_LOCALE[locale])} ${t.dayCellAria}`} onClick={() => { setDay(dateKey(date)); setMode(t.viewDay); }}>{date.getDate()}</button>
-      {found.filter((event) => event.date === dateKey(date)).map((event) => <Link key={event.title} href={eventsHref}>{event.title}</Link>)}
-    </div>)}</div></div> : <div className="kadik-event-list">{list.map((event) => <article key={event.date + event.title}><time dateTime={event.date}>{event.date}</time><h2>{event.title}</h2><Button href={membershipHref}>{t.join}</Button></article>)}{list.length === 0 && <p role="status">{t.noResults}</p>}</div>}
-  </section></Shell></KadikPage>;
+      {found.filter((event) => event.date === dateKey(date)).map((event) => <button type="button" className="kadik-day-event" key={event.id} onClick={() => setOpenEvent(event)}>{event.startTime ? `${event.startTime} ` : ""}{event.title}</button>)}
+    </div>)}</div></div> : <div className="kadik-event-list">{list.map((event) => {
+      const time = eventTime(event);
+      return <article key={event.id}>
+        {event.image && <img src={event.image} alt="" />}
+        <div>
+          <time dateTime={event.date}>{formatEventDate(locale, event.date)}{time ? ` · ${time}` : ""}</time>
+          <h2>{event.title}</h2>
+          {event.location && <p>{event.location}</p>}
+          <button type="button" className="kadik-button kadik-button-blue" onClick={() => setOpenEvent(event)}>{t.details}<span aria-hidden="true">↗</span></button>
+        </div>
+      </article>;
+    })}{list.length === 0 && <p role="status">{t.noResults}</p>}</div>}
+  </section><EventDialog event={openEvent} onClose={() => setOpenEvent(null)} /></Shell></KadikPage>;
 }
 
 export function KadikMembership({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
@@ -346,11 +442,19 @@ export function KadikMembership({ locale, dict = KADIK_DICT[locale] }: KadikPage
   </section></Shell></KadikPage>;
 }
 
-export function KadikIssues({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+export function KadikIssues({ locale, dict = KADIK_DICT[locale], announcements = [] }: KadikPageProps & { announcements?: readonly KadikAnnouncementView[] }) {
   const t = dict.announcements;
   const contactHref = KADIK_PATHS.contact[locale];
   return <KadikPage locale={locale} active="issues" dict={dict}><Shell title={t.pageTitle}>
-    <section className="kadik-section kadik-container"><SectionHeading eyebrow={t.eyebrow} title={t.title} /><p className="kadik-intro-copy">{t.lead}</p><div className="kadik-issue-grid">{t.items.map((issue, i) => <article key={`${i}-${issue}`}><span>{String(i + 1).padStart(2, "0")}</span><h3>{issue}</h3><p>{t.itemText}</p><Link href={contactHref}>{t.itemCta}</Link></article>)}</div></section>
+    <section className="kadik-section kadik-container"><SectionHeading eyebrow={t.eyebrow} title={t.title} /><p className="kadik-intro-copy">{t.lead}</p>
+      {announcements.length === 0 ? <p className="kadik-empty-state" role="status">{t.empty}</p> : <div className="kadik-issue-grid">{announcements.map((item, i) => <article key={item.id}>
+        <span>{String(i + 1).padStart(2, "0")}</span>
+        {item.date && <time dateTime={item.date}>{formatEventDate(locale, item.date)}</time>}
+        <h3>{item.title}</h3>
+        {item.text && <p>{item.text}</p>}
+        <Link href={item.linkUrl ?? contactHref}>{item.linkLabel ?? t.itemCta}</Link>
+      </article>)}</div>}
+    </section>
     <section className="kadik-cta-band"><div className="kadik-container"><h2>{t.ctaTitle}</h2><Button href={contactHref} tone="red">{t.ctaButton}</Button></div></section>
   </Shell></KadikPage>;
 }
@@ -431,9 +535,8 @@ export function KadikContact({ locale, dict = KADIK_DICT[locale] }: KadikPagePro
   return <KadikPage locale={locale} active="contact" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container"><div className="kadik-contact-grid"><div><SectionHeading eyebrow={t.eyebrow} title={t.title} /><p>{t.lead}</p><div className="kadik-contact-items"><p><b>{t.addressLabel}</b>{t.address}</p><p><b>{t.phoneLabel}</b>{t.phone}</p><p><b>{t.emailLabel}</b>{t.email}</p></div></div><ContactForm /></div></section></Shell></KadikPage>;
 }
 
-export function KadikGallery({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
+export function KadikGallery({ locale, dict = KADIK_DICT[locale], items = [] }: KadikPageProps & { items?: readonly KadikGalleryItemView[] }) {
   const t = dict.gallery;
-  const items = t.items.filter((item) => item.image.url);
   const categories = Array.from(new Set(items.map((item) => item.category).filter((category) => category.length > 0)));
   const [active, setActive] = useState<string | null>(null);
   const [filter, setFilter] = useState(t.all);
@@ -448,7 +551,8 @@ export function KadikGallery({ locale, dict = KADIK_DICT[locale] }: KadikPagePro
   }, [active]);
   return <KadikPage locale={locale} active="gallery" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
     <div className="kadik-gallery-filter">{[t.all, ...categories].map((category) => <button key={category} aria-pressed={filter === category} className={filter === category ? "is-selected" : ""} onClick={() => setFilter(category)}>{category}</button>)}</div>
-    <div className="kadik-gallery-grid">{items.map((item, index) => ({ ...item, index })).filter((item) => filter === t.all || item.category === filter).map(({ image, index, category, alt }) => <button key={`${index}-${image.url}`} aria-label={alt || `${category} ${index + 1}`} onClick={() => setActive(image.url)}><img src={image.url} alt={alt} /><span>{String(index + 1).padStart(2, "0")}</span></button>)}</div>
+    {items.length === 0 && <p className="kadik-empty-state" role="status">{t.empty}</p>}
+    <div className="kadik-gallery-grid">{items.map((item, index) => ({ ...item, index })).filter((item) => filter === t.all || item.category === filter).map(({ id, image, index, category, caption }) => <button key={id} aria-label={caption || `${category} ${index + 1}`} onClick={() => setActive(image)}><img src={image} alt={caption} /><span>{String(index + 1).padStart(2, "0")}</span></button>)}</div>
   </section><dialog ref={dialog} className="kadik-lightbox" aria-label={t.lightboxAria} onCancel={() => setActive(null)} onClick={(event) => { if (event.target === event.currentTarget) setActive(null); }}>
     <button autoFocus aria-label={t.close} onClick={() => setActive(null)}>×</button>{active && <img src={active} alt={t.enlargedAlt} />}
   </dialog></Shell></KadikPage>;

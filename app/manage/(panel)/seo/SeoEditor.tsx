@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Building2, CheckCircle2, ChevronLeft, ChevronRight, ExternalLink, FileText, Newspaper, Pencil, RotateCcw, Save } from "lucide-react";
+import { AlertCircle, Building2, CheckCircle2, Info, ChevronLeft, ChevronRight, ExternalLink, FileText, Newspaper, Pencil, RotateCcw, Save } from "lucide-react";
 import { MediaField } from "@/components/admin/MediaField";
 import { useToast } from "@/components/admin/Toast";
 import { card, cn, fieldInput, fieldLabel, fieldTextarea, helpText, primaryButton, secondaryButton } from "@/components/admin/ui";
@@ -69,7 +69,7 @@ function siteChecks(site: SiteSeo, draft: SiteDraft): readonly Check[] {
     { label: `Kurum açıklaması (${DESCRIPTION_MIN}-${DESCRIPTION_LIMIT * 2} karakter)`, ok: org.description.trim().length >= DESCRIPTION_MIN && org.description.trim().length <= DESCRIPTION_LIMIT * 2 },
     { label: "Kuruluş yılı, şehir ve ülke dolu", ok: Boolean(org.foundingDate.trim() && org.locality.trim() && /^[A-Z]{2}$/.test(org.countryCode.trim())) },
     { label: "E-posta ve telefon (İletişim sayfasından)", ok: Boolean(site.email.trim() && site.phone.trim()) },
-    { label: "En az bir gerçek sosyal medya adresi (https://…)", ok: Object.values(draft.socials).some(isHttp) },
+    { label: "Sosyal medya hesabı (önerilir, zorunlu değil)", ok: Object.values(draft.socials).some(isHttp), optional: true },
   ];
 }
 
@@ -180,7 +180,13 @@ function SiteDetail({ site, draft, saved, onChange, onSaved }: { site: SiteSeo; 
             <ul className="space-y-1.5 text-sm">
               {siteChecks(site, draft).map((check) => (
                 <li key={check.label} className="flex items-center gap-2">
-                  {check.ok ? <CheckCircle2 className="size-4 shrink-0 text-brand-success" aria-hidden="true" /> : <AlertCircle className="size-4 shrink-0 text-brand-warning" aria-hidden="true" />}
+                  {check.ok ? (
+                    <CheckCircle2 className="size-4 shrink-0 text-brand-success" aria-hidden="true" />
+                  ) : check.optional ? (
+                    <Info className="size-4 shrink-0 text-brand-muted" aria-hidden="true" />
+                  ) : (
+                    <AlertCircle className="size-4 shrink-0 text-brand-warning" aria-hidden="true" />
+                  )}
                   <span className={check.ok ? "text-brand-text" : "text-brand-muted"}>{check.label}</span>
                 </li>
               ))}
@@ -211,7 +217,8 @@ const SITE_HOST = "kadiklondon.org";
 const keyOf = (entry: SeoEntry) => `${entry.kind}:${entry.id}`;
 const draftOf = (entry: SeoEntry): Draft => ({ title: entry.title, description: entry.description, image: entry.image });
 
-type Check = Readonly<{ label: string; ok: boolean }>;
+/** `optional` checks are recommendations: shown, but never block the ✓. */
+type Check = Readonly<{ label: string; ok: boolean; optional?: boolean }>;
 
 /** The checklist behind the ✓ in the sidebar: every item filled in and within Google's display limits. */
 function checksFor(entry: SeoEntry, draft: Draft): readonly Check[] {
@@ -506,7 +513,7 @@ export function SeoWorkspace({
   const [siteSaved, setSiteSaved] = useState<SiteDraft>(initialSite);
   const [siteDraft, setSiteDraft] = useState<SiteDraft>(initialSite);
   const siteDirty = JSON.stringify(siteDraft) !== JSON.stringify(siteSaved);
-  const siteComplete = siteChecks(site, siteDraft).every((check) => check.ok);
+  const siteComplete = siteChecks(site, siteDraft).every((check) => check.ok || check.optional);
   const [saved, setSaved] = useState<Record<string, Draft>>(() => Object.fromEntries(all.map((entry) => [keyOf(entry), draftOf(entry)])));
   const [drafts, setDrafts] = useState<Record<string, Draft>>(saved);
 

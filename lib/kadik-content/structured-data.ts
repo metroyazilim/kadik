@@ -1,6 +1,8 @@
 import "server-only";
 import { SITE_URL } from "@/lib/i18n/config";
 import { KADIK_PATHS, kadikPostPath, type KadikDictionary } from "@/lib/kadik-i18n";
+import { stripHtmlToText } from "@/lib/content-model/sanitization";
+import type { KadikEventView } from "./collection-types";
 import { KADIK_PAGE_DEFINITIONS, type KadikContentKey, type KadikSeo } from "./pages";
 
 /**
@@ -89,6 +91,8 @@ function webPageLd(key: KadikContentKey, dict: KadikDictionary, seo: KadikSeo, p
 }
 
 export type KadikLdExtras = Readonly<{
+  events?: readonly KadikEventView[];
+  gallery?: readonly Readonly<{ image: string; caption: string }>[];
   members?: readonly Readonly<{ name: string; role: string; image: string }>[];
   posts?: readonly Readonly<{ slug: string; title: string }>[];
 }>;
@@ -111,29 +115,44 @@ export function kadikPageGraph(key: KadikContentKey, dict: KadikDictionary, seo:
   const graph: Json[] = [organizationLd(dict), websiteLd(dict), webPageLd(key, dict, seo, pageNames[key] ?? dict.nav.home)];
   const eventsUrl = abs(KADIK_PATHS.events.en);
 
-  if (key === "events" || key === "home") {
-    const upcoming = dict.events.events.filter((event) => /^\d{4}-\d{2}-\d{2}$/.test(event.date) && event.title.trim());
-    if (upcoming.length) {
-      graph.push({
-        "@type": "ItemList",
-        name: dict.events.pageTitle,
-        itemListElement: upcoming.map((event, index) => ({
+  if (extras.events?.length) {
+    graph.push({
+      "@type": "ItemList",
+      name: dict.events.pageTitle,
+      itemListElement: extras.events.map((event, index) => {
+        const description = event.descriptionHtml ? stripHtmlToText(event.descriptionHtml).replace(/\s+/g, " ").trim().slice(0, 300) : undefined;
+        return {
           "@type": "ListItem",
           position: index + 1,
           item: {
             "@type": "Event",
             name: event.title,
-            startDate: event.date,
+            startDate: event.startTime ? `${event.date}T${event.startTime}` : event.date,
+            endDate: event.endTime ? `${event.date}T${event.endTime}` : undefined,
+            description,
             eventStatus: "https://schema.org/EventScheduled",
             eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-            location: { "@type": "Place", name: dict.organization.eventVenue, address: { "@type": "PostalAddress", addressLocality: dict.organization.locality, addressCountry: dict.organization.countryCode } },
+            location: {
+              "@type": "Place",
+              name: event.location || dict.organization.eventVenue,
+              address: { "@type": "PostalAddress", addressLocality: dict.organization.locality, addressCountry: dict.organization.countryCode },
+            },
             organizer: { "@id": ORG_ID },
-            image: abs("/kadik/og/events.png"),
-            url: eventsUrl,
+            image: abs(event.image || "/kadik/og/events.png"),
+            url: `${eventsUrl}?event=${encodeURIComponent(event.id)}`,
           },
-        })),
-      });
-    }
+        };
+      }),
+    });
+  }
+
+  if (extras.gallery?.length) {
+    graph.push({
+      "@type": "ImageGallery",
+      name: dict.gallery.pageTitle,
+      url: abs(KADIK_PATHS.gallery.en),
+      image: extras.gallery.map((item) => ({ "@type": "ImageObject", contentUrl: abs(item.image), caption: item.caption || undefined })),
+    });
   }
 
   if (extras.members?.length) {

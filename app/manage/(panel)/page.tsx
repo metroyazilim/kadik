@@ -79,6 +79,12 @@ export default async function ManageOverviewPage({ searchParams }: { searchParam
       }),
     ]);
 
+  const kadikCounts = await Promise.all([
+    prisma.kadikEvent.count(),
+    prisma.kadikAnnouncement.count(),
+    prisma.kadikGalleryItem.count(),
+  ]).catch(() => [0, 0, 0]);
+
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader
@@ -103,6 +109,9 @@ export default async function ManageOverviewPage({ searchParams }: { searchParam
       <h2 className="mb-3 mt-8 text-sm font-bold text-brand-text">İçerik</h2>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <StatCard label="Sayfalar" value={KADIK_CONTENT_KEYS.length} hint="Düzenlenebilir sayfa" href="/manage/pages" />
+        <StatCard label="Etkinlikler" value={kadikCounts[0]} hint="Takvimdeki etkinlik" href="/manage/events" />
+        <StatCard label="Duyurular" value={kadikCounts[1]} hint="Duyuru kartı" href="/manage/announcements" />
+        <StatCard label="Galeri" value={kadikCounts[2]} hint="Fotoğraf" href="/manage/gallery" />
         {collectionCounts.map((collection) => (
           <StatCard
             key={collection.contentType}

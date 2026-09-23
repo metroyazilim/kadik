@@ -263,3 +263,45 @@ html { top: 0 !important; position: static !important; }
 .kadik-translate-menu button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px; border: 0; border-radius: 4px; background: transparent; color: var(--kadik-ink); cursor: pointer; text-align: left; white-space: nowrap; }
 .kadik-translate-menu button:hover, .kadik-translate-menu button:focus-visible { background: #f1f5f9; outline: none; }
 @media (max-width: 1000px) { .kadik-translate { margin-left: auto; } }
+
+/* Event calendar entries, details window and "email me" form */
+.kadik-day-event { display: block; width: calc(100% + 24px); margin: 3px -12px; padding: 7px 10px; border: 0; background: var(--kadik-red); color: #fff; font-size: 11px; line-height: 1.3; text-align: left; cursor: pointer; }
+.kadik-day-event:hover, .kadik-day-event:focus-visible { background: var(--kadik-navy); }
+.kadik-event-list article { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: start; }
+.kadik-event-list article:not(:has(img)) { grid-template-columns: 1fr; }
+.kadik-event-list article img { width: 220px; aspect-ratio: 4 / 3; object-fit: cover; }
+.kadik-event-list time { color: var(--kadik-red); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.kadik-event-list h2 { margin: 8px 0; }
+.kadik-event-list p { margin: 0 0 16px; color: var(--kadik-muted); }
+.kadik-event-list button.kadik-button { border: 0; cursor: pointer; }
+.kadik-site dialog.kadik-event-modal { position: fixed; inset: 0; margin: auto; width: min(760px, calc(100vw - 32px)); height: fit-content; max-height: calc(100vh - 48px); padding: 0; border: 0; background: #fff; color: var(--kadik-ink); box-shadow: 0 30px 80px rgba(7, 40, 95, .35); overflow: auto; }
+.kadik-site dialog.kadik-event-modal:not([open]) { display: none; }
+.kadik-site dialog.kadik-event-modal::backdrop { background: rgba(11, 14, 29, .72); }
+.kadik-event-modal-panel { position: relative; }
+.kadik-event-modal-close { position: absolute; top: 12px; right: 14px; z-index: 1; width: 42px; height: 42px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .92); color: var(--kadik-navy); font-size: 28px; line-height: 1; cursor: pointer; }
+.kadik-event-modal-image { display: block; width: 100%; max-height: 320px; object-fit: cover; }
+.kadik-event-modal-body { padding: 36px 40px 40px; }
+.kadik-event-modal-body h2 { margin: 0 48px 22px 0; font-family: var(--kadik-serif); font-size: clamp(28px, 4vw, 38px); line-height: 1.15; }
+.kadik-event-facts { display: grid; gap: 10px; margin: 0 0 24px; padding: 18px 0; border-block: 1px solid var(--kadik-line); }
+.kadik-event-facts div { display: grid; grid-template-columns: 110px 1fr; gap: 12px; }
+.kadik-event-facts dt { color: var(--kadik-red); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.kadik-event-facts dd { margin: 0; font-size: 16px; }
+.kadik-event-description { color: #4f5566; font-size: 16px; line-height: 1.75; }
+.kadik-event-description p { margin: 0 0 14px; }
+.kadik-event-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0; }
+.kadik-event-email { padding: 22px; background: #f4f6fa; }
+.kadik-event-email h3 { margin: 0 0 12px; font-family: var(--kadik-serif); font-size: 20px; }
+.kadik-event-email > div { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+.kadik-event-email input[type="email"] { min-height: 50px; padding: 12px 14px; border: 1px solid var(--kadik-line); background: #fff; }
+.kadik-event-email button { border: 0; cursor: pointer; }
+.kadik-event-email small { display: block; margin-top: 10px; color: var(--kadik-muted); }
+.kadik-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; opacity: 0; }
+.kadik-issue-grid time { display: block; margin: 6px 0; color: var(--kadik-muted); font-size: 12px; letter-spacing: 1px; }
+@media (max-width: 640px) {
+  .kadik-day-event { width: calc(100% + 8px); margin: 3px -4px; padding: 5px 3px; font-size: 9px; }
+  .kadik-event-list article { grid-template-columns: 1fr; }
+  .kadik-event-list article img { width: 100%; }
+  .kadik-event-modal-body { padding: 26px 20px 28px; }
+  .kadik-event-facts div { grid-template-columns: 1fr; gap: 2px; }
+  .kadik-event-email > div { grid-template-columns: 1fr; }
+}

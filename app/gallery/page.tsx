@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { KadikGallery } from "@/components/KadikSite";
 import { KadikJsonLd } from "@/components/KadikJsonLd";
+import { listPublicGallery } from "@/lib/kadik-content/collections";
 import { getKadikSiteContent, kadikMetadata } from "@/lib/kadik-content/store";
 import { kadikPageGraph } from "@/lib/kadik-content/structured-data";
 
@@ -12,11 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { dict, seo } = await getKadikSiteContent();
+  const [{ dict, seo }, items] = await Promise.all([getKadikSiteContent(), listPublicGallery()]);
   return (
     <>
-      <KadikJsonLd data={kadikPageGraph("gallery", dict, seo.gallery)} />
-      <KadikGallery locale="en" dict={dict} />
+      <KadikJsonLd data={kadikPageGraph("gallery", dict, seo.gallery, { gallery: items.map((item) => ({ image: item.image, caption: item.caption })) })} />
+      <KadikGallery locale="en" dict={dict} items={items} />
     </>
   );
 }

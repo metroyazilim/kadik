@@ -1,5 +1,8 @@
 import {
+  CalendarDays,
   CircleHelp,
+  Images,
+  Megaphone,
   FileText,
   FolderKanban,
   Image,
@@ -21,6 +24,9 @@ export type AdminNavKey =
   | "products"
   | "projects"
   | "team"
+  | "events"
+  | "announcements"
+  | "gallery"
   | "faq"
   | "messages"
   | "media"
@@ -85,6 +91,9 @@ export const ADMIN_NAV_SECTIONS: readonly AdminNavSection[] = [
         publicHref: "/news",
         icon: Newspaper,
       },
+      { key: "events", label: "Etkinlikler", href: "/manage/events", publicHref: "/events", icon: CalendarDays },
+      { key: "announcements", label: "Duyurular", href: "/manage/announcements", publicHref: "/announcements", icon: Megaphone },
+      { key: "gallery", label: "Galeri", href: "/manage/gallery", publicHref: "/gallery", icon: Images },
     ],
   },
   {

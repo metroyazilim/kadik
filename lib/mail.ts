@@ -18,6 +18,7 @@ export type MailMessage = Readonly<{
   subject: string;
   text: string;
   html: string;
+  attachments?: readonly Readonly<{ filename: string; content: string; contentType: string }>[];
 }>;
 
 const globalForMail = globalThis as unknown as { metroMailTransport?: Transporter | null };
@@ -27,7 +28,8 @@ function resolveTransport(): Transporter | null {
 
   const host = process.env.SMTP_HOST?.trim();
   const user = process.env.SMTP_USER?.trim();
-  const pass = process.env.SMTP_PASS?.trim();
+  // `SMTP_PASSWORD` is accepted as an alias: older .env.local files used that name.
+  const pass = (process.env.SMTP_PASS ?? process.env.SMTP_PASSWORD)?.trim();
   const port = Number.parseInt(process.env.SMTP_PORT?.trim() || "465", 10);
 
   if (!host || !user || !pass || !Number.isFinite(port)) {
@@ -63,6 +65,7 @@ export async function sendMail(message: MailMessage): Promise<boolean> {
       subject: message.subject,
       text: message.text,
       html: message.html,
+      attachments: message.attachments?.map((attachment) => ({ ...attachment })),
     });
     return true;
   } catch (error) {
