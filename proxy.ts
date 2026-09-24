@@ -2,15 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "./lib/session-token";
 
 /**
- * Apex production domain (`kadiklondon.org`) is not launched yet - it must
- * show a static holding page regardless of the requested path, while the
- * real site stays fully reachable on `staging.kadiklondon.org` and every
- * other host (local dev, preview deployments). Comma-separated override via
- * `COMING_SOON_HOSTS` so this never needs a code change to add/remove a
- * domain from the holding-page set.
+ * Optional "coming soon" holding page (`app/coming-soon`). OFF by default:
+ * every host serves the real site. To bring the holding page back for a
+ * domain, set `COMING_SOON_HOSTS` (comma-separated), e.g.
+ * `COMING_SOON_HOSTS="kadiklondon.org,www.kadiklondon.org"`, and restart.
+ * The page itself is kept in the codebase for reuse.
  */
 const COMING_SOON_HOSTS = new Set(
-  (process.env.COMING_SOON_HOSTS ?? "kadiklondon.org,www.kadiklondon.org")
+  (process.env.COMING_SOON_HOSTS ?? "")
     .split(",")
     .map((host) => host.trim().toLowerCase())
     .filter((host) => host.length > 0),
@@ -40,7 +39,7 @@ const PUBLIC_PATHS: Record<string, true> = {
  */
 export async function proxy(request: NextRequest) {
   const host = request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
-  if (COMING_SOON_HOSTS.has(host) && request.nextUrl.pathname !== "/coming-soon") {
+  if (COMING_SOON_HOSTS.size > 0 && COMING_SOON_HOSTS.has(host) && request.nextUrl.pathname !== "/coming-soon") {
     return NextResponse.rewrite(new URL("/coming-soon", request.url));
   }
 
