@@ -70,11 +70,13 @@ function initializeGoogleTranslate(pageLanguage: KadikLocale) {
 }
 
 function getCookieLanguage(pageLanguage: KadikLocale): LanguageCode {
+  // `applyGoogleTranslateCookie` keeps every copy of the cookie in agreement,
+  // so the first one found is the current language.
   const cookie = document.cookie
     .split(";")
     .map((part) => part.trim())
     .find((part) => part.startsWith("googtrans="));
-  const match = cookie?.match(/^googtrans=\/(?:en|tr)\/([a-z]{2})$/);
+  const match = cookie?.match(/^googtrans=\/[a-z]{2}\/([a-z]{2})$/);
   const code = match?.[1];
 
   return LANGUAGES.some((language) => language.code === code)
@@ -82,18 +84,40 @@ function getCookieLanguage(pageLanguage: KadikLocale): LanguageCode {
     : pageLanguage;
 }
 
+/**
+ * Every domain scope a `googtrans` cookie may have been written under:
+ * host-only, the exact host, and each parent domain with and without a
+ * leading dot. Google's own script writes the cookie on the registrable
+ * parent domain (e.g. `.kadiklondon.org`), so clearing only the host copy
+ * left that one behind and the first language picked stuck forever.
+ */
+function cookieDomains(): readonly (string | null)[] {
+  const parts = window.location.hostname.split(".");
+  const domains: (string | null)[] = [null];
+  for (let index = 0; index < parts.length - 1; index += 1) {
+    const domain = parts.slice(index).join(".");
+    domains.push(domain, `.${domain}`);
+  }
+  return domains;
+}
+
 /** Module scope (outside any component/hook): the compiler's render-purity
  * check only tracks mutations reachable from a component/hook body, and
  * `document.cookie = ...` has no non-mutating equivalent - it's the only
  * way the browser exposes cookie writes. */
 function applyGoogleTranslateCookie(pageLanguage: KadikLocale, code: LanguageCode) {
-  if (code === pageLanguage) {
-    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname}`;
-  } else {
-    document.cookie = `googtrans=/${pageLanguage}/${code}; path=/`;
-    document.cookie = `googtrans=/${pageLanguage}/${code}; path=/; domain=${window.location.hostname}`;
+  const domains = cookieDomains();
+  for (const domain of domains) {
+    const scope = domain ? `; domain=${domain}` : "";
+    document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/${scope}`;
   }
+  if (code === pageLanguage) return;
+  const value = `/${pageLanguage}/${code}`;
+  // Host-only plus the widest parent domain, the same place Google writes
+  // it, so both copies always agree.
+  document.cookie = `googtrans=${value}; path=/`;
+  const widest = domains.length > 1 ? domains[domains.length - 1] : null;
+  if (widest) document.cookie = `googtrans=${value}; path=/; domain=${widest}`;
 }
 
 function noopSubscribe() {
