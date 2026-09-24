@@ -357,8 +357,6 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
           text("dateLabel", "Tarih etiketi"),
           text("timeLabel", "Saat etiketi"),
           text("locationLabel", "Yer etiketi"),
-          text("register", "Kayıt butonu"),
-          text("addToCalendar", "Takvime ekle butonu"),
           text("close", "Kapat butonu"),
           text("emailHeading", "E-posta bölümü başlığı"),
           text("emailPlaceholder", "E-posta alanı"),

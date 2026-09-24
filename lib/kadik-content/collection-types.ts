@@ -10,8 +10,6 @@ export type KadikEventView = Readonly<{
   location: string | null;
   /** Sanitised HTML; `null` when empty. */
   descriptionHtml: string | null;
-  image: string | null;
-  registrationUrl: string | null;
 }>;
 
 export type KadikAnnouncementView = Readonly<{

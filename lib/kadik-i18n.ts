@@ -228,8 +228,6 @@ export type KadikDictionary = Readonly<{
     dateLabel: string;
     timeLabel: string;
     locationLabel: string;
-    register: string;
-    addToCalendar: string;
     close: string;
     emailHeading: string;
     emailPlaceholder: string;
@@ -491,16 +489,14 @@ const en: KadikDictionary = {
     dateLabel: "Date",
     timeLabel: "Time",
     locationLabel: "Location",
-    register: "Register",
-    addToCalendar: "Add to calendar",
     close: "Close",
     emailHeading: "Send these details to my email",
     emailPlaceholder: "Your email address",
     emailSubmit: "Send",
     emailSending: "Sending…",
-    emailSuccess: "Sent. Check your inbox for the event details and calendar invite.",
+    emailSuccess: "Sent. Check your inbox for the event details.",
     emailError: "The email could not be sent. Please try again later.",
-    emailUnavailable: "Email sending is not available right now. You can add the event to your calendar instead.",
+    emailUnavailable: "Email sending is not available right now. Please try again later.",
     emailNote: "We only use your address to send this event.",
   },
   membership: {

@@ -12,7 +12,7 @@ export default async function EventEditorPage({ params }: { params: Promise<{ id
       <PageHeader
         eyebrow="Etkinlik"
         title={event?.title ?? "Yeni etkinlik"}
-        description="Başlık ve tarih zorunlu; diğer alanlar doluysa sitedeki etkinlik penceresinde gösterilir."
+        description="Ad ve tarih zorunlu; saat, yer ve açıklama doluysa sitedeki etkinlik penceresinde gösterilir."
         backHref="/manage/events"
         backLabel="Etkinliklere dön"
       />

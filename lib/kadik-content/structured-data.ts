@@ -138,7 +138,7 @@ export function kadikPageGraph(key: KadikContentKey, dict: KadikDictionary, seo:
               address: { "@type": "PostalAddress", addressLocality: dict.organization.locality, addressCountry: dict.organization.countryCode },
             },
             organizer: { "@id": ORG_ID },
-            image: abs(event.image || "/kadik/og/events.png"),
+            image: abs("/kadik/og/events.png"),
             url: `${eventsUrl}?event=${encodeURIComponent(event.id)}`,
           },
         };

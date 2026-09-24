@@ -17,7 +17,6 @@ import { KadikContentError } from "./store";
  * and resolve library images to their current URL.
  */
 
-export const EVENT_MEDIA_SURFACE = "kadik-event";
 export const GALLERY_MEDIA_SURFACE = "kadik-gallery";
 
 async function assetUrls(ids: readonly (string | null)[]): Promise<Map<string, string>> {
@@ -42,22 +41,20 @@ async function safely<T>(fallback: T, read: () => Promise<T>): Promise<T> {
 export function listPublicEvents(): Promise<KadikEventView[]> {
   return safely([], async () => {
     const rows = await prisma.kadikEvent.findMany({ where: { published: true }, orderBy: [{ date: "asc" }, { startTime: "asc" }] });
-    const urls = await assetUrls(rows.map((row) => row.imageAssetId));
-    return rows.map((row) => toEventView(row, urls));
+    return rows.map(toEventView);
   });
 }
 
 export function getPublicEvent(id: string): Promise<KadikEventView | null> {
   return safely(null, async () => {
     const row = await prisma.kadikEvent.findFirst({ where: { id, published: true } });
-    if (!row) return null;
-    return toEventView(row, await assetUrls([row.imageAssetId]));
+    return row ? toEventView(row) : null;
   });
 }
 
 type EventRow = Awaited<ReturnType<typeof prisma.kadikEvent.findFirstOrThrow>>;
 
-function toEventView(row: EventRow, urls: Map<string, string>): KadikEventView {
+function toEventView(row: EventRow): KadikEventView {
   const html = row.description ? sanitizeRichHtml(row.description) : "";
   return {
     id: row.id,
@@ -67,8 +64,6 @@ function toEventView(row: EventRow, urls: Map<string, string>): KadikEventView {
     endTime: row.endTime,
     location: row.location,
     descriptionHtml: stripHtmlToText(html).trim() ? html : null,
-    image: (row.imageAssetId && urls.get(row.imageAssetId)) || row.imageUrl || null,
-    registrationUrl: row.registrationUrl,
   };
 }
 
@@ -122,11 +117,10 @@ export type KadikEventInput = Readonly<{
   endTime?: string;
   location?: string;
   description?: string;
-  imageAssetId?: string | null;
-  registrationUrl?: string;
   published: boolean;
 }>;
 
+/** An event is its name, date, time, place and description - nothing else. */
 export async function saveKadikEvent(id: string | null, input: KadikEventInput, actorId: string): Promise<string> {
   const title = clean(input.title, 200);
   if (!title) throw new KadikContentError("Etkinlik başlığı zorunlu.");
@@ -139,7 +133,6 @@ export async function saveKadikEvent(id: string | null, input: KadikEventInput, 
   if (startTime && endTime && endTime <= startTime) throw new KadikContentError("Bitiş saati başlangıçtan sonra olmalı.");
   const html = sanitizeRichHtml(clean(input.description, 20_000));
   const description = stripHtmlToText(html).trim() ? html : null;
-  const asset = await resolveAsset(input.imageAssetId);
   const data = {
     title,
     date,
@@ -147,16 +140,11 @@ export async function saveKadikEvent(id: string | null, input: KadikEventInput, 
     endTime,
     location: optional(input.location, 300),
     description,
-    imageAssetId: asset?.id ?? null,
-    imageUrl: asset?.url ?? null,
-    registrationUrl: safeUrl(input.registrationUrl, "Kayıt bağlantısı"),
     published: Boolean(input.published),
   };
 
   return prisma.$transaction(async (tx) => {
     const row = id ? await tx.kadikEvent.update({ where: { id }, data }) : await tx.kadikEvent.create({ data });
-    await tx.mediaUsage.deleteMany({ where: { surface: EVENT_MEDIA_SURFACE, field: row.id } });
-    if (asset) await tx.mediaUsage.create({ data: { assetId: asset.id, surface: EVENT_MEDIA_SURFACE, field: row.id } });
     await tx.auditLog.create({ data: { action: id ? "kadik.event.update" : "kadik.event.create", entity: "KadikEvent", entityId: row.id, userId: actorId, metadata: { published: data.published } } });
     return row.id;
   });
@@ -164,7 +152,6 @@ export async function saveKadikEvent(id: string | null, input: KadikEventInput, 
 
 export async function deleteKadikEvent(id: string, actorId: string): Promise<void> {
   await prisma.$transaction([
-    prisma.mediaUsage.deleteMany({ where: { surface: EVENT_MEDIA_SURFACE, field: id } }),
     prisma.kadikEvent.delete({ where: { id } }),
     prisma.auditLog.create({ data: { action: "kadik.event.delete", entity: "KadikEvent", entityId: id, userId: actorId } }),
   ]);
@@ -275,23 +262,17 @@ export type AdminEventRow = Readonly<{
   endTime: string | null;
   location: string | null;
   description: string | null;
-  imageAssetId: string | null;
-  imageUrl: string | null;
-  registrationUrl: string | null;
   published: boolean;
 }>;
 
 export async function listAdminEvents(): Promise<AdminEventRow[]> {
   const rows = await prisma.kadikEvent.findMany({ orderBy: [{ date: "desc" }, { startTime: "desc" }] });
-  const urls = await assetUrls(rows.map((row) => row.imageAssetId));
-  return rows.map((row) => ({ ...pickEvent(row), imageUrl: (row.imageAssetId && urls.get(row.imageAssetId)) || row.imageUrl }));
+  return rows.map(pickEvent);
 }
 
 export async function getAdminEvent(id: string): Promise<AdminEventRow | null> {
   const row = await prisma.kadikEvent.findUnique({ where: { id } });
-  if (!row) return null;
-  const urls = await assetUrls([row.imageAssetId]);
-  return { ...pickEvent(row), imageUrl: (row.imageAssetId && urls.get(row.imageAssetId)) || row.imageUrl };
+  return row ? pickEvent(row) : null;
 }
 
 function pickEvent(row: EventRow): AdminEventRow {
@@ -303,9 +284,6 @@ function pickEvent(row: EventRow): AdminEventRow {
     endTime: row.endTime,
     location: row.location,
     description: row.description,
-    imageAssetId: row.imageAssetId,
-    imageUrl: row.imageUrl,
-    registrationUrl: row.registrationUrl,
     published: row.published,
   };
 }

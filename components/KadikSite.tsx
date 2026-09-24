@@ -341,7 +341,7 @@ function EventEmailForm({ event }: { event: KadikEventView }) {
   </form>;
 }
 
-/** Event details window: every row appears only when the editor filled it in. */
+/** Event details window: name, date, and - only when filled in - time, place and description. */
 function EventDialog({ event, onClose }: { event: KadikEventView | null; onClose: () => void }) {
   const { locale } = useKadikPage();
   const t = useKadikDict().events;
@@ -358,7 +358,6 @@ function EventDialog({ event, onClose }: { event: KadikEventView | null; onClose
   return <dialog ref={dialog} className="kadik-event-modal" aria-labelledby="kadik-event-title" onCancel={onClose} onClick={(click) => { if (click.target === click.currentTarget) onClose(); }}>
     {event && <div className="kadik-event-modal-panel">
       <button className="kadik-event-modal-close" aria-label={t.close} onClick={onClose}>×</button>
-      {event.image && <img className="kadik-event-modal-image" src={event.image} alt="" />}
       <div className="kadik-event-modal-body">
         <h2 id="kadik-event-title">{event.title}</h2>
         <dl className="kadik-event-facts">
@@ -367,10 +366,6 @@ function EventDialog({ event, onClose }: { event: KadikEventView | null; onClose
           {event.location && <div><dt>{t.locationLabel}</dt><dd>{event.location}</dd></div>}
         </dl>
         {event.descriptionHtml && <div className="kadik-event-description" dangerouslySetInnerHTML={{ __html: event.descriptionHtml }} />}
-        <div className="kadik-event-actions">
-          {event.registrationUrl && <a className="kadik-button kadik-button-red" href={event.registrationUrl} target={event.registrationUrl.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">{t.register}<span aria-hidden="true">↗</span></a>}
-          <a className="kadik-button kadik-button-light" href={`/api/kadik/events/${encodeURIComponent(event.id)}/ics`}>{t.addToCalendar}<span aria-hidden="true">↓</span></a>
-        </div>
         <EventEmailForm key={event.id} event={event} />
       </div>
     </div>}
@@ -415,7 +410,6 @@ export function KadikEvents({ locale, dict = KADIK_DICT[locale], events = [], in
     </div>)}</div></div> : <div className="kadik-event-list">{list.map((event) => {
       const time = eventTime(event);
       return <article key={event.id}>
-        {event.image && <img src={event.image} alt="" />}
         <div>
           <time dateTime={event.date}>{formatEventDate(locale, event.date)}{time ? ` · ${time}` : ""}</time>
           <h2>{event.title}</h2>

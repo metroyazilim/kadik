@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ExternalLink, Save, Trash2 } from "lucide-react";
 import { EditorPageLayout } from "@/components/admin/EditorPageLayout";
 import { EditorSection } from "@/components/admin/EditorSection";
-import { MediaField } from "@/components/admin/MediaField";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { useToast } from "@/components/admin/Toast";
 import { card, checkboxInput, cn, dangerLinkButton, fieldHint, fieldInput, fieldLabel, primaryButton, secondaryButton } from "@/components/admin/ui";
@@ -19,8 +18,6 @@ type Form = {
   endTime: string;
   location: string;
   description: string;
-  image: { url: string; assetId: string | null };
-  registrationUrl: string;
   published: boolean;
 };
 
@@ -32,8 +29,6 @@ function initial(event: AdminEventRow | null): Form {
     endTime: event?.endTime ?? "",
     location: event?.location ?? "",
     description: event?.description ?? "",
-    image: { url: event?.imageUrl ?? "", assetId: event?.imageAssetId ?? null },
-    registrationUrl: event?.registrationUrl ?? "",
     published: event?.published ?? true,
   };
 }
@@ -63,8 +58,6 @@ export function EventEditor({ event }: { event: AdminEventRow | null }) {
         endTime: form.endTime,
         location: form.location,
         description: form.description,
-        imageAssetId: form.image.assetId,
-        registrationUrl: form.registrationUrl,
         published: form.published,
       });
       toast(result.message, result.ok ? "success" : "error");
@@ -90,10 +83,10 @@ export function EventEditor({ event }: { event: AdminEventRow | null }) {
     <EditorPageLayout
       main={
         <div className="space-y-4">
-          <EditorSection id="event-basics" title="Temel bilgiler" description="Takvimde ve etkinlik penceresinde görünür." defaultOpen>
+          <EditorSection id="event-basics" title="Temel bilgiler" description="Ad, tarih, saat ve yer; takvimde ve etkinlik penceresinde görünür." defaultOpen>
             <div className="grid gap-5 md:grid-cols-2">
               <div className="md:col-span-2">
-                <label className={fieldLabel} htmlFor="event-title">Başlık *</label>
+                <label className={fieldLabel} htmlFor="event-title">Etkinlik adı *</label>
                 <input id="event-title" className={fieldInput} value={form.title} onChange={(e) => set("title", e.target.value)} maxLength={200} />
               </div>
               <div>
@@ -121,22 +114,6 @@ export function EventEditor({ event }: { event: AdminEventRow | null }) {
             <RichTextEditor label="Açıklama" value={form.description} onChange={(value) => set("description", value)} maxLength={20000} />
           </EditorSection>
 
-          <EditorSection id="event-media" title="Görsel ve kayıt" description="İkisi de isteğe bağlı." defaultOpen>
-            <div className="space-y-5">
-              <MediaField
-                label="Etkinlik görseli"
-                value={form.image.url}
-                assetId={form.image.assetId ?? undefined}
-                contextLabel={form.title}
-                onChange={(payload) => set("image", { url: payload.url, assetId: payload.assetId ?? null })}
-              />
-              <div>
-                <label className={fieldLabel} htmlFor="event-registration">Kayıt / bilet bağlantısı</label>
-                <input id="event-registration" className={fieldInput} inputMode="url" placeholder="https://" value={form.registrationUrl} onChange={(e) => set("registrationUrl", e.target.value)} />
-                <span className={fieldHint}>Doluysa pencerede &quot;Register&quot; butonu çıkar. Site içi sayfa için /membership gibi yazabilirsiniz.</span>
-              </div>
-            </div>
-          </EditorSection>
         </div>
       }
       aside={

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { CalendarDays, Clock, MapPin, Pencil } from "lucide-react";
 import { PageHeader } from "@/components/admin/PageHeader";
-import { RowThumbnail } from "@/components/admin/RowThumbnail";
 import { EmptyState } from "@/components/admin/StateSurfaces";
 import { ToneBadge } from "@/components/admin/StatusBadge";
 import { cn, iconButton, tableWrap } from "@/components/admin/ui";
@@ -21,7 +20,6 @@ function todayKey() {
 function EventRow({ event, past }: { event: AdminEventRow; past: boolean }) {
   return (
     <div className={cn("flex items-center gap-4 px-4 py-3", past && "opacity-70")}>
-      <RowThumbnail url={event.imageUrl} />
       <div className="min-w-0 flex-1">
         <Link href={`/manage/events/${event.id}`} className="block truncate text-sm font-bold text-brand-text hover:text-brand-primary">
           {event.title}
@@ -52,7 +50,7 @@ export default async function EventsAdminPage() {
       <PageHeader
         eyebrow="KADİK İçerikleri"
         title="Etkinlikler"
-        description="Takvimde görünen etkinlikler. Ziyaretçi bir etkinliğe tıkladığında doldurduğunuz bilgiler (saat, yer, açıklama, görsel, kayıt bağlantısı) bir pencerede açılır; boş bıraktıklarınız gösterilmez."
+        description="Takvimde görünen etkinlikler. Ziyaretçi bir etkinliğe tıkladığında adı, tarihi, saati, yeri ve açıklaması bir pencerede açılır; boş bıraktığınız alan gösterilmez."
         actionHref="/manage/events/new"
         actionLabel="Yeni etkinlik"
       />

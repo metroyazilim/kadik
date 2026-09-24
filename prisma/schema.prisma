@@ -584,8 +584,8 @@ model KadikPageContent {
   updatedAt   DateTime @updatedAt
 }
 
-/// KADİK etkinlik takvimi (`/events`). Tarih `YYYY-MM-DD`, saatler `HH:mm`;
-/// boş bırakılan alanlar public etkinlik penceresinde gösterilmez.
+/// KADİK etkinlik takvimi (`/events`): ad, tarih, saat, yer ve açıklama.
+/// Tarih `YYYY-MM-DD`, saatler `HH:mm`; boş alanlar etkinlik penceresinde gösterilmez.
 model KadikEvent {
   id              String   @id @default(cuid())
   title           String
@@ -595,9 +595,6 @@ model KadikEvent {
   location        String?
   /// Sanitised rich-text HTML.
   description     String?
-  imageAssetId    String?
-  imageUrl        String?
-  registrationUrl String?
   published       Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
