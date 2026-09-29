@@ -117,6 +117,7 @@ test("navigation, category query and search", async ({ page }, info) => {
     const mobileNav = page.getByRole("navigation", { name: "Mobile menu" });
     await expect(mobileNav.getByRole("link", { name: "Corporate", exact: true })).toBeVisible();
     await expect(mobileNav.getByRole("link", { name: "Board Members", exact: true })).toBeVisible();
+    await expect(mobileNav.getByRole("link", { name: "Charter", exact: true })).toBeVisible();
     await expect(mobileNav.getByRole("link", { name: "Activities", exact: true })).toBeVisible();
     await expect(mobileNav.getByRole("link", { name: "Events", exact: true })).toBeVisible();
     await expect(mobileNav.getByRole("link", { name: "Announcements", exact: true })).toBeVisible();
@@ -128,10 +129,17 @@ test("navigation, category query and search", async ({ page }, info) => {
     await expect(mainNav.getByRole("link", { name: "Events", exact: true })).toBeVisible();
     await expect(mainNav.getByRole("link", { name: "Announcements", exact: true })).toBeVisible();
     await expect(mainNav.getByRole("link", { name: "News", exact: true }).first()).toBeVisible();
+    await mainNav.getByRole("link", { name: "Corporate", exact: true }).hover();
+    await expect(mainNav.getByRole("link", { name: "About Us", exact: true })).toBeVisible();
+    await expect(mainNav.getByRole("link", { name: "Board Members", exact: true })).toBeVisible();
+    await expect(mainNav.getByRole("link", { name: "Contact", exact: true })).toBeVisible();
+    await expect(mainNav.getByRole("link", { name: "Charter", exact: true })).toBeVisible();
     await expect(page.locator(".kadik-header-inner > .kadik-button")).toHaveCount(0);
     await mainNav.getByRole("link", { name: "News", exact: true }).last().click();
   }
   await expect(page).toHaveURL(KADIK_PATHS.posts.en);
+  await expect(page.getByRole("link", { name: "Made by Metro Yazılım", exact: true })).toHaveAttribute("href", "https://www.metroyazilim.com");
+  await expect(page.locator(".kadik-footer-bottom").getByRole("link", { name: "Charter", exact: true })).toHaveCount(0);
   await expect(page.locator(".kadik-post-card")).toHaveCount(2);
   const filters = page.locator(".kadik-filter-row");
   await filters.getByRole("button", { name: "Article", exact: true }).click();

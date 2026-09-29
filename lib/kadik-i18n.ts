@@ -74,6 +74,7 @@ export type KadikDictionary = Readonly<{
     about: string;
     board: string;
     contact: string;
+    charter: string;
     activities: string;
     events: string;
     announcements: string;
@@ -93,7 +94,6 @@ export type KadikDictionary = Readonly<{
     rightsReserved: string;
     privacy: string;
     terms: string;
-    charter: string;
     socials: Readonly<{ facebook: string; youtube: string; x: string; linkedin: string; instagram: string }>;
   }>;
   breadcrumbHome: string;
@@ -325,6 +325,7 @@ const en: KadikDictionary = {
     about: "About Us",
     board: "Board Members",
     contact: "Contact",
+    charter: "Charter",
     activities: "Activities",
     events: "Events",
     announcements: "Announcements",
@@ -344,7 +345,6 @@ const en: KadikDictionary = {
     rightsReserved: "All rights reserved.",
     privacy: "Privacy",
     terms: "Terms of Use",
-    charter: "Charter",
     socials: { facebook: "#facebook", youtube: "#youtube", x: "#x", linkedin: "", instagram: "" },
   },
   breadcrumbHome: "HOME",

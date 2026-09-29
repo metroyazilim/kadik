@@ -17,6 +17,8 @@ import {
 
 const ASSET_ROOT = "/kadik";
 const BRAND_SHORT = "KADİK";
+const AGENCY_CREDIT_URL = "https://www.metroyazilim.com";
+const AGENCY_CREDIT_LABEL = "Made by Metro Yazılım";
 
 /** BCP 47 tag for `Date#toLocaleDateString`/string comparison helpers. */
 const DATE_LOCALE: Record<KadikLocale, string> = { en: "en-GB" };
@@ -176,6 +178,7 @@ function useNavItems() {
         { label: t.nav.about, href: p("about") },
         { label: t.nav.board, href: p("board") },
         { label: t.nav.contact, href: p("contact") },
+        { label: t.nav.charter, href: p("charter") },
       ],
     },
     {
@@ -200,7 +203,7 @@ function Header() {
   const t = useKadikDict();
   const navItems = useNavItems();
   const [open, setOpen] = useState(false);
-  const isCorporatePage = active === "about" || active === "board" || active === "contact";
+  const isCorporatePage = active === "about" || active === "board" || active === "contact" || active === "charter";
   const isActivityPage = active === "events" || active === "issues" || active === "posts";
   return <header className="kadik-header">
     <div className="kadik-header-inner">
@@ -231,7 +234,7 @@ function Footer() {
     <div><h3>{t.footer.corporate}</h3><Link href={p("about")}>{t.nav.about}</Link><Link href={p("board")}>{t.nav.board}</Link><Link href={p("membership")}>{t.nav.membership}</Link><Link href={p("contact")}>{t.nav.contact}</Link><Link href={p("privacy")}>{t.footer.privacy}</Link></div>
     <div><h3>{t.footer.activities}</h3><Link href={p("events")}>{t.nav.events}</Link><Link href={p("issues")}>{t.nav.announcements}</Link><Link href={p("posts")}>{t.nav.news}</Link><Link href={p("gallery")}>{t.nav.gallery}</Link></div>
     <div><h3>{t.footer.followUs}</h3><p className="kadik-socials">{t.footer.socials.facebook && <Link href={t.footer.socials.facebook} aria-label="Facebook">f</Link>}{t.footer.socials.youtube && <Link href={t.footer.socials.youtube} aria-label="YouTube">▶</Link>}{t.footer.socials.x && <Link href={t.footer.socials.x} aria-label="X">𝕏</Link>}{t.footer.socials.linkedin && <Link href={t.footer.socials.linkedin} aria-label="LinkedIn">in</Link>}{t.footer.socials.instagram && <Link href={t.footer.socials.instagram} aria-label="Instagram">◎</Link>}</p><Button href={p("contact")}>{t.footer.contactCta}</Button></div>
-  </div><div className="kadik-footer-bottom"><span>© 2026 {t.brandFull}. {t.footer.rightsReserved}</span><span><Link href={p("privacy")}>{t.footer.privacy}</Link><Link href={p("terms")}>{t.footer.terms}</Link><Link href={p("charter")}>{t.footer.charter}</Link></span></div></footer>;
+  </div><div className="kadik-footer-bottom"><span>© 2026 {t.brandFull}. {t.footer.rightsReserved}</span><span><Link href={p("privacy")}>{t.footer.privacy}</Link><Link href={p("terms")}>{t.footer.terms}</Link></span></div><div className="kadik-footer-credit"><a href={AGENCY_CREDIT_URL} target="_blank" rel="noopener noreferrer">{AGENCY_CREDIT_LABEL}</a></div></footer>;
 }
 
 function Banner({ title }: { title: string }) {

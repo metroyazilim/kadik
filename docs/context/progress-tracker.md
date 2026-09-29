@@ -1,6 +1,7 @@
 # Progress Tracker
 
 ## KADİK güncel kayıt — 2026-09-24
+- **2026-09-30 — Tüzük navigasyonu ve footer kredisi:** Mevcut `/charter` sayfası Corporate/Yönetim açılır menüsüne eklendi ve charter footer bağlantısı kaldırıldı. Footer altına `Made by Metro Yazılım` metni `https://www.metroyazilim.com` dış bağlantısıyla eklendi. `nav.charter` yönetim içeriği düzenlenebilir alanlarına dahil edildi; artık kullanılmayan `footer.charter` alanı kaldırıldı.
 
 - **Tüm public sayfalar yönetim paneline bağlandı.** Yeni `KadikPageContent` tablosu (migration `20260924120000_kadik_page_content`) her sayfa için tek JSON satırı tutar. Şema/alan tanımı `lib/kadik-content/pages.ts`; doğrulama `sanitize.ts`; okuma/yazma `store.ts`. Public sayfalar (`/`, `/about`, `/board`, `/events`, `/announcements`, `/news`, `/news/[slug]`, `/membership`, `/gallery`, `/contact`, `/privacy-policy`, `/terms`, `/charter`, 404) `getKadikSiteContent()` ile DB içeriğini `lib/kadik-i18n.ts` varsayılanlarının üstüne birleştirir; SEO başlık/açıklama da buradan gelir. Header/footer (marka, menü, footer, sosyal bağlantılar) "Header & Footer" kaydıdır.
 - **Tek giriş noktası:** Sidebar'daki "Ana Sayfa" kaldırıldı; anasayfa dahil her sayfa `/manage/pages` → `/manage/pages/<key>` editöründen düzenlenir. `/manage/home` ve `/manage/site-settings` eski adresleri buraya yönlendirir. Görseller MediaAsset kütüphanesinden seçilir (MediaUsage `surface = "kadik-page"`), listeler dnd-kit ile sıralanır.

@@ -663,6 +663,7 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
           text("about", "Hakkımızda"),
           text("board", "Kurul Üyeleri"),
           text("contact", "İletişim"),
+          text("charter", "Tüzük"),
           text("activities", "Faaliyetler (açılır menü)"),
           text("events", "Etkinlikler"),
           text("announcements", "Duyurular"),
@@ -687,7 +688,6 @@ export const KADIK_PAGE_DEFINITIONS: Readonly<Record<KadikContentKey, KadikPageD
           text("rightsReserved", "Telif yazısı"),
           text("privacy", "Gizlilik bağlantısı"),
           text("terms", "Kullanım şartları bağlantısı"),
-          text("charter", "Tüzük bağlantısı"),
         ],
       },
       {
