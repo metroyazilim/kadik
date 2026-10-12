@@ -58,7 +58,7 @@ function TeamMemberLocaleForm({
       <EditorPageLayout
         main={
           <div className="space-y-4">
-            <EditorSection title="Profil" id="team-profile" description="Public kurul üyesi detayında ve liste kartında görünen temel bilgiler." defaultOpen>
+            <EditorSection title="Profil" id="team-profile" description="Public kurul üyesi detayında ve liste kartında görünen temel bilgiler. Site İngilizce yayınlanır; unvanı İngilizce yazın (ör. Chairman of the Board, Board Member), ziyaretçinin seçtiği dile otomatik çevrilir." defaultOpen>
               <div className="space-y-5">
                 <FieldGrid>
                   <label className={fieldLabel}>

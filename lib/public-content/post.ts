@@ -123,6 +123,22 @@ export async function getPublishedPostByRoute(locale: ContentLocale, slug: strin
   };
 }
 
+/**
+ * A post served only through its Turkish slug until it got its own
+ * translation for `locale` now lives at a different slug, and
+ * `getPublishedPostByRoute` deliberately refuses the old address (stale
+ * alias). Returns the native slug that old address should permanently
+ * redirect to, or `null` when the slug was never a Turkish post route.
+ */
+export async function getPostSlugForTurkishAlias(locale: ContentLocale, turkishSlug: string): Promise<string | null> {
+  if (locale === "tr") return null;
+  const found = await findPublishedPostByRoute(prisma, "tr", POST_COLLECTION_SEGMENTS.tr, turkishSlug);
+  if (!found) return null;
+  const routes = await getPublishedRouteCandidates(prisma, found.entityId);
+  const native = routes.find((route) => route.locale === locale);
+  return native && native.slug !== turkishSlug ? native.slug : null;
+}
+
 /** Returns hreflang candidates only for locales with an actual published route. */
 export async function getPostAlternates(entityId: string): Promise<Readonly<Partial<Record<ContentLocale, string>>>> {
   const routes = await getPublishedRouteCandidates(prisma, entityId);

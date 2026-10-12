@@ -95,5 +95,11 @@ else
   echo "entrypoint: database already has $entities content entities, skipping bootstrap"
 fi
 
+# The public site reads English; without this the seeded board members and
+# posts fell back to their Turkish copy. Records that already have a
+# published English translation (including admin edits) are skipped.
+echo "entrypoint: publishing English board member and post translations (missing ones only)"
+./node_modules/.bin/tsx scripts/seed-kadik-content-en.ts || echo "entrypoint: kadik English content seed failed, continuing"
+
 echo "entrypoint: starting Next.js"
 exec node server.js

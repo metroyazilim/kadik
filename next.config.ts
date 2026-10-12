@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { OPTIMIZED_IMAGE_HOSTS } from "./lib/media/image-hosts";
 
 const securityHeaders = [
   {
@@ -42,6 +43,13 @@ const nextConfig: NextConfig = {
   // The clone contract comes from the generation prompt; a second, generic rule
   // file in the same directory would compete with it.
   agentRules: false,
+  // Public images are served through `/_next/image` (see `lib/kadik-image.ts`).
+  images: {
+    remotePatterns: OPTIMIZED_IMAGE_HOSTS.map(({ hostname }) => ({ protocol: "https" as const, hostname })),
+    // Media object keys are unique per upload and never rewritten, so an
+    // optimized copy can be kept for 30 days.
+    minimumCacheTTL: 2_592_000,
+  },
   // English is the site's only structural locale; there is no `/tr/*`
   // route tree. These rows carry forward the old bare-Turkish Kadik
   // addresses (and the pre-KADIK `/gonulluluk` campaign address) to their

@@ -3,6 +3,7 @@
 import { FormEvent, createContext, useContext, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { KadikMotion } from "./KadikMotion";
+import { kadikBackground, kadikImg } from "@/lib/kadik-image";
 import GoogleTranslateWidget from "./GoogleTranslateWidget";
 import type { PublicTeamMemberListItem } from "@/lib/public-content/team";
 import type { KadikAnnouncementView, KadikEventView, KadikGalleryItemView } from "@/lib/kadik-content/collection-types";
@@ -17,6 +18,10 @@ import {
 
 const ASSET_ROOT = "/kadik";
 const BRAND_SHORT = "KADİK";
+
+/** `sizes` hints for `kadikImg`, following the 640px/1000px grid breakpoints and 1170px container in globals.css. */
+const CARD_SIZES = "(max-width: 640px) 100vw, (max-width: 1000px) 50vw, 400px";
+const CONTENT_WIDTH_SIZES = "(max-width: 1220px) 100vw, 1170px";
 const AGENCY_CREDIT_URL = "https://www.metroyazilim.com";
 const AGENCY_CREDIT_LABEL = "Made by Metro Yazılım";
 
@@ -240,7 +245,7 @@ function Footer() {
 function Banner({ title }: { title: string }) {
   const { locale } = useKadikPage();
   const t = useKadikDict();
-  return <><Header /><section className="kadik-banner"><div className="kadik-banner-overlay" /><div className="kadik-container kadik-banner-content"><h1>{title}</h1><p><Link href={KADIK_PATHS.home[locale]}>{t.breadcrumbHome}</Link><span>›</span>{title.toUpperCase()}</p></div></section></>;
+  return <><Header /><section className="kadik-banner" style={{ backgroundImage: kadikBackground(`${ASSET_ROOT}/is-banner.webp`) }}><div className="kadik-banner-overlay" /><div className="kadik-container kadik-banner-content"><h1>{title}</h1><p><Link href={KADIK_PATHS.home[locale]}>{t.breadcrumbHome}</Link><span>›</span>{title.toUpperCase()}</p></div></section></>;
 }
 
 function Shell({ children, title }: { children: React.ReactNode; title: string }) {
@@ -254,7 +259,7 @@ function BoardPreview({ members }: { members: readonly PublicTeamMemberListItem[
   const t = useKadikDict().home;
   return <section className="kadik-section kadik-board-preview"><div className="kadik-container">
     <div className="kadik-section-heading kadik-board-heading"><span>{t.boardKicker}</span><h2>{t.boardTitle}</h2><p>{t.boardText}</p><Button href={KADIK_PATHS.board[locale]}>{t.boardCta}</Button></div>
-    {members.length > 0 ? <div className="kadik-board-grid">{members.map((member) => <article className="kadik-board-card" key={member.entityId}><img src={member.image.url} alt={member.name} /><div><span>{member.role}</span><h3>{member.name}</h3></div></article>)}</div> : <div className="kadik-board-empty"><strong>{t.boardEmptyTitle}</strong><p>{t.boardEmptyText}</p><Link href={KADIK_PATHS.board[locale]}>{t.boardEmptyLink}</Link></div>}
+    {members.length > 0 ? <div className="kadik-board-grid">{members.map((member) => <article className="kadik-board-card" key={member.entityId}><img {...kadikImg(member.image.url, CARD_SIZES)} alt={member.name} /><div><span>{member.role}</span><h3>{member.name}</h3></div></article>)}</div> : <div className="kadik-board-empty"><strong>{t.boardEmptyTitle}</strong><p>{t.boardEmptyText}</p><Link href={KADIK_PATHS.board[locale]}>{t.boardEmptyLink}</Link></div>}
   </div></section>;
 }
 
@@ -262,10 +267,10 @@ export function KadikHome({ locale, dict = KADIK_DICT[locale], team = [], posts 
   const t = dict;
   const p = (key: KadikPageKey) => KADIK_PATHS[key][locale];
   return <KadikPage locale={locale} active="home" dict={dict}><KadikMotion><Header /><main>
-    <section className="kadik-hero" style={t.home.heroImage.url ? { backgroundImage: `url(${t.home.heroImage.url})` } : undefined}><div className="kadik-hero-overlay" /><div className="kadik-hero-content"><span className="kadik-hero-kicker">{t.home.heroKicker}</span><h1>{t.home.heroTitleLine1}<br />{t.home.heroTitleLine2}</h1><p>{t.home.heroSubtitle}</p><Button href={p("membership")} tone="red">{t.home.heroCta}</Button></div></section>
+    <section className="kadik-hero" style={{ backgroundImage: kadikBackground(t.home.heroImage.url || `${ASSET_ROOT}/is-hero.webp`) }}><div className="kadik-hero-overlay" /><div className="kadik-hero-content"><span className="kadik-hero-kicker">{t.home.heroKicker}</span><h1>{t.home.heroTitleLine1}<br />{t.home.heroTitleLine2}</h1><p>{t.home.heroSubtitle}</p><Button href={p("membership")} tone="red">{t.home.heroCta}</Button></div></section>
     <section className="kadik-section kadik-intro kadik-container"><div><SectionHeading eyebrow={t.home.introEyebrow} title={t.home.introTitle} /></div><div><p className="kadik-lead">{t.home.introLead}</p><p>{t.home.introText}</p><Button href={p("about")}>{t.home.introCta}</Button></div></section>
     <section className="kadik-section kadik-dark-section"><div className="kadik-container"><SectionHeading eyebrow={t.home.principlesEyebrow} title={t.home.principlesTitle} /><div className="kadik-card-grid kadik-card-grid-3">{t.home.principles.map((principle) => <article className="kadik-principle-card" key={principle.title}><span>{principle.number}</span><h3>{principle.title}</h3><p>{principle.text}</p><Link href={p("events")}>{t.home.principlesLink}</Link></article>)}</div></div></section>
-    <section className="kadik-image-band" style={t.home.bandImage.url ? { backgroundImage: `url(${t.home.bandImage.url})` } : undefined}><div className="kadik-image-band-overlay" /><div className="kadik-container"><span className="kadik-image-kicker">{t.home.bandKicker}</span><h2>{t.home.bandTitleLine1}<br />{t.home.bandTitleLine2}</h2><Button href={p("membership")} tone="red">{t.home.bandCta}</Button></div></section>
+    <section className="kadik-image-band" style={t.home.bandImage.url ? { backgroundImage: kadikBackground(t.home.bandImage.url) } : undefined}><div className="kadik-image-band-overlay" /><div className="kadik-container"><span className="kadik-image-kicker">{t.home.bandKicker}</span><h2>{t.home.bandTitleLine1}<br />{t.home.bandTitleLine2}</h2><Button href={p("membership")} tone="red">{t.home.bandCta}</Button></div></section>
     <BoardPreview members={team} />
     <section className="kadik-section kadik-container"><SectionHeading eyebrow={t.home.newsEyebrow} title={t.home.newsTitle} />
       {posts.length > 0 ? <><div className="kadik-post-grid">{posts.slice(0, 3).map((post) => <PostCard key={post.slug} post={post} />)}</div><div className="kadik-center"><Button href={p("posts")}>{t.home.newsCta}</Button></div></> : <p className="kadik-empty-state" role="status">{t.home.newsEmpty}</p>}
@@ -277,14 +282,14 @@ export function KadikBoard({ locale, dict = KADIK_DICT[locale], members }: Kadik
   const t = dict.board;
   return <KadikPage locale={locale} active="board" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
     <div className="kadik-board-intro"><SectionHeading eyebrow={t.introEyebrow} title={t.introTitle} /><p className="kadik-lead">{t.introLead}</p></div>
-    {members.length > 0 ? <div className="kadik-board-grid kadik-board-grid-page">{members.map((member) => <article className="kadik-board-card" key={member.entityId}><img src={member.image.url} alt={member.name} /><div><span>{member.role}</span><h3>{member.name}</h3></div></article>)}</div> : <div className="kadik-board-empty"><strong>{t.emptyTitle}</strong><p>{t.emptyText}</p></div>}
+    {members.length > 0 ? <div className="kadik-board-grid kadik-board-grid-page">{members.map((member) => <article className="kadik-board-card" key={member.entityId}><img {...kadikImg(member.image.url, CARD_SIZES)} alt={member.name} /><div><span>{member.role}</span><h3>{member.name}</h3></div></article>)}</div> : <div className="kadik-board-empty"><strong>{t.emptyTitle}</strong><p>{t.emptyText}</p></div>}
   </section></Shell></KadikPage>;
 }
 
 function PostCard({ post }: { post: KadikPostListItem }) {
   const { locale } = useKadikPage();
   const t = useKadikDict();
-  return <article className="kadik-post-card"><Link href={kadikPostPath(locale, post.slug)}><img src={post.image} alt="" /><div className="kadik-post-card-body"><span>{post.category.toLocaleUpperCase(locale)} · {post.dateLabel}</span><h3>{post.title}</h3><p>{post.excerpt}</p><b>{t.home.readMore}</b></div></Link></article>;
+  return <article className="kadik-post-card"><Link href={kadikPostPath(locale, post.slug)}><img {...kadikImg(post.image, CARD_SIZES)} alt="" /><div className="kadik-post-card-body"><span>{post.category.toLocaleUpperCase(locale)} · {post.dateLabel}</span><h3>{post.title}</h3><p>{post.excerpt}</p><b>{t.home.readMore}</b></div></Link></article>;
 }
 
 export function KadikAbout({ locale, dict = KADIK_DICT[locale] }: KadikPageProps) {
@@ -292,7 +297,7 @@ export function KadikAbout({ locale, dict = KADIK_DICT[locale] }: KadikPageProps
   const boardHref = KADIK_PATHS.board[locale];
   return <KadikPage locale={locale} active="about" dict={dict}><Shell title={t.pageTitle}>
     <section className="kadik-section kadik-container kadik-two-col"><div><SectionHeading title={t.heroTitle} /></div><div><p className="kadik-lead">{t.lead}</p><p>{t.text}</p><Button href={boardHref}>{t.cta}</Button></div></section>
-    {t.image.url && <section className="kadik-container"><img className="kadik-wide-image" src={t.image.url} alt={t.wideImageAlt} /></section>}
+    {t.image.url && <section className="kadik-container"><img className="kadik-wide-image" {...kadikImg(t.image.url, CONTENT_WIDTH_SIZES)} alt={t.wideImageAlt} /></section>}
     <section className="kadik-section kadik-stats"><div className="kadik-container"><SectionHeading eyebrow={t.statsEyebrow} title={t.statsTitle} /><div className="kadik-stat-grid">{t.stats.map((stat) => <div key={stat.label}><strong>{stat.number}</strong><span>{stat.label}</span></div>)}</div></div></section>
     <section className="kadik-section kadik-container"><SectionHeading eyebrow={t.storyEyebrow} title={t.storyTitle} /><div className="kadik-timeline">{t.timeline.map((entry) => <article key={entry.year}><span>{entry.year}</span><div><h3>{entry.title}</h3><p>{entry.text}</p></div></article>)}</div></section>
   </Shell></KadikPage>;
@@ -484,7 +489,7 @@ function ArticleBlocks({ blocks }: { blocks: readonly KadikArticleBlock[] }) {
         // Panel tarafında `validateAndSanitizeRichText` ile temizlenmiş HTML.
         return <section key={index} dangerouslySetInnerHTML={{ __html: block.html }} />;
       case "image":
-        return <figure className="kadik-figure" key={index}><img src={block.url} alt={block.caption ?? ""} />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>;
+        return <figure className="kadik-figure" key={index}><img {...kadikImg(block.url, CONTENT_WIDTH_SIZES)} alt={block.caption ?? ""} />{block.caption && <figcaption>{block.caption}</figcaption>}</figure>;
       case "kpi":
         return <section key={index}>{block.heading && <h2>{block.heading}</h2>}<div className="kadik-kpi-block">{block.items.map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div></section>;
       case "quote":
@@ -499,7 +504,7 @@ export function KadikPostDetail({ locale, dict = KADIK_DICT[locale], post }: Kad
   const t = dict.article;
   return <KadikPage locale={locale} active="post" dict={dict}><Shell title={post.title}><article className="kadik-section kadik-container kadik-article">
     <div className="kadik-article-meta">{post.category.toLocaleUpperCase(locale)} · {post.dateLabel} · {post.author.toLocaleUpperCase(locale)}</div>
-    <img className="kadik-article-image" src={post.image} alt="" />
+    <img className="kadik-article-image" {...kadikImg(post.image, CONTENT_WIDTH_SIZES)} alt="" />
     {post.excerpt && <p className="kadik-lead">{post.excerpt}</p>}
     <ArticleBlocks blocks={post.blocks} />
     <div className="kadik-article-tags">{t.tagsLabel} <span>{post.category.toLocaleUpperCase(locale)}</span><span>{t.brandTag}</span><span>{t.industryTag}</span></div>
@@ -549,9 +554,9 @@ export function KadikGallery({ locale, dict = KADIK_DICT[locale], items = [] }: 
   return <KadikPage locale={locale} active="gallery" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
     <div className="kadik-gallery-filter">{[t.all, ...categories].map((category) => <button key={category} aria-pressed={filter === category} className={filter === category ? "is-selected" : ""} onClick={() => setFilter(category)}>{category}</button>)}</div>
     {items.length === 0 && <p className="kadik-empty-state" role="status">{t.empty}</p>}
-    <div className="kadik-gallery-grid">{items.map((item, index) => ({ ...item, index })).filter((item) => filter === t.all || item.category === filter).map(({ id, image, index, category, caption }) => <button key={id} aria-label={caption || `${category} ${index + 1}`} onClick={() => setActive(image)}><img src={image} alt={caption} /><span>{String(index + 1).padStart(2, "0")}</span></button>)}</div>
+    <div className="kadik-gallery-grid">{items.map((item, index) => ({ ...item, index })).filter((item) => filter === t.all || item.category === filter).map(({ id, image, index, category, caption }) => <button key={id} aria-label={caption || `${category} ${index + 1}`} onClick={() => setActive(image)}><img {...kadikImg(image, CARD_SIZES)} alt={caption} /><span>{String(index + 1).padStart(2, "0")}</span></button>)}</div>
   </section><dialog ref={dialog} className="kadik-lightbox" aria-label={t.lightboxAria} onCancel={() => setActive(null)} onClick={(event) => { if (event.target === event.currentTarget) setActive(null); }}>
-    <button autoFocus aria-label={t.close} onClick={() => setActive(null)}>×</button>{active && <img src={active} alt={t.enlargedAlt} />}
+    <button autoFocus aria-label={t.close} onClick={() => setActive(null)}>×</button>{active && <img {...kadikImg(active, "100vw")} alt={t.enlargedAlt} />}
   </dialog></Shell></KadikPage>;
 }
 

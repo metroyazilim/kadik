@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { KadikPostDetail } from "@/components/KadikSite";
 import { KadikJsonLd } from "@/components/KadikJsonLd";
 import { getKadikSiteContent } from "@/lib/kadik-content/store";
 import { kadikArticleGraph } from "@/lib/kadik-content/structured-data";
 import { getKadikPost } from "@/lib/public-content/kadik-view";
-import { getPublishedPostByRoute } from "@/lib/public-content/post";
+import { getPostSlugForTurkishAlias, getPublishedPostByRoute } from "@/lib/public-content/post";
 import { SITE_URL } from "@/lib/i18n/config";
 import { kadikPostPath } from "@/lib/kadik-i18n";
 
@@ -48,7 +48,13 @@ export default async function KadikPostPage({ params }: { params: Params }) {
     getPublishedPostByRoute(LOCALE, slug).catch(() => null),
     getKadikSiteContent(),
   ]);
-  if (!post || !detail) notFound();
+  if (!post || !detail) {
+    // An article first published in Turkish keeps its old address alive by
+    // redirecting to the English slug it was given later.
+    const nativeSlug = await getPostSlugForTurkishAlias(LOCALE, slug).catch(() => null);
+    if (nativeSlug) permanentRedirect(encodeURI(kadikPostPath(LOCALE, nativeSlug)));
+    notFound();
+  }
   const article = kadikArticleGraph(dict, {
     slug,
     title: detail.seoTitle?.trim() || detail.title,

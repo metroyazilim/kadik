@@ -59,7 +59,7 @@ function PostLocaleForm({
       <EditorPageLayout
         main={
           <div className="space-y-4">
-            <EditorSection title="Temel bilgiler" id="post-basics" description="Haber listesi, detay sayfası ve adres bilgileri." defaultOpen>
+            <EditorSection title="Temel bilgiler" id="post-basics" description="Haber listesi, detay sayfası ve adres bilgileri. Site İngilizce yayınlanır; metinleri İngilizce yazın, ziyaretçinin seçtiği dile otomatik çevrilir." defaultOpen>
               <div className="space-y-5">
                 <FieldGrid>
                   <label className={fieldLabel}>
