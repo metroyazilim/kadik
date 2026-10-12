@@ -25,7 +25,7 @@ test("public images are served from our own origin and all load", async ({ page 
     const sources = await page.$$eval("main img", (nodes) => nodes.map((node) => node.getAttribute("src") ?? ""));
     expect(sources.filter((src) => /^https?:\/\//.test(src)), path).toEqual([]);
     await expect
-      .poll(() => page.$$eval("main img", (nodes) => nodes.filter((node) => !(node.complete && node.naturalWidth > 0)).length), { message: path })
+      .poll(() => page.$$eval("main img", (nodes) => (nodes as HTMLImageElement[]).filter((node) => !(node.complete && node.naturalWidth > 0)).length), { message: path })
       .toBe(0);
   }
 });
