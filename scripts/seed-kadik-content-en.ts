@@ -7,8 +7,8 @@
  * `adminPublish` path the admin panel itself uses.
  *
  * Usage: npx tsx scripts/seed-kadik-content-en.ts
- * Idempotent: an entity that already has a published English translation
- * is skipped.
+ * Idempotent: an entity whose published English translation is already
+ * translated is skipped (see `publishEnglishTeamMember` for the repair case).
  */
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../lib/db";
@@ -154,22 +154,20 @@ const POSTS_EN: readonly {
   },
 ];
 
+/**
+ * Publishes the English board member translation, or repairs one that only
+ * carries the untranslated Turkish copy: uploading a photo in the admin
+ * panel (which edits English) created English translations whose role and
+ * bio were still the Turkish seed text. Only a field that is still
+ * identical to the Turkish one is replaced; everything else the admin set
+ * (photo, contact details, edited text) is kept.
+ */
 async function publishEnglishTeamMember(context: AdminContext, slug: string, role: string, bio: string): Promise<void> {
-  const existingEn = await prisma.contentRoute.findFirst({
-    where: { contentType: TEAM_MEMBER_CONTENT_TYPE, locale: EN, collectionSegment: "team" },
-    select: { entityId: true },
-  });
   const route = await prisma.contentRoute.findUnique({
     where: { contentType_locale_collectionSegment_slug: { contentType: TEAM_MEMBER_CONTENT_TYPE, locale: "tr", collectionSegment: "ekip", slug } },
     select: { entityId: true },
   });
   if (!route) { console.warn(`- tr entity not found for team slug: ${slug}`); return; }
-
-  const alreadyEn = await prisma.contentTranslation.findUnique({
-    where: { entityId_locale: { entityId: route.entityId, locale: EN } },
-    select: { publishedRevisionId: true },
-  });
-  if (alreadyEn?.publishedRevisionId) { console.log(`- skipped (already EN published): ${slug}`); return; }
 
   const trTranslation = await prisma.contentTranslation.findUnique({
     where: { entityId_locale: { entityId: route.entityId, locale: "tr" } },
@@ -178,7 +176,26 @@ async function publishEnglishTeamMember(context: AdminContext, slug: string, rol
   const trPayload = trTranslation?.publishedRevision?.payload as unknown as TeamMemberPayload | undefined;
   if (!trPayload) { console.warn(`- no published tr payload for: ${slug}`); return; }
 
-  const payload: TeamMemberPayload = { ...trPayload, role, bio, seoTitle: null, seoDescription: null };
+  const enTranslation = await prisma.contentTranslation.findUnique({
+    where: { entityId_locale: { entityId: route.entityId, locale: EN } },
+    include: { publishedRevision: true },
+  });
+  const enPayload = enTranslation?.publishedRevision?.payload as unknown as TeamMemberPayload | undefined;
+
+  let payload: TeamMemberPayload;
+  if (enPayload) {
+    const untranslatedRole = enPayload.role === trPayload.role;
+    const untranslatedBio = enPayload.bio === trPayload.bio;
+    if (!untranslatedRole && !untranslatedBio) { console.log(`- skipped (already EN published): ${slug}`); return; }
+    payload = { ...enPayload, role: untranslatedRole ? role : enPayload.role, bio: untranslatedBio ? bio : enPayload.bio };
+  } else {
+    payload = { ...trPayload, role, bio, seoTitle: null, seoDescription: null };
+  }
+
+  const enRoute = await prisma.contentRoute.findFirst({
+    where: { entityId: route.entityId, contentType: TEAM_MEMBER_CONTENT_TYPE, locale: EN },
+    select: { slug: true },
+  });
   const translation = await ensureLocaleTranslation(prisma, context, route.entityId, EN);
   const draft = await adminSaveDraft(prisma, context, {
     translationId: translation.translationId,
@@ -191,12 +208,12 @@ async function publishEnglishTeamMember(context: AdminContext, slug: string, rol
     prisma,
     context,
     { translationId: translation.translationId, expectedVersion: draft.translation.version, expectedDraftRevisionId: draft.revisionId },
-    { candidate: teamMemberRouteCandidate(EN, slug) },
+    { candidate: teamMemberRouteCandidate(EN, enRoute?.slug ?? slug) },
     { recorder: persistedOutboxRecorder, tags: [contentEntityTag(route.entityId), contentAvailabilityTag(route.entityId, EN), "team-member:collection", seoIndexTag()] },
   );
   if (!published.ok) throw new Error(`Publish failed for ${slug}`);
   await syncFieldMediaUsage(prisma, { entityId: route.entityId, locale: EN, surface: TEAM_MEMBER_CONTENT_TYPE, field: "image", assetIds: [payload.imageAssetId] });
-  console.log(`+ EN published: ${slug} (${role})${existingEn ? "" : ""}`);
+  console.log(`${enPayload ? "~ EN repaired" : "+ EN published"}: ${slug} (${payload.role})`);
 }
 
 async function publishEnglishPost(context: AdminContext, input: (typeof POSTS_EN)[number]): Promise<void> {
