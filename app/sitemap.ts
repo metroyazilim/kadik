@@ -3,6 +3,7 @@ import { SITE_URL } from "@/lib/i18n/config";
 import { KADIK_CONTENT_KEYS, KADIK_PAGE_DEFINITIONS } from "@/lib/kadik-content/pages";
 import { kadikPostPath } from "@/lib/kadik-i18n";
 import { listPublishedPosts } from "@/lib/public-content/post";
+import { listPublishedTeamMembers } from "@/lib/public-content/team";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +20,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [{ url: `${SITE_URL}${path === "/" ? "/" : path}`, changeFrequency: path === "/" || path === "/news" || path === "/events" ? "weekly" : "monthly", priority: PRIORITY[path] ?? 0.5 }];
   });
   const posts = await listPublishedPosts("en").catch(() => []);
+  const members = await listPublishedTeamMembers("en").catch(() => []);
   return [
     ...pages,
+    ...(members.some(member => member.name.trim().toLowerCase() === "bob farmer") ? [{ url: `${SITE_URL}/board/bob-farmer`, changeFrequency: "monthly" as const, priority: 0.7 }] : []),
     ...posts.map((post) => ({ url: `${SITE_URL}${kadikPostPath("en", post.slug)}`, lastModified: post.publishedAt, changeFrequency: "monthly" as const, priority: 0.7 })),
   ];
 }

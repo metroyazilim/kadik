@@ -282,8 +282,32 @@ export function KadikBoard({ locale, dict = KADIK_DICT[locale], members }: Kadik
   const t = dict.board;
   return <KadikPage locale={locale} active="board" dict={dict}><Shell title={t.pageTitle}><section className="kadik-section kadik-container">
     <div className="kadik-board-intro"><SectionHeading eyebrow={t.introEyebrow} title={t.introTitle} /><p className="kadik-lead">{t.introLead}</p></div>
+    {members.some(member => member.name.trim().toLowerCase() === "bob farmer") && <p><Link href="/board/bob-farmer" className="kadik-button">Bob Farmer: role and publications</Link></p>}
     {members.length > 0 ? <div className="kadik-board-grid kadik-board-grid-page">{members.map((member) => <article className="kadik-board-card" key={member.entityId}><img {...kadikImg(member.image.url, CARD_SIZES)} alt={member.name} /><div><span>{member.role}</span><h3>{member.name}</h3></div></article>)}</div> : <div className="kadik-board-empty"><strong>{t.emptyTitle}</strong><p>{t.emptyText}</p></div>}
   </section></Shell></KadikPage>;
+}
+
+export function KadikPersonProfile({ locale, dict = KADIK_DICT[locale], member }: KadikPageProps & { member: PublicTeamMemberListItem }) {
+  return <KadikPage locale={locale} active="board" dict={dict}><Shell title={member.name}>
+    <section className="kadik-section kadik-container">
+      <nav aria-label="Breadcrumb"><Link href="/">Home</Link> / <Link href="/board">Board members</Link> / {member.name}</nav>
+      <article className="kadik-two-col">
+        <img {...kadikImg(member.image.url, CARD_SIZES)} alt={member.name} />
+        <div>
+          <h2>{member.role}, KADİK London</h2>
+          <p className="kadik-lead">KADİK London’s published board list presents Bob Farmer as {member.role.toLowerCase()}. The council brings together people working across business and international cooperation.</p>
+          <p>This profile connects the council’s role information with his journalism and other public profiles. His 1TVTR archive lists published articles carrying his visible byline.</p>
+          <h3>Biography and publications</h3>
+          <ul>
+            <li><a href="https://www.1tvtr.com/yazar/bob-farmer">Bob Farmer’s articles at 1TVTR</a></li>
+            <li><a href="https://www.bobfarmer.org/">Bob Farmer’s personal website</a></li>
+            <li><a href="https://www.wpfuk.org/about/bob-farmer">World Press Federation UK profile</a></li>
+          </ul>
+          <p>For the council’s work, visit <Link href="/about">About KADİK London</Link> or view all <Link href="/board">board members</Link>.</p>
+        </div>
+      </article>
+    </section>
+  </Shell></KadikPage>;
 }
 
 function PostCard({ post }: { post: KadikPostListItem }) {
