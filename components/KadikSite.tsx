@@ -291,9 +291,9 @@ export function KadikPersonProfile({ locale, dict = KADIK_DICT[locale], member }
   return <KadikPage locale={locale} active="board" dict={dict}><Shell title={member.name}>
     <section className="kadik-section kadik-container">
       <nav aria-label="Breadcrumb"><Link href="/">Home</Link> / <Link href="/board">Board members</Link> / {member.name}</nav>
-      <article className="kadik-two-col">
+      <article className="kadik-two-col kadik-person-profile">
         <img {...kadikImg(member.image.url, CARD_SIZES)} alt={member.name} />
-        <div>
+        <div className="kadik-person-copy">
           <h2>{member.role}, KADİK London</h2>
           <p className="kadik-lead">KADİK London’s published board list presents Bob Farmer as {member.role.toLowerCase()}. The council brings together people working across business and international cooperation.</p>
           <p>This profile connects the council’s role information with his journalism and other public profiles. His 1TVTR archive lists published articles carrying his visible byline.</p>
