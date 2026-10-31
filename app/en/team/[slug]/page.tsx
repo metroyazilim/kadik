@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
 import { TeamMemberDetail, generateTeamMemberMetadata } from "@/lib/public-pages/team-member-detail";
 
 const LOCALE = "en" as const;
@@ -11,5 +12,6 @@ export function generateMetadata({ params }: { params: Params }): Promise<Metada
 
 export default async function EnglishTeamMemberPage({ params }: { params: Params }) {
   const { slug } = await params;
+  if (slug === "bob-farmer") permanentRedirect("/board/bob-farmer");
   return <TeamMemberDetail locale={LOCALE} slug={slug} />;
 }

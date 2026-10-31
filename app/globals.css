@@ -236,6 +236,13 @@ button, input, textarea, select { font: inherit; }
 .kadik-banner p { margin: 0; color: #99aef2; font-size: 11px; font-weight: 700; letter-spacing: 3px; }
 .kadik-banner p a { color: #fff; }.kadik-banner p span { padding: 0 14px; color: #b7bdcb; }
 .kadik-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 95px; }
+.kadik-person-profile { align-items: start; gap: 48px; margin-top: 28px; }
+.kadik-person-profile > img { display: block; width: 100%; height: auto; }
+.kadik-person-copy { display: grid; gap: 22px; max-width: 70ch; }
+.kadik-person-copy h2 { font-family: var(--kadik-serif); font-size: clamp(26px, 3vw, 36px); line-height: 1.2; }
+.kadik-person-copy h3 { font-size: 20px; font-weight: 700; }
+.kadik-person-copy a { color: var(--kadik-blue); text-decoration: underline; text-underline-offset: 3px; }
+.kadik-person-copy ul { display: grid; gap: 12px; padding-left: 22px; list-style: disc; }
 .kadik-two-col > div:last-child > p { color: #5b5e6c; font-size: 18px; line-height: 1.7; }
 .kadik-wide-image { display: block; width: 100%; max-height: 580px; object-fit: cover; }
 .kadik-stats { background: #f4f4f4; }.kadik-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 70px; }.kadik-stat-grid div { display: grid; gap: 10px; border-top: 3px solid var(--kadik-red); padding-top: 20px; }.kadik-stat-grid strong { color: var(--kadik-ink); font-family: var(--kadik-serif); font-size: 60px; }.kadik-stat-grid span { color: var(--kadik-muted); font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
