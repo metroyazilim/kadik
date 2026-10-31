@@ -183,6 +183,8 @@ Her spec tamamlanmadan sonraki spec'e geçilmez:
 
 ## Session Notes
 
+- 2026-10-31: KADIK CI eklendi: Node 22, temiz npm kurulumu, Prisma generate, typecheck, lint, unit/integration ve build. Test verisi yalnız CI PostgreSQL kadik_test içinde, build bağlantısından ayrı tutulur; üretim seed/reset yok. Bob Farmer profil ve eski URL yönlendirme commitleri korunur. CI sonucu ayrıca doğrulanmalıdır; GSC sitemap Success görülmesi bütün URLlerin indekslendiği anlamına gelmez.
+
 - Yerel geliştirme: Next.js 16.3.4 + Turbopack, PostgreSQL `localhost:5432/extech`.
 - Extech dev server bu güncelleme sırasında port 3900 üzerinde çalıştı; tarayıcıda `/manage/home` üzerinden hero metin/buton/link, süreç adımı ikonu (medya yükleme dahil) ve hizmet bölümünün grid/adet/seçim ayarları düzenlenip yayınlandı, public anasayfada doğrulandı ve test verisi geri alındı. `/manage/pages/copy/faq` düzenlemesi `/sss` sayfasında görüldü ve geri alındı.
 - Port 3000 başka proje tarafından kullanılabilir; uygulama doğrulamasında working directory kontrol edilir.
