@@ -303,6 +303,11 @@ export function KadikPersonProfile({ locale, dict = KADIK_DICT[locale], member }
             <li><a href="https://www.bobfarmer.org/">Bob Farmer’s personal website</a></li>
             <li><a href="https://www.wpfuk.org/about/bob-farmer">World Press Federation UK profile</a></li>
           </ul>
+          <h3>Coverage on 1TVTR (Turkish)</h3>
+          <ul>
+            <li><a lang="tr" href="https://www.1tvtr.com/genel/izmirli-ali-celal-ayter-gazeteci-bob-farmer-baskanligindaki-kadik-london-yonetiminde">Ali Celal Ayter, Bob Farmer başkanlığındaki KADİK London’da</a></li>
+            <li><a lang="tr" href="https://www.1tvtr.com/genel/bob-farmer-medya-is-dunyasi-1tvtr-wpfuk-kadik-london">Bob Farmer’ın medya ve iş dünyasındaki çalışmaları: 1TVTR, WPFUK ve KADİK London</a></li>
+          </ul>
           <p>For the council’s work, visit <Link href="/about">About KADİK London</Link> or view all <Link href="/board">board members</Link>.</p>
         </div>
       </article>
